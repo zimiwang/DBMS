@@ -10,24 +10,23 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="include">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+      <UniqueIdentifier>{8539dc44-e94a-4f29-9aca-475dbb51be2d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="database.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="filehelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="parser.h">
+    <ClInclude Include="utils.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="table.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="utils.h">
+    <ClInclude Include="parser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="filehelper.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="database.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

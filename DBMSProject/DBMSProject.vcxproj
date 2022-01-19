@@ -116,10 +116,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\dc7-2\source\repos\DBMSProject\DBMSProject;C:\Users\dc7-2\source\repos\DBMSProject\DBMSProject\data;C:\Users\dc7-2\source\repos\DBMSProject\DBMSProject\source;C:\Users\dc7-2\source\repos\DBMSProject\DBMSProject\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\dc7-2\source\repos\DBMSProject\DBMSProject;C:\Users\dc7-2\source\repos\DBMSProject\DBMSProject\data;C:\Users\dc7-2\source\repos\DBMSProject\DBMSProject\include;C:\Users\dc7-2\source\repos\DBMSProject\DBMSProject\source;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
