@@ -23,12 +23,21 @@ public:
 
 };
 
-// Private Functions
+/// <summary>
+/// Compares if filename size is greater than ext
+/// </summary>
+/// <param name="filename">filename</param>
+/// <param name="ext">ext</param>
+/// <returns>True if filename is greater than ext</returns>
 bool FileHelper::CheckExtension(std::string filename, std::string ext) {
 	return filename.size() >= ext.size() && 0 == filename.compare(filename.size() - ext.size(), ext.size(), ext);
 }
 
-// Public Functions
+/// <summary>
+/// prints out a list of files in a directory with a file extension
+/// </summary>
+/// <param name="directory">The directory to print</param>
+/// <param name="ext">the extension of the files to be printed</param>
 void FileHelper::listfiles(std::string directory, std::string ext) {
 	DIR* di;
 	char* ptr1, * ptr2;
@@ -57,6 +66,12 @@ void FileHelper::listfiles(std::string directory, std::string ext) {
 	}
 }
 
+/// <summary>
+/// Reads a file from a directory
+/// </summary>
+/// <param name="dir">The directory to look in</param>
+/// <param name="filename">The name of the file to open</param>
+/// <returns>A string of the file content</returns>
 std::string FileHelper::readfile(std::string dir, std::string filename) {
 	std::string ret = "";
 	std::ifstream file("data/" + filename);
@@ -72,6 +87,13 @@ std::string FileHelper::readfile(std::string dir, std::string filename) {
 	return ret;
 }
 
+/// <summary>
+/// Writes to a file
+/// </summary>
+/// <param name="contents">The content to write</param>
+/// <param name="filename">The name of the file</param>
+/// <param name="isbinary"></param>
+/// <returns>A string saying "closed"</returns>
 std::string FileHelper::writefile(std::string contents, std::string filename, bool isbinary) {
 	std::ofstream out(filename);
 
