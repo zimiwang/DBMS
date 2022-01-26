@@ -13,13 +13,13 @@ namespace Utils {
 
 	std::string WHITESPACE = " \n\r\t\f\v";
 
-	/**
-	* FUNCTION: split
-	* USE: Splits a string into tokens and saves them into a vector
-	* @param source: String to be broken up into substrings (tokens)
-	* @param delimiters: String containing the delimiter character(s)
-	* @return: A vector containing all the found tokens in the string
-	*/
+
+	/// <summary>
+	/// Splits a string into tokens and saves them into a vector
+	/// </summary>
+	/// <param name="source">String to be broken up into substrings (tokens)</param>
+	/// <param name="delimiters">String containing the delimiter character(s)</param>
+	/// <returns>A vector containing all the found tokens in the string</returns>
 	std::vector<std::string> split(const std::string& source, const std::string& delimiters = " ") {
 		std::size_t prev = 0;
 		std::size_t currentPos = 0;
@@ -37,9 +37,13 @@ namespace Utils {
 		return results;
 	}
 
-	/// Author: Andrew Nunez
-	/// 10-20-2021
-	/// Removes the specified char from the string
+
+	/// <summary>
+	/// Rmoves the specified char from the string
+	/// </summary>
+	/// <param name="str">The string to be used</param>
+	/// <param name="delim">The char to remove</param>
+	/// <returns>The string without the char</returns>
 	std::string remove_char(std::string str, char delim)
 	{
 		str.erase(std::remove(str.begin(), str.end(), delim), str.end());
@@ -47,34 +51,48 @@ namespace Utils {
 		return str;
 	}
 
-	/// Author: Andrew Nunez
-	/// 10-20-2021
+
+	
+	/// <summary>
 	/// Trims whitespace from the left side of the string
+	/// </summary>
+	/// <param name="s">The string to remove whitespace from</param>
+	/// <returns>The string without the whitespace</returns>
 	std::string ltrim(const std::string& s)
 	{
 		size_t start = s.find_first_not_of(WHITESPACE);
 		return (start == std::string::npos) ? "" : s.substr(start);
 	}
 
-	/// Author: Andrew Nunez
-	/// 10-20-2021
+	
+	/// <summary>
 	/// Trims whitespace from the right side of the string
+	/// </summary>
+	/// <param name="s">The string to remove whitespace from</param>
+	/// <returns>The string without the whitespace</returns>
 	std::string rtrim(const std::string& s)
 	{
 		size_t end = s.find_last_not_of(WHITESPACE);
 		return (end == std::string::npos) ? "" : s.substr(0, end + 1);
 	}
 
-	/// Author: Andrew Nunez
-	/// 10-20-2021
+	
+	/// <summary>
 	/// Trims whitespace from both sides of the string
+	/// </summary>
+	/// <param name="s">The string to remove whitespace from</param>
+	/// <returns>The string without the whitespace</returns>
 	std::string trim(const std::string& s) {
 		return rtrim(ltrim(s));
 	}
 
-	/// Author: Andrew Nunez
-	/// 12-04-2021
+
+	/// <summary>
 	/// Determines if a string is a substring of another
+	/// </summary>
+	/// <param name="str">The string to compare</param>
+	/// <param name="subStr">The substring to find</param>
+	/// <returns>True if the substring is a substring of the string to compare. False otherwise</returns>
 	bool contains(std::string str, std::string subStr) {
 		bool ret = false;
 
@@ -86,9 +104,15 @@ namespace Utils {
 
 	}
 
-	/// Author: Andrew Nunez
-	/// 12-08-2021
-	/// Get a the first occurance of a string between the first occurence of two other strings
+	
+	
+	/// <summary>
+	/// Get the first occurance of a string between the first occurence of two other strings
+	/// </summary>
+	/// <param name="str">The string to use</param>
+	/// <param name="start">The string of where it will start</param>
+	/// <param name="end">The string of where it will end</param>
+	/// <returns>The first occurance of a string between the start string and the end string</returns>
 	std::string get_string_between_two_strings(const std::string str, const std::string start, const std::string end)
 	{
 		signed first_delim_pos = str.find(start);

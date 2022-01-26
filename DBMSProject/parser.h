@@ -25,6 +25,12 @@ public:
 };
 
 /// Converts a string to lower
+
+/// <summary>
+/// Converts a given string to lowercase.
+/// </summary>
+/// <param name="s">String to be converted to lowercase.</param>
+/// <returns>S but lowercase.</returns>
 std::string Parser::to_lower(std::string s)
 {
 	std::for_each(s.begin(), s.end(), [](char& c)
@@ -36,6 +42,12 @@ std::string Parser::to_lower(std::string s)
 /// Author: Andrew
 /// Date: 11-28-2021
 /// Parses an update command
+
+/// <summary>
+/// Parses command line input for valid command clause i.e. splits from "=".
+/// </summary>
+/// <param name="cmd">Command string passed in to be parsed.</param>
+/// <returns>update clause</returns>
 vector<string> Parser::get_update_clause(string cmd) {
 	smatch sm;
 	vector<string> ret;
@@ -71,6 +83,13 @@ vector<string> Parser::get_update_clause(string cmd) {
 /// Author: Andrew
 /// Date: 11-28-2021
 /// Get's the where clause parameters for a select or update statement
+
+/// <summary>
+/// parses "where" command and the clause to be searched for
+/// </summary>
+/// <param name="cmd">overall command passed in</param>
+/// <param name="op">operator passed in</param>
+/// <returns>returns where clause</returns>
 vector<string> Parser::get_where_clause(string cmd, string op) {
 	smatch sm;
 	vector<string> ret;
@@ -101,6 +120,13 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 /// Author: Andrew
 /// Date: 09-28-2021
 /// Splits the provided string on the specified delimiter
+
+/// <summary>
+/// Splits a string on a delimeter
+/// </summary>
+/// <param name="str">string to be split</param>
+/// <param name="delim">where to split it</param>
+/// <returns>split string array</returns>
 std::string* Parser::split_str(std::string str, char delim) {
 	int size = std::count(str.begin(), str.end(), delim) + 1;
 	std::string* ret = new std::string[size];
@@ -118,7 +144,14 @@ std::string* Parser::split_str(std::string str, char delim) {
 
 /// Author: Andrew
 /// Date: 11-15-2021
-/// Splits the provided string on the specified delimiter
+/// Splits the provided string on the specified delimiter - it obviously does not do this lol
+
+/// <summary>
+/// Appears to figure out whether or not what is asked to be inserted into a table is possible
+/// </summary>
+/// <param name="cmd">what to do</param>
+/// <param name="table_name">where to put it</param>
+/// <returns>string vector of column</returns>
 vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	smatch sm;
 	vector<string> ret;
@@ -153,6 +186,12 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 /// Author: Andrew
 /// Date: 12-12-2021
 /// Gets the conditional statement from a command
+
+/// <summary>
+/// parses command for condition
+/// </summary>
+/// <param name="stm">statement</param>
+/// <returns>the condition passed in</returns>
 string Parser::get_conditional(string stm) {
 	string ret = "";
 
@@ -177,7 +216,14 @@ string Parser::get_conditional(string stm) {
 
 /// Author: Andrew Nunez
 /// Date: 11-15-2021
-/// Splits the provided string on the specified delimiter
+/// Splits the provided string on the specified delimiter - again, no it doesn't
+
+/// <summary>
+/// same as 2 above but with rows
+/// </summary>
+/// <param name="cmd">what to do</param>
+/// <param name="table_name">which table to operate on</param>
+/// <returns>string vector of row</returns>
 vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 	smatch sm;
 	vector<vector<string> > ret;
@@ -218,7 +264,13 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 
 /// Author: Andrew
 /// Date: 10-28-2021
-/// Splits the provided string on the specified delimiter
+/// Splits the provided string on the specified delimiter - you guessed it, no it doesn't
+
+/// <summary>
+/// gets a selected column from input command
+/// </summary>
+/// <param name="cmd">command recieved</param>
+/// <returns>string vector of columns</returns>
 vector<string> Parser::get_select_columns(string cmd) {
 	smatch sm;
 	vector<string> ret;
@@ -245,6 +297,12 @@ vector<string> Parser::get_select_columns(string cmd) {
 /// Author: Andrew
 /// Date: 10-28-2021
 /// Gets the columns for create table command
+
+/// <summary>
+/// not quite certain but it gets columns while table is being created
+/// </summary>
+/// <param name="cmd">command passed in</param>
+/// <returns>string vector of columns</returns>
 vector<string> Parser::get_create_columns(string cmd) {
 	smatch sm;
 	vector<string> ret;
@@ -270,7 +328,13 @@ vector<string> Parser::get_create_columns(string cmd) {
 	return ret;
 
 }
-
+/// <summary>
+/// table name retriever
+/// </summary>
+/// <param name="cmd">command to execute</param>
+/// <param name="first_delim">first place to split</param>
+/// <param name="second_delim">second place to split</param>
+/// <returns>table name if it exists</returns>
 std::string Parser::get_table_name(string cmd, string first_delim, string second_delim) {
 	smatch sm;
 	std::string ret;
@@ -304,6 +368,12 @@ std::string Parser::get_table_name(string cmd, string first_delim, string second
 	return ret;
 }
 
+/// <summary>
+/// splits a string based on a delimeter
+/// </summary>
+/// <param name="input">string to split</param>
+/// <param name="delimeter">delimeter</param>
+/// <returns>array of split strings</returns>
 std::vector<std::string> split_text(std::string input, std::string delimeter)
 {
 	// Declare delimiters
