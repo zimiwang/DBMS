@@ -19,6 +19,7 @@ private:
 public:
 	/// The name of the database
 	std::string database_name;
+
 	/// The collection of tables
 	std::vector<Table> tables;
 
@@ -52,6 +53,7 @@ public:
 /// Date: 09-28-2021
 /// Deletes the current data base
 /// Todo: Delete the associated .db file aswell.
+
 void Database::Delete()
 {
 	//remove file
@@ -120,6 +122,9 @@ void Database::Save()
 }
 
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
+
+/// add a table
+/// <param name="tbl"></param>
 void Database::AddTable(Table& tbl)
 {
 	tables.push_back(tbl);
@@ -127,6 +132,8 @@ void Database::AddTable(Table& tbl)
 	this->Save();
 }
 
+/// drop a table
+/// for all tables in the db, if the tabe name matches, erase it and save the state
 void Database::DropTable(std::string name)
 {
 	int count = 0;
@@ -142,6 +149,11 @@ void Database::DropTable(std::string name)
 	}
 }
 
+
+/// with an inputted name and update clause, the table is updated by creating a new table and deleting the old one, then saving it.
+/// <param name="table_name"></param>
+/// <param name="update_clause"></param>
+/// <param name="where_clause"></param>
 void Database::UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause) {
 	Table tbl = this->get_table(table_name);
 	int update_idx = tbl.get_column_index(update_clause[0]);
@@ -256,11 +268,13 @@ void Database::Read(std::string db_name)
 	}
 }
 
+/// list the "data" files in the db
 void Database::List()
 {
 	FileHelper::listfiles("data", "db");
 }
 
+/// list the tables
 void Database::List_Tables()
 {
 	for (Table tbl : tables)
@@ -269,6 +283,7 @@ void Database::List_Tables()
 	}
 }
 
+/// return a boolean; true if the a table is found, false otherwise
 bool Database::find_table(std::string name)
 {
 	for (Table tbl : tables)
@@ -284,6 +299,7 @@ bool Database::find_table(std::string name)
 }
 
 
+/// return the table reference with a particular name
 Table Database::get_table(std::string name)
 {
 	Table ret;
@@ -300,6 +316,7 @@ Table Database::get_table(std::string name)
 
 	return ret;
 }
+
 
 
 /// Author: Saurav Gautam
@@ -323,6 +340,8 @@ void Database::SaveTable(Table table)
 	tables[count] = table;
 }
 
+
+/// list the tables and print their information
 void Database::List_Info() {
 	int size = 0;
 	std::cout << "Database Name:    	" << database_name << endl;
