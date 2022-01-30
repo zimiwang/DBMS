@@ -268,16 +268,16 @@ void show_help()
 	std::cout << "CREATE DATABASE 	- Creates and new database and opens a connection to it." << std::endl;
 	std::cout << "DB INFO 		- Lists the current database names." << std::endl;
 	std::cout << "DROP DATABASE 		- Deletes the given database." << std::endl;
-	std::cout << "CREATE TABLE 		- Creates a table in the current database." << std::endl;
-	std::cout << "DROP TABLE [name] 	- Creates a table in the current database." << std::endl;
-	std::cout << "DROP DATABASE 		- Check if the database exists and open it." << std::endl;
+	std::cout << "CREATE TABLE [name] ( column, datatype ) 		- Creates a table in the current database." << std::endl; //USAGE: CREATE TABLE name ( COLNAME COLTYPE, etc );
+	std::cout << "DROP TABLE [name] 	- Drops table in current database." << std::endl; //USAGE: DROP TABLE name;
+	std::cout << "DROP DATABASE 		- Check if the database exists and drops it." << std::endl;
 	std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl;
-	std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl;
+	std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl; // USAGE: Unknown.
 	std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl;
 	std::cout << "INSERT INTO 		- Inserts the data into the table. (In Testing))" << std::endl;
 	std::cout << "LIST DATABASES 		- Lists the current database names." << std::endl;
-	std::cout << "LIST TABLES 		- Lists the current database names." << std::endl;
-	std::cout << "TABLE INFO [name] 	- Lists the current database names." << std::endl;
+	std::cout << "LIST TABLES 		- Lists the current database names." << std::endl; // USAGE: LIST TABLES:
+	std::cout << "TABLE INFO [name] 	- Lists the given table's information." << std::endl; // USAGE: TABLE INFO name;
 
 }
 
