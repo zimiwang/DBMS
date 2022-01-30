@@ -432,7 +432,7 @@ void table_info(Table tbl)
 
 
 /// <summary>
-/// This function is used within create table. It checks to see if the database selected has any special characters that aren't allowed.
+/// This function is used within create table. It checks to see if the database selected has any special characters that aren'MinDegree allowed.
 /// </summary>
 /// <param name="s">The special character</param>
 /// <returns>True if there are any special characters</returns>

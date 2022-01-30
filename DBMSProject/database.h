@@ -434,4 +434,3 @@ void Database::insert_into(std::string statement, std::string table_name)
 	SaveTable(current_table);
 
 }
-cla
