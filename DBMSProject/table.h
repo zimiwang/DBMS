@@ -58,8 +58,12 @@ public:
 		this->table_name = name;
 	}
 
-	/// Author: Janita Aamir
+
+	/// <summary>
 	/// Creates a new instances of a table with columns assigned
+	/// </summary>
+	/// <param name="name"></param>
+	/// <param name="cols"></param>
 	Table(std::string name, vector<string> cols)
 		: Table(name) {
 		for (std::string col : cols) {
@@ -75,8 +79,11 @@ public:
 
 };
 
-/// Author: Andrew Nunez
+
+/// <summary>
 /// Gets the size of the largest column
+/// </summary>
+/// <returns>The size of the largest column</returns>
 int Table::GetLargestColumnSize() {
 	int ret = 0;
 
@@ -100,8 +107,11 @@ int Table::GetLargestColumnSize() {
 
 }
 
-/// Author: Andrew Nunez
+/// <summary>
 /// Gets the index of the provided column
+/// </summary>
+/// <param name="column_name"></param>
+/// <returns>index of the provided column</returns>
 int Table::get_column_index(std::string column_name) {
 	int ret = -1;
 	std::map<std::string, std::string>::iterator it;
@@ -117,8 +127,12 @@ int Table::get_column_index(std::string column_name) {
 	return ret;
 }
 
-/// Author: Andrew Nunez
+/// <summary>
 /// Prints the rows using the specified where clause and column names
+/// </summary>
+/// <param name="column_names"></param>
+/// <param name="where_clause"></param>
+/// <param name="conditional"></param>
 void Table::Print_Rows(std::vector<std::string> column_names, vector<string> where_clause, string conditional) {
 	int row_count = 0;
 
@@ -230,8 +244,11 @@ void Table::Print_Rows(std::vector<std::string> column_names, vector<string> whe
 
 }
 
-/// Author: Andrew Nunez
+/// <summary>
 /// Adds a key to the table
+/// </summary>
+/// <param name="key"></param>
+/// <param name="value"></param>
 void Table::AddKey(std::string key, std::string value) {
 	std::cout << "Adding: " << key << " " << value << std::endl;
 
@@ -239,19 +256,30 @@ void Table::AddKey(std::string key, std::string value) {
 
 }
 
-/// Author: Andrew Nunez
-// Inserts a row vector to the table
+
+/// <summary>
+/// Inserts a row vector to the table
+/// </summary>
+/// <param name="row"></param>
 void Table::Insert(std::vector<std::string> row) {
 	rows.push_back(row);
 }
 
-// Selects the columns from the table
+
+/// <summary>
+/// Selects the columns from the table
+/// </summary>
+/// <param name="col_names"></param>
+/// <returns></returns>
 std::vector<std::vector<std::string> > Table::Select(std::vector<std::string> col_names) {
 	return rows;
 }
 
 
-// Deletes the table
+
+/// <summary>
+/// Deletes the table
+/// </summary>
 void Table::Delete() {
 	delete this;
 }
@@ -268,6 +296,10 @@ std::vector<std::string> Table::get_column_names() {
 	return temp;
 }
 
+/// <summary>
+/// Delete the provided row
+/// </summary>
+/// <param name="row"></param>
 void Table::DeleteRow(vector<string> row) {
 	rows.erase(std::remove(rows.begin(), rows.end(), row), rows.end());
 }

@@ -3,7 +3,7 @@
 
 #include <fstream>
 #include <regex>
-//#include <bits/stdc++.h>		// comment this out because no uses it and it is recommeded that you don't use it.
+//#include <bits/stdc++.h>		// comment this out because no uses it and it is recommeded that you don'MinDegree use it.
 #include "utils.h"
 #include <iomanip>
 using namespace std;
@@ -216,7 +216,7 @@ string Parser::get_conditional(string stm) {
 
 /// Author: Andrew Nunez
 /// Date: 11-15-2021
-/// Splits the provided string on the specified delimiter - again, no it doesn't
+/// Splits the provided string on the specified delimiter - again, no it doesn'MinDegree
 
 /// <summary>
 /// same as 2 above but with rows
@@ -264,7 +264,7 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 
 /// Author: Andrew
 /// Date: 10-28-2021
-/// Splits the provided string on the specified delimiter - you guessed it, no it doesn't
+/// Splits the provided string on the specified delimiter - you guessed it, no it doesn'MinDegree
 
 /// <summary>
 /// gets a selected column from input command

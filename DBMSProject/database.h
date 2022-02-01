@@ -17,11 +17,17 @@ private:
 	void Read(std::string db_name);
 
 public:
-	/// The name of the database
+	
+	/// <summary>
+	/// The name of the database 
+	/// </summary>
 	std::string database_name;
 
-	/// The collection of tables
+	/// <summary>
+	/// The tables associated to <database_name>
+	/// </summary>
 	std::vector<Table> tables;
+
 
 	static void List();
 	void List_Tables();
@@ -37,32 +43,40 @@ public:
 	Table get_table(std::string tbl_name);
 	void UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause);
 
-	// Base constructor database
+	
+	/// <summary>
+	/// constructor for empty database
+	/// </summary>
 	Database()
 	{}
 
-	// Use this a the create a DB
-	// TODO: Tie into user input
+	
+	/// <summary>
+	/// Database contructor
+	/// </summary>
+	/// <param name="name">name for the new database</param>
 	Database(std::string name)
 	{
 		Read(name);
 	}
 };
 
-/// Author: Andrew Nunez
-/// Date: 09-28-2021
-/// Deletes the current data base
-/// Todo: Delete the associated .db file aswell.
 
+/// <summary>
+/// delete the current database
+/// </summary>
+/// TODO: delete the associated .db file
 void Database::Delete()
 {
-	//remove file
+	// remove file
 	delete this;
 }
 
+
 /// Author: Andrew Nunez
-/// Date: 09-28-2021
-/// Saves the current database state to disk.
+/// <summary>
+/// Save the state of the current database to disk
+/// </summary>
 void Database::Save()
 {
 	std::string line;
@@ -123,8 +137,10 @@ void Database::Save()
 
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
 
-/// add a table
-/// <param name="tbl"></param>
+/// <summary>
+/// Add a table to the associated database
+/// </summary>
+/// <param name="tbl">reference to the table to add</param>
 void Database::AddTable(Table& tbl)
 {
 	tables.push_back(tbl);
@@ -132,8 +148,11 @@ void Database::AddTable(Table& tbl)
 	this->Save();
 }
 
-/// drop a table
-/// for all tables in the db, if the tabe name matches, erase it and save the state
+
+/// <summary>
+/// For all tables in the database, if the table name matches, erase it from the file and save its new state
+/// </summary>
+/// <param name="name">name of table to remove</param>
 void Database::DropTable(std::string name)
 {
 	int count = 0;
@@ -150,10 +169,12 @@ void Database::DropTable(std::string name)
 }
 
 
+/// <summary>
 /// with an inputted name and update clause, the table is updated by creating a new table and deleting the old one, then saving it.
-/// <param name="table_name"></param>
-/// <param name="update_clause"></param>
-/// <param name="where_clause"></param>
+/// </summary>
+/// <param name="table_name">Name of the table to update</param>
+/// <param name="update_clause">command to execute</param>
+/// <param name="where_clause">table to update based on the command</param>
 void Database::UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause) {
 	Table tbl = this->get_table(table_name);
 	int update_idx = tbl.get_column_index(update_clause[0]);
@@ -181,8 +202,10 @@ void Database::UpdateTable(string table_name, vector<string> update_clause, vect
 }
 
 /// Author: Andrew Nunez
-/// Date: 09-28-2021
-/// Reads the given file name and initializes an object from the contents
+/// <summary>
+/// Read the given file name 
+/// </summary>
+/// <param name="db_name">name of the database to read</param>
 void Database::Read(std::string db_name)
 {
 	int tmp_size, i = 0;

@@ -31,6 +31,14 @@ void table_info(Table tbl);
 Database* read_sql_file(string path);
 void update_table(Database* db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable);
 
+
+
+/// <summary>
+/// Gets User Input and Route To Correct Function
+/// </summary>
+/// <param name="argc"></param>
+/// <param name="argv"></param>
+/// <returns></returns>
 int main(int argc, char** argv)
 {
 	std::string cmd;
@@ -250,8 +258,9 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-/// Author: Andrew Nunez
+/// <summary>
 /// Shows the help menu
+/// </summary>
 void show_help()
 {
 	std::cout << "Available Commands:" << std::endl;
@@ -259,21 +268,23 @@ void show_help()
 	std::cout << "CREATE DATABASE 	- Creates and new database and opens a connection to it." << std::endl;
 	std::cout << "DB INFO 		- Lists the current database names." << std::endl;
 	std::cout << "DROP DATABASE 		- Deletes the given database." << std::endl;
-	std::cout << "CREATE TABLE 		- Creates a table in the current database." << std::endl;
-	std::cout << "DROP TABLE [name] 	- Creates a table in the current database." << std::endl;
-	std::cout << "DROP DATABASE 		- Check if the database exists and open it." << std::endl;
+	std::cout << "CREATE TABLE [name] ( column, datatype ) 		- Creates a table in the current database." << std::endl; //USAGE: CREATE TABLE name ( COLNAME COLTYPE, etc );
+	std::cout << "DROP TABLE [name] 	- Drops table in current database." << std::endl; //USAGE: DROP TABLE name;
+	std::cout << "DROP DATABASE 		- Check if the database exists and drops it." << std::endl;
 	std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl;
-	std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl;
+	std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl; // USAGE: Unknown.
 	std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl;
 	std::cout << "INSERT INTO 		- Inserts the data into the table. (In Testing))" << std::endl;
 	std::cout << "LIST DATABASES 		- Lists the current database names." << std::endl;
-	std::cout << "LIST TABLES 		- Lists the current database names." << std::endl;
-	std::cout << "TABLE INFO [name] 	- Lists the current database names." << std::endl;
+	std::cout << "LIST TABLES 		- Lists the current database names." << std::endl; // USAGE: LIST TABLES:
+	std::cout << "TABLE INFO [name] 	- Lists the given table's information." << std::endl; // USAGE: TABLE INFO name;
 
 }
 
-/// Author: Andrew Nunez
+
+/// <summary>
 /// Setups the intro, emulating a startup
+/// </summary>
 void setup_intro()
 {
 	std::cout << "ISU RDBMS Project" << std::endl;
@@ -296,16 +307,28 @@ void setup_intro()
 		<< std::endl;
 }
 
-///Author: Andrew Nunez
-///Sets the console output color
+
+/// <summary>
+/// Sets the console output color
+/// </summary>
+/// <param name="s">the color</param>
 void color(int s)
 {
 	SetConsoleTextAttribute(h, s);
 }
 
 
-///Author: Janita Aamir
-///This function updates an existing value with a new one given the column names and specific row.
+
+/// <summary>
+/// TODO: UPDATE FUNCTION
+/// This function updates an exisiting value with a new one given the column names and specific row.
+/// </summary>
+/// <param name="db">The database</param>
+/// <param name="table_name">The name of the table to update</param>
+/// <param name="col1">The column name</param>
+/// <param name="toUpdate">The value to update</param>
+/// <param name="col2"></param>
+/// <param name="forVariable"></param>
 void update_table(Database* db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable) {
 	Table tbl = db->get_table(table_name);
 
@@ -326,8 +349,13 @@ void update_table(Database* db, std::string table_name, std::string col1, std::s
 
 }
 
-/// Author: Janita Aamir
+
+/// <summary>
 /// Creates a table with given column info
+/// </summary>
+/// <param name="table_name">The name of the table</param>
+/// <param name="columns_info">A vector of names for the columns</param>
+/// <returns>The table created</returns>
 Table* create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info)
 {
 	Table* tbl = new Table(table_name);
@@ -338,8 +366,12 @@ Table* create_table(std::string table_name, std::vector<pair<std::string, std::s
 	return tbl;
 }
 
-///Author: Janita Aamir
-///This function drops the given table from the current database.
+
+/// <summary>
+/// This function drops the given table from the current database.
+/// </summary>
+/// <param name="db">The database pointer</param>
+/// <param name="tbl">The table pointer</param>
 void drop_table(Database* db, Table* tbl) {
 	tbl->Delete();
 
@@ -354,8 +386,11 @@ void drop_table(Database* db, Table* tbl) {
 	db->Save();
 }
 
-///Author: Janita Aamir
-///This function drops the given database from the dbms.
+
+/// <summary>
+/// This function drops the given database from the dbms.
+/// </summary>
+/// <param name="db_name">The name of the database</param>
 void drop_database(string db_name)
 {
 
@@ -373,9 +408,11 @@ void drop_database(string db_name)
 	}
 }
 
-/// Author: Janita Aamir, Saurav Gautam
+
+/// <summary>
 /// Shows the given table information
-/// Table Name, Column Names, Number of Rows
+/// </summary>
+/// <param name="tbl">The table class</param>
 void table_info(Table tbl)
 {
 	std::cout << "Table name: " << tbl.table_name << std::endl;
@@ -393,9 +430,12 @@ void table_info(Table tbl)
 	std::cout << "Number of Rows: " << tbl.rows.size() << std::endl;
 }
 
-///Janita Aamir
-///This function is used within create table. It checks to see if the
-///database selected has any special characters that aren't allowed.
+
+/// <summary>
+/// This function is used within create table. It checks to see if the database selected has any special characters that aren'MinDegree allowed.
+/// </summary>
+/// <param name="s">The special character</param>
+/// <returns>True if there are any special characters</returns>
 bool has_special_char(std::string const& s)
 {
 	for (int i = 0; i < s.length(); i++)
@@ -405,11 +445,15 @@ bool has_special_char(std::string const& s)
 	}
 }
 
-/// Author: Saurav Gautam, Andrew Nunez
+
+/// <summary>
 /// Loads the sql file
 /// Parses the data
 /// Runs the queries
 /// Saves the database
+/// </summary>
+/// <param name="path">The path to the sql file</param>
+/// <returns>The pointer to the database</returns>
 Database* read_sql_file(string path)
 {
 	ifstream infile("data/" + path, std::ios::in | std::ios::binary);
