@@ -255,13 +255,13 @@ int main(int argc, char** argv)
 void show_help()
 {
 	std::cout << "Available Commands:" << std::endl;
-	std::cout << "OPEN DATABASE [name] 	- Check if the database exists and open it." << std::endl;
-	std::cout << "CREATE DATABASE 	- Creates and new database and opens a connection to it." << std::endl;
-	std::cout << "DB INFO 		- Lists the current database names." << std::endl;
-	std::cout << "DROP DATABASE 		- Deletes the given database." << std::endl;
+	std::cout << "OPEN DATABASE [NAME] 	- Check if the database exists and open it." << std::endl;
+	std::cout << "CREATE DATABASE [NAME]	- Creates a new database under the provided name and opens a connection to it." << std::endl;
+	std::cout << "DB INFO 		- Lists the database name and prints table information." << std::endl;	// calls List_Info()
+	// * removed due to redundancy * // std::cout << "DROP DATABASE 		- Deletes the given database." << std::endl;
 	std::cout << "CREATE TABLE 		- Creates a table in the current database." << std::endl;
-	std::cout << "DROP TABLE [name] 	- Creates a table in the current database." << std::endl;
-	std::cout << "DROP DATABASE 		- Check if the database exists and open it." << std::endl;
+	std::cout << "DROP TABLE [NAME] 	- Creates a table in the current database." << std::endl;
+	std::cout << "DROP DATABASE [NAME]		- Check if the database exists and drop it." << std::endl;
 	std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl;
 	std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl;
 	std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl;

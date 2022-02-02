@@ -17,10 +17,17 @@ private:
 	void Read(std::string db_name);
 
 public:
-	/// The name of the database
+
+	/// <summary>
+	/// The name of the database 
+	/// </summary>
 	std::string database_name;
-	/// The collection of tables
+
+	/// <summary>
+	/// The tables associated to <database_name>
+	/// </summary>
 	std::vector<Table> tables;
+
 
 	static void List();
 	void List_Tables();
@@ -36,31 +43,44 @@ public:
 	Table get_table(std::string tbl_name);
 	void UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause);
 
-	// Base constructor database
+
+
+	/// <summary>
+	/// Constructor for an empty database
+	/// </summary>
 	Database()
 	{}
 
-	// Use this a the create a DB
-	// TODO: Tie into user input
+
+
+	/// <summary>
+	/// Database contructor
+	/// </summary>
+	/// <param name="name">Name for the new database</param>
 	Database(std::string name)
 	{
 		Read(name);
 	}
 };
 
-/// Author: Andrew Nunez
-/// Date: 09-28-2021
-/// Deletes the current data base
-/// Todo: Delete the associated .db file aswell.
+
+
+/// TODO: delete the associated .db file
+/// <summary>
+/// Delete the calling database instance
+/// </summary>
 void Database::Delete()
 {
-	//remove file
+	// remove file
 	delete this;
 }
 
+
+
 /// Author: Andrew Nunez
-/// Date: 09-28-2021
-/// Saves the current database state to disk.
+/// <summary>
+/// Save the state of the current database to disk
+/// </summary>
 void Database::Save()
 {
 	std::string line;
@@ -119,7 +139,13 @@ void Database::Save()
 	out.close();
 }
 
+
+
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
+/// <summary>
+/// Add a table to the associated database
+/// </summary>
+/// <param name="tbl">reference to the table to add</param>
 void Database::AddTable(Table& tbl)
 {
 	tables.push_back(tbl);
@@ -127,6 +153,12 @@ void Database::AddTable(Table& tbl)
 	this->Save();
 }
 
+
+
+/// <summary>
+/// For all tables in the database, if the table name matches, erase it from the file and save its new state
+/// </summary>
+/// <param name="name">name of table to remove</param>
 void Database::DropTable(std::string name)
 {
 	int count = 0;
@@ -142,6 +174,14 @@ void Database::DropTable(std::string name)
 	}
 }
 
+
+
+/// <summary>
+/// with an inputted name and update clause, the table is updated by creating a new table and deleting the old one, then saving it.
+/// </summary>
+/// <param name="table_name">Name of the table to update</param>
+/// <param name="update_clause">command to execute</param>
+/// <param name="where_clause">table to update based on the command</param>
 void Database::UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause) {
 	Table tbl = this->get_table(table_name);
 	int update_idx = tbl.get_column_index(update_clause[0]);
@@ -168,9 +208,12 @@ void Database::UpdateTable(string table_name, vector<string> update_clause, vect
 
 }
 
+
 /// Author: Andrew Nunez
-/// Date: 09-28-2021
-/// Reads the given file name and initializes an object from the contents
+/// <summary>
+/// Read the given file name 
+/// </summary>
+/// <param name="db_name">name of the database to read</param>
 void Database::Read(std::string db_name)
 {
 	int tmp_size, i = 0;
@@ -256,11 +299,21 @@ void Database::Read(std::string db_name)
 	}
 }
 
+
+
+/// <summary>
+/// list the "data" files in the db
+/// </summary>
 void Database::List()
 {
 	FileHelper::listfiles("data", "db");
 }
 
+
+
+/// <summary>
+/// List the tables in referencing database
+/// </summary>
 void Database::List_Tables()
 {
 	for (Table tbl : tables)
@@ -269,27 +322,44 @@ void Database::List_Tables()
 	}
 }
 
+
+
+// TODO: I feel like the else \n return false; is an implicit !IF, so the for loop will only run for a single iteration. If we place the "return false" statement after the for loop ends, then we can ensure all the tables are checked
+/// <summary>
+///  return a boolean; true if the a table is found, false otherwise
+/// </summary>
+/// <param name="name">name of a table</param>
+/// <returns>true if the a table is found, false otherwise</returns>
 bool Database::find_table(std::string name)
 {
 	for (Table tbl : tables)
 	{
-
+		// if the iterated table name matches the searched table name
 		if (name == tbl.table_name)
 		{
 			return true;
 		}
+		// if it does not
 		else
 			return false;
 	}
 }
 
 
+
+/// <summary>
+/// return the table reference for a particular name
+/// </summary>
+/// <param name="name">table name to search for</param>
+/// <returns>reference to the table being searched</returns>
 Table Database::get_table(std::string name)
 {
 	Table ret;
 
+	// search for the table
 	for (Table tbl : tables)
 	{
+		// if the table is found, stop searching
 		if (tbl.table_name == name)
 		{
 			ret = tbl;
@@ -298,13 +368,18 @@ Table Database::get_table(std::string name)
 		}
 	}
 
+	// return the reference
 	return ret;
 }
 
 
+
+// TODO: I do not think this function actually does anything...
 /// Author: Saurav Gautam
-/// Save the table after being updated in the console
-/// Replaces the table by creating a new one
+/// <summary>
+/// Save the table. 
+/// </summary>
+/// <param name="table">Reference to the table being saved</param>
 void Database::SaveTable(Table table)
 {
 
@@ -323,11 +398,18 @@ void Database::SaveTable(Table table)
 	tables[count] = table;
 }
 
+
+
+/// <summary>
+/// list the tables for the database and print their information
+/// </summary>
 void Database::List_Info() {
 	int size = 0;
 	std::cout << "Database Name:    	" << database_name << endl;
 	std::cout << "Number of Tables: 	" << tables.size() << endl;
 	std::cout << "==========================" << endl;
+	
+	// print tables' information
 	for (Table tbl : tables) {
 		cout << ">    " << tbl.table_name << endl;
 
@@ -343,11 +425,19 @@ void Database::List_Info() {
 	std::cout << "Total Size: " << size << " bytes" << endl;
 }
 
+
+
 /// Author: Saurav Gautam, Andrew Nunez
+/// <summary>
 /// Read the insert statement and insert values in the table
+/// </summary>
+/// <param name="statement">Console command</param>
+/// <param name="table_name">Name of the table being inserted into</param>
 void Database::insert_into(std::string statement, std::string table_name)
 {
 	Table current_table = get_table(table_name);;
+	
+	// run the statement through a parser to get information for columns and then rows to insert
 	vector<string> columns = Parser::get_insert_columns(statement, table_name);
 	vector<vector<string> > values = Parser::get_insert_rows(statement, table_name);
 
@@ -355,6 +445,7 @@ void Database::insert_into(std::string statement, std::string table_name)
 
 	vector<int> order;
 
+	// insert column data into table
 	for (string str : col_names) {
 		auto it = std::find(columns.begin(), columns.end(), str);
 
@@ -368,6 +459,7 @@ void Database::insert_into(std::string statement, std::string table_name)
 
 	int cnt = 0;
 
+	// insert row data into table
 	for (vector<string> row : values)
 	{
 		vector<string> temp;
@@ -389,6 +481,7 @@ void Database::insert_into(std::string statement, std::string table_name)
 		current_table.Insert(temp);
 	}
 
+	// save changes
 	SaveTable(current_table);
 
 }
