@@ -66,6 +66,7 @@ public:
 	/// <param name="cols"></param>
 	Table(std::string name, vector<string> cols)
 		: Table(name) {
+		this->table_name = name;
 		for (std::string col : cols) {
 			vector<string> tmp = Utils::split(col, " ");
 
