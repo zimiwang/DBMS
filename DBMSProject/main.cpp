@@ -1,3 +1,9 @@
+
+
+// main function
+/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+
+
 #define _CRT_SECURE_NO_WARNINGS		// error occurred because of security reasons. Needed to add this.
 #include "database.h"
 #include <vector>
@@ -11,8 +17,6 @@
 #include <iostream>
 #include <cerrno>
 
-
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
 
 // global variables
