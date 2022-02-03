@@ -16,26 +16,30 @@
 
 
 // global variables
+HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+Table* create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info);
+
+std::string current_db_name;
+std::string to_lower(std::string str);
+std::string table_name;
+std::string db_name;
+std::string cmd = "";
+std::string statement;
+
+Database* read_sql_file(string path);
+Database* db = NULL;
+
+// function initializers
 void color(int s);
 void setup_intro();
 void show_help();
 void print_rows(Table tbl);
-std::string to_lower(std::string str);
-HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-std::string current_db_name;
-Table* create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info);
-std::string table_name;
-std::string db_name;
+void table_info(Table tbl);
 void insert_into(Database* db, vector<string> split_commands);
 void drop_table(Database* db, Table* tbl);
 void drop_database(string db_name);
 bool has_special_char(std::string const& str);
-void table_info(Table tbl);
-Database* read_sql_file(string path);
 void update_table(Database* db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable);
-std::string cmd = "";
-Database* db = NULL;
-std::string statement;
 
 int exitDBMS();
 int helpMenu();
