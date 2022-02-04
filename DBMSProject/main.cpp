@@ -268,7 +268,7 @@ void show_help()
 	std::cout << "CREATE DATABASE 	- Creates and new database and opens a connection to it." << std::endl;
 	std::cout << "DB INFO 		- Lists the current database names." << std::endl;
 	std::cout << "DROP DATABASE 		- Deletes the given database." << std::endl;
-	std::cout << "CREATE TABLE [name] ( column, datatype ) 		- Creates a table in the current database." << std::endl; //USAGE: CREATE TABLE name ( COLNAME COLTYPE, etc );
+	std::cout << "CREATE TABLE 		- Creates a table in the current database." << std::endl; //USAGE: CREATE TABLE name ( COLNAME COLTYPE, etc );
 	std::cout << "DROP TABLE [name] 	- Drops table in current database." << std::endl; //USAGE: DROP TABLE name;
 	std::cout << "DROP DATABASE 		- Check if the database exists and drops it." << std::endl;
 	std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl;

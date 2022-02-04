@@ -246,7 +246,11 @@ void Database::Read(std::string db_name)
 
 				rows.push_back(tmp_v);
 			}
-			else if (line.find(",") != std::string::npos)
+			else if (line.find("keys:") == 0)
+			{
+				//keys.insert({ tmp_child_array[0], tmp_child_array[1] }); fix later
+			}
+			else if (line.find("columns:") == 0)
 			{
 				tmp_parent_array = Parser::split_str(line, ',');
 
@@ -264,6 +268,24 @@ void Database::Read(std::string db_name)
 					}
 				}
 			}
+			/*else if (line.find(",") != std::string::npos)
+			{
+				tmp_parent_array = Parser::split_str(line, ',');
+
+				for (i = 0; i < tmp_size; i++)
+				{
+					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+
+					if (line.find("keys:") == 0)
+					{
+						keys.insert({ tmp_child_array[0], tmp_child_array[1] });
+					}
+					else if (line.find("columns:") == 0)
+					{
+						columns.insert({ tmp_child_array[0], tmp_child_array[1] });
+					}
+				}
+			}*/
 			else if (line.find(";") == 0)
 			{
 				Table* tbl = new Table(tbl_name);
