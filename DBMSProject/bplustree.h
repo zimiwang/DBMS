@@ -1,5 +1,5 @@
 // Searching on a B+ tree in C++
-//Used From: https://www.programiz.com/dsa/b-plus-tree
+// B+ tree used From: https://www.programiz.com/dsa/b-plus-tree
 #include <climits>
 #include <fstream>
 #include <iostream>
