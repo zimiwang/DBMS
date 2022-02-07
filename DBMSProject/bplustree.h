@@ -35,6 +35,7 @@ Node::Node() {
 class BPTree {
     Node* root;             // root node
     void insertInternal(PrimaryKey, Node*, Node*); // insert internal function
+    void removeInternal(PrimaryKey, Node*, Node*);
     Node* findParent(Node*, Node*);         // find parent of given node
 
 public:
@@ -230,253 +231,255 @@ void BPTree::insertInternal(PrimaryKey x, Node* parentNode, Node* child) {
 }
 
 
-//
-//void BPTree::remove(int x) {
-//    if (root == NULL) {
-//        cout << "Tree empty\n";
-//    }
-//    else {
-//        Node* currentNode = root;
-//        Node* parent;
-//        int leftSibling, rightSibling;
-//        // move down the tree
-//        while (currentNode->IS_LEAF == false) {
-//            for (int i = 0; i < currentNode->size; i++) {
-//                parent = currentNode;
-//                leftSibling = i - 1;
-//                rightSibling = i + 1;
-//                if (x < currentNode->key[i]) {
-//                    currentNode = currentNode->ptr[i];
-//                    break;
-//                }
-//                if (i == currentNode->size - 1) {
-//                    leftSibling = i;
-//                    rightSibling = i + 2;
-//                    currentNode = currentNode->ptr[i + 1];
-//                    break;
-//                }
-//            }
-//        }
-//        bool found = false;
-//        int pos;
-//        for (pos = 0; pos < currentNode->size; pos++) {
-//            if (currentNode->key[pos] == x) {
-//                found = true;
-//                break;
-//            }
-//        }
-//        if (!found) {
-//            cout << "Not found\n";
-//            return;
-//        }
-//        for (int i = pos; i < currentNode->size; i++) {
-//            currentNode->key[i] = currentNode->key[i + 1];
-//        }
-//        currentNode->size--;
-//        if (currentNode == root) {
-//            for (int i = 0; i < MAX + 1; i++) {
-//                currentNode->ptr[i] = NULL;
-//            }
-//            if (currentNode->size == 0) {
-//                cout << "Tree died\n";
-//                delete[] currentNode->key;
-//                delete[] currentNode->ptr;
-//                delete currentNode;
-//                root = NULL;
-//            }
-//            return;
-//        }
-//        currentNode->ptr[currentNode->size] = currentNode->ptr[currentNode->size + 1];
-//        currentNode->ptr[currentNode->size + 1] = NULL;
-//        if (currentNode->size >= (MAX + 1) / 2) {
-//            return;
-//        }
-//        if (leftSibling >= 0) {
-//            Node* leftNode = parent->ptr[leftSibling];
-//            if (leftNode->size >= (MAX + 1) / 2 + 1) {
-//                for (int i = currentNode->size; i > 0; i--) {
-//                    currentNode->key[i] = currentNode->key[i - 1];
-//                }
-//                currentNode->size++;
-//                currentNode->ptr[currentNode->size] = currentNode->ptr[currentNode->size - 1];
-//                currentNode->ptr[currentNode->size - 1] = NULL;
-//                currentNode->key[0] = leftNode->key[leftNode->size - 1];
-//                leftNode->size--;
-//                leftNode->ptr[leftNode->size] = currentNode;
-//                leftNode->ptr[leftNode->size + 1] = NULL;
-//                parent->key[leftSibling] = currentNode->key[0];
-//                return;
-//            }
-//        }
-//        if (rightSibling <= parent->size) {
-//            Node* rightNode = parent->ptr[rightSibling];
-//            if (rightNode->size >= (MAX + 1) / 2 + 1) {
-//                currentNode->size++;
-//                currentNode->ptr[currentNode->size] = currentNode->ptr[currentNode->size - 1];
-//                currentNode->ptr[currentNode->size - 1] = NULL;
-//                currentNode->key[currentNode->size - 1] = rightNode->key[0];
-//                rightNode->size--;
-//                rightNode->ptr[rightNode->size] = rightNode->ptr[rightNode->size + 1];
-//                rightNode->ptr[rightNode->size + 1] = NULL;
-//                for (int i = 0; i < rightNode->size; i++) {
-//                    rightNode->key[i] = rightNode->key[i + 1];
-//                }
-//                parent->key[rightSibling - 1] = rightNode->key[0];
-//                return;
-//            }
-//        }
-//        if (leftSibling >= 0) {
-//            Node* leftNode = parent->ptr[leftSibling];
-//            for (int i = leftNode->size, j = 0; j < currentNode->size; i++, j++) {
-//                leftNode->key[i] = currentNode->key[j];
-//            }
-//            leftNode->ptr[leftNode->size] = NULL;
-//            leftNode->size += currentNode->size;
-//            leftNode->ptr[leftNode->size] = currentNode->ptr[currentNode->size];
-//            removeInternal(parent->key[leftSibling], parent, currentNode);
-//            delete[] currentNode->key;
-//            delete[] currentNode->ptr;
-//            delete currentNode;
-//        }
-//        else if (rightSibling <= parent->size) {
-//            Node* rightNode = parent->ptr[rightSibling];
-//            for (int i = currentNode->size, j = 0; j < rightNode->size; i++, j++) {
-//                currentNode->key[i] = rightNode->key[j];
-//            }
-//            currentNode->ptr[currentNode->size] = NULL;
-//            currentNode->size += rightNode->size;
-//            currentNode->ptr[currentNode->size] = rightNode->ptr[rightNode->size];
-//            cout << "Merging two leaf nodes\n";
-//            removeInternal(parent->key[rightSibling - 1], parent, rightNode);
-//            delete[] rightNode->key;
-//            delete[] rightNode->ptr;
-//            delete rightNode;
-//        }
-//    }
-//}
-//void BPTree::removeInternal(int x, Node* cursor, Node* child) {
-//    if (cursor == root) {
-//        if (cursor->size == 1) {
-//            if (cursor->ptr[1] == child) {
-//                delete[] child->key;
-//                delete[] child->ptr;
-//                delete child;
-//                root = cursor->ptr[0];
-//                delete[] cursor->key;
-//                delete[] cursor->ptr;
-//                delete cursor;
-//                cout << "Changed root node\n";
-//                return;
-//            }
-//            else if (cursor->ptr[0] == child) {
-//                delete[] child->key;
-//                delete[] child->ptr;
-//                delete child;
-//                root = cursor->ptr[1];
-//                delete[] cursor->key;
-//                delete[] cursor->ptr;
-//                delete cursor;
-//                cout << "Changed root node\n";
-//                return;
-//            }
-//        }
-//    }
-//    int pos;
-//    for (pos = 0; pos < cursor->size; pos++) {
-//        if (cursor->key[pos] == x) {
-//            break;
-//        }
-//    }
-//    for (int i = pos; i < cursor->size; i++) {
-//        cursor->key[i] = cursor->key[i + 1];
-//    }
-//    for (pos = 0; pos < cursor->size + 1; pos++) {
-//        if (cursor->ptr[pos] == child) {
-//            break;
-//        }
-//    }
-//    for (int i = pos; i < cursor->size + 1; i++) {
-//        cursor->ptr[i] = cursor->ptr[i + 1];
-//    }
-//    cursor->size--;
-//    if (cursor->size >= (MAX + 1) / 2 - 1) {
-//        return;
-//    }
-//    if (cursor == root)
-//        return;
-//    Node* parent = findParent(root, cursor);
-//    int leftSibling, rightSibling;
-//    for (pos = 0; pos < parent->size + 1; pos++) {
-//        if (parent->ptr[pos] == cursor) {
-//            leftSibling = pos - 1;
-//            rightSibling = pos + 1;
-//            break;
-//        }
-//    }
-//    if (leftSibling >= 0) {
-//        Node* leftNode = parent->ptr[leftSibling];
-//        if (leftNode->size >= (MAX + 1) / 2) {
-//            for (int i = cursor->size; i > 0; i--) {
-//                cursor->key[i] = cursor->key[i - 1];
-//            }
-//            cursor->key[0] = parent->key[leftSibling];
-//            parent->key[leftSibling] = leftNode->key[leftNode->size - 1];
-//            for (int i = cursor->size + 1; i > 0; i--) {
-//                cursor->ptr[i] = cursor->ptr[i - 1];
-//            }
-//            cursor->ptr[0] = leftNode->ptr[leftNode->size];
-//            cursor->size++;
-//            leftNode->size--;
-//            return;
-//        }
-//    }
-//    if (rightSibling <= parent->size) {
-//        Node* rightNode = parent->ptr[rightSibling];
-//        if (rightNode->size >= (MAX + 1) / 2) {
-//            cursor->key[cursor->size] = parent->key[pos];
-//            parent->key[pos] = rightNode->key[0];
-//            for (int i = 0; i < rightNode->size - 1; i++) {
-//                rightNode->key[i] = rightNode->key[i + 1];
-//            }
-//            cursor->ptr[cursor->size + 1] = rightNode->ptr[0];
-//            for (int i = 0; i < rightNode->size; ++i) {
-//                rightNode->ptr[i] = rightNode->ptr[i + 1];
-//            }
-//            cursor->size++;
-//            rightNode->size--;
-//            return;
-//        }
-//    }
-//    if (leftSibling >= 0) {
-//        Node* leftNode = parent->ptr[leftSibling];
-//        leftNode->key[leftNode->size] = parent->key[leftSibling];
-//        for (int i = leftNode->size + 1, j = 0; j < cursor->size; j++) {
-//            leftNode->key[i] = cursor->key[j];
-//        }
-//        for (int i = leftNode->size + 1, j = 0; j < cursor->size + 1; j++) {
-//            leftNode->ptr[i] = cursor->ptr[j];
-//            cursor->ptr[j] = NULL;
-//        }
-//        leftNode->size += cursor->size + 1;
-//        cursor->size = 0;
-//        removeInternal(parent->key[leftSibling], parent, cursor);
-//    }
-//    else if (rightSibling <= parent->size) {
-//        Node* rightNode = parent->ptr[rightSibling];
-//        cursor->key[cursor->size] = parent->key[rightSibling - 1];
-//        for (int i = cursor->size + 1, j = 0; j < rightNode->size; j++) {
-//            cursor->key[i] = rightNode->key[j];
-//        }
-//        for (int i = cursor->size + 1, j = 0; j < rightNode->size + 1; j++) {
-//            cursor->ptr[i] = rightNode->ptr[j];
-//            rightNode->ptr[j] = NULL;
-//        }
-//        cursor->size += rightNode->size + 1;
-//        rightNode->size = 0;
-//        removeInternal(parent->key[rightSibling - 1], parent, rightNode);
-//    }
-//}
-//
+
+void BPTree::remove(int x) {
+    if (root == NULL) {
+        cout << "Tree empty\n";
+    }
+    else {
+        Node* currentNode = root;
+        Node* parent;
+        int leftSibling, rightSibling;
+        // move down the tree
+        while (currentNode->IS_LEAF == false) {
+            for (int i = 0; i < currentNode->size; i++) {
+                parent = currentNode;
+                leftSibling = i - 1;
+                rightSibling = i + 1;
+                if (x < currentNode->key[i].key) {
+                    currentNode = currentNode->ptr[i];
+                    break;
+                }
+                if (i == currentNode->size - 1) {
+                    leftSibling = i;
+                    rightSibling = i + 2;
+                    currentNode = currentNode->ptr[i + 1];
+                    break;
+                }
+            }
+        }
+        bool found = false;
+        int pos;
+        for (pos = 0; pos < currentNode->size; pos++) {
+            if (currentNode->key[pos].key == x) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            cout << "Not found\n";
+            return;
+        }
+        for (int i = pos; i < currentNode->size; i++) {
+            currentNode->key[i] = currentNode->key[i + 1];
+        }
+        currentNode->size--;
+        if (currentNode == root) {
+            for (int i = 0; i < MAX + 1; i++) {
+                currentNode->ptr[i] = NULL;
+            }
+            if (currentNode->size == 0) {
+                cout << "Tree died\n";
+                delete[] currentNode->key;
+                delete[] currentNode->ptr;
+                delete currentNode;
+                root = NULL;
+            }
+            return;
+        }
+        currentNode->ptr[currentNode->size] = currentNode->ptr[currentNode->size + 1];
+        currentNode->ptr[currentNode->size + 1] = NULL;
+        if (currentNode->size >= (MAX + 1) / 2) {
+            return;
+        }
+        if (leftSibling >= 0) {
+            Node* leftNode = parent->ptr[leftSibling];
+            if (leftNode->size >= (MAX + 1) / 2 + 1) {
+                for (int i = currentNode->size; i > 0; i--) {
+                    currentNode->key[i] = currentNode->key[i - 1];
+                }
+                currentNode->size++;
+                currentNode->ptr[currentNode->size] = currentNode->ptr[currentNode->size - 1];
+                currentNode->ptr[currentNode->size - 1] = NULL;
+                currentNode->key[0] = leftNode->key[leftNode->size - 1];
+                leftNode->size--;
+                leftNode->ptr[leftNode->size] = currentNode;
+                leftNode->ptr[leftNode->size + 1] = NULL;
+                parent->key[leftSibling] = currentNode->key[0];
+                return;
+            }
+        }
+        if (rightSibling <= parent->size) {
+            Node* rightNode = parent->ptr[rightSibling];
+            if (rightNode->size >= (MAX + 1) / 2 + 1) {
+                currentNode->size++;
+                currentNode->ptr[currentNode->size] = currentNode->ptr[currentNode->size - 1];
+                currentNode->ptr[currentNode->size - 1] = NULL;
+                currentNode->key[currentNode->size - 1] = rightNode->key[0];
+                rightNode->size--;
+                rightNode->ptr[rightNode->size] = rightNode->ptr[rightNode->size + 1];
+                rightNode->ptr[rightNode->size + 1] = NULL;
+                for (int i = 0; i < rightNode->size; i++) {
+                    rightNode->key[i] = rightNode->key[i + 1];
+                }
+                parent->key[rightSibling - 1] = rightNode->key[0];
+                return;
+            }
+        }
+        if (leftSibling >= 0) {
+            Node* leftNode = parent->ptr[leftSibling];
+            for (int i = leftNode->size, j = 0; j < currentNode->size; i++, j++) {
+                leftNode->key[i] = currentNode->key[j];
+            }
+            leftNode->ptr[leftNode->size] = NULL;
+            leftNode->size += currentNode->size;
+            leftNode->ptr[leftNode->size] = currentNode->ptr[currentNode->size];
+            removeInternal(parent->key[leftSibling], parent, currentNode);
+            delete[] currentNode->key;
+            delete[] currentNode->ptr;
+            delete currentNode;
+        }
+        else if (rightSibling <= parent->size) {
+            Node* rightNode = parent->ptr[rightSibling];
+            for (int i = currentNode->size, j = 0; j < rightNode->size; i++, j++) {
+                currentNode->key[i] = rightNode->key[j];
+            }
+            currentNode->ptr[currentNode->size] = NULL;
+            currentNode->size += rightNode->size;
+            currentNode->ptr[currentNode->size] = rightNode->ptr[rightNode->size];
+            cout << "Merging two leaf nodes\n";
+            removeInternal(parent->key[rightSibling - 1], parent, rightNode);
+            delete[] rightNode->key;
+            delete[] rightNode->ptr;
+            delete rightNode;
+        }
+    }
+}
+ 
+ 
+void BPTree::removeInternal(PrimaryKey x, Node* currentNode, Node* child) {
+    if (currentNode == root) {
+        if (currentNode->size == 1) {
+            if (currentNode->ptr[1] == child) {
+                delete[] child->key;
+                delete[] child->ptr;
+                delete child;
+                root = currentNode->ptr[0];
+                delete[] currentNode->key;
+                delete[] currentNode->ptr;
+                delete currentNode;
+                cout << "Changed root node\n";
+                return;
+            }
+            else if (currentNode->ptr[0] == child) {
+                delete[] child->key;
+                delete[] child->ptr;
+                delete child;
+                root = currentNode->ptr[1];
+                delete[] currentNode->key;
+                delete[] currentNode->ptr;
+                delete currentNode;
+                cout << "Changed root node\n";
+                return;
+            }
+        }
+    }
+    int pos;
+    for (pos = 0; pos < currentNode->size; pos++) {
+        if (currentNode->key[pos].key == x.key) {
+            break;
+        }
+    }
+    for (int i = pos; i < currentNode->size; i++) {
+        currentNode->key[i] = currentNode->key[i + 1];
+    }
+    for (pos = 0; pos < currentNode->size + 1; pos++) {
+        if (currentNode->ptr[pos] == child) {
+            break;
+        }
+    }
+    for (int i = pos; i < currentNode->size + 1; i++) {
+        currentNode->ptr[i] = currentNode->ptr[i + 1];
+    }
+    currentNode->size--;
+    if (currentNode->size >= (MAX + 1) / 2 - 1) {
+        return;
+    }
+    if (currentNode == root)
+        return;
+    Node* parent = findParent(root, currentNode);
+    int leftSibling, rightSibling;
+    for (pos = 0; pos < parent->size + 1; pos++) {
+        if (parent->ptr[pos] == currentNode) {
+            leftSibling = pos - 1;
+            rightSibling = pos + 1;
+            break;
+        }
+    }
+    if (leftSibling >= 0) {
+        Node* leftNode = parent->ptr[leftSibling];
+        if (leftNode->size >= (MAX + 1) / 2) {
+            for (int i = currentNode->size; i > 0; i--) {
+                currentNode->key[i] = currentNode->key[i - 1];
+            }
+            currentNode->key[0] = parent->key[leftSibling];
+            parent->key[leftSibling] = leftNode->key[leftNode->size - 1];
+            for (int i = currentNode->size + 1; i > 0; i--) {
+                currentNode->ptr[i] = currentNode->ptr[i - 1];
+            }
+            currentNode->ptr[0] = leftNode->ptr[leftNode->size];
+            currentNode->size++;
+            leftNode->size--;
+            return;
+        }
+    }
+    if (rightSibling <= parent->size) {
+        Node* rightNode = parent->ptr[rightSibling];
+        if (rightNode->size >= (MAX + 1) / 2) {
+            currentNode->key[currentNode->size] = parent->key[pos];
+            parent->key[pos] = rightNode->key[0];
+            for (int i = 0; i < rightNode->size - 1; i++) {
+                rightNode->key[i] = rightNode->key[i + 1];
+            }
+            currentNode->ptr[currentNode->size + 1] = rightNode->ptr[0];
+            for (int i = 0; i < rightNode->size; ++i) {
+                rightNode->ptr[i] = rightNode->ptr[i + 1];
+            }
+            currentNode->size++;
+            rightNode->size--;
+            return;
+        }
+    }
+    if (leftSibling >= 0) {
+        Node* leftNode = parent->ptr[leftSibling];
+        leftNode->key[leftNode->size] = parent->key[leftSibling];
+        for (int i = leftNode->size + 1, j = 0; j < currentNode->size; j++) {
+            leftNode->key[i] = currentNode->key[j];
+        }
+        for (int i = leftNode->size + 1, j = 0; j < currentNode->size + 1; j++) {
+            leftNode->ptr[i] = currentNode->ptr[j];
+            currentNode->ptr[j] = NULL;
+        }
+        leftNode->size += currentNode->size + 1;
+        currentNode->size = 0;
+        removeInternal(parent->key[leftSibling], parent, currentNode);
+    }
+    else if (rightSibling <= parent->size) {
+        Node* rightNode = parent->ptr[rightSibling];
+        currentNode->key[currentNode->size] = parent->key[rightSibling - 1];
+        for (int i = currentNode->size + 1, j = 0; j < rightNode->size; j++) {
+            currentNode->key[i] = rightNode->key[j];
+        }
+        for (int i = currentNode->size + 1, j = 0; j < rightNode->size + 1; j++) {
+            currentNode->ptr[i] = rightNode->ptr[j];
+            rightNode->ptr[j] = NULL;
+        }
+        currentNode->size += rightNode->size + 1;
+        rightNode->size = 0;
+        removeInternal(parent->key[rightSibling - 1], parent, rightNode);
+    }
+}
+
 
 
 
