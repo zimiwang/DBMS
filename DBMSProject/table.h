@@ -29,6 +29,9 @@ public:
 	/// The collection of arrays of rows for the table.
 	std::vector<std::vector<std::string>> rows;
 
+	/// Counter for row ID
+	int ID_count = 0;
+
 	void Print_Rows(std::vector<std::string> column_names, vector<string> where_clause, string conditional);
 
 	void Insert(std::vector<std::string> row);
@@ -67,13 +70,21 @@ public:
 	Table(std::string name, vector<string> cols)
 		: Table(name) {
 		this->table_name = name;
+		bool hasID = false;
 		for (std::string col : cols) {
 			vector<string> tmp = Utils::split(col, " ");
-
+			if (tmp[0] == "ID")
+			{
+				hasID = true;
+			}
 			//columns.insert(Utils::trim(tmp[0]), Utils::trim(tmp[1]));
 			columns.insert(std::pair<std::string, std::string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
+			int letstes = 0;
 
-
+		}
+		if (hasID == false) //We have no ID column defined by the user, manually add one
+		{
+			columns.insert(std::pair<std::string, std::string>("ID", "int"));
 		}
 	}
 

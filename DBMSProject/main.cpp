@@ -1,3 +1,9 @@
+
+
+// main function
+/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+
+
 #define _CRT_SECURE_NO_WARNINGS		// error occurred because of security reasons. Needed to add this.
 #include "database.h"
 #include <vector>
@@ -11,41 +17,79 @@
 #include <iostream>
 #include <cerrno>
 
-/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+#include "unitTests.h"
 
-void color(int s);
-void setup_intro();
-void show_help();
-void print_rows(Table tbl);
-std::string to_lower(std::string str);
+#include "commandHandler.h"
+
+// global variables
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-std::string current_db_name;
 Table* create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info);
+
+std::string current_db_name;
+std::string to_lower(std::string str);
 std::string table_name;
 std::string db_name;
+std::string cmd = "";
+std::string statement;
+
+Database* read_sql_file(string path);
+Database* db = NULL;
+
+// function initializers
+void color(int s);
+
+void setup_intro();
+
+/*
+void show_help();
+void print_rows(Table tbl);
+void table_info(Table tbl);
 void insert_into(Database* db, vector<string> split_commands);
 void drop_table(Database* db, Table* tbl);
 void drop_database(string db_name);
 bool has_special_char(std::string const& str);
-void table_info(Table tbl);
-Database* read_sql_file(string path);
 void update_table(Database* db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable);
+*/
+
+CommandHandler* cmdHandler = new CommandHandler;
+
+
+/*	
+	these functions actually call and return the values for their sister-functions in commandHander.h 
+	the variables for cmd, db, etc. are updated after these functions run, just in case they are important
+*/
+int exitDBMS() { return cmdHandler->exitDBMS(); }
+int helpMenu() { return cmdHandler->helpMenu(); }
+int noSemiColon() { return cmdHandler->noSemiColon(); }
+int openDatabase() { int retVal = cmdHandler->openDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;}
+int createDatabase() { int retVal = cmdHandler->createDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }
+int listDatabases() { int retVal = cmdHandler->listDatabases(); return retVal; }
+int loadSQLfile() { int retVal = cmdHandler->loadSQLfile(db, current_db_name); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }
+int dropDatabase() { int retVal = cmdHandler->dropDatabase(cmd); current_db_name = cmdHandler->current_db_name; return retVal; }
+int noDBopen() { int retVal = cmdHandler->noDBopen(); return retVal; }
+int listTables() { int retVal = cmdHandler->listTables(db);  db = cmdHandler->db; return retVal; }
+int dbInfo() { int retVal = cmdHandler->dbInfo(db); return retVal; }
+int select() { int retVal = cmdHandler->select(db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;} //TODO ***************** untested ************************
+int createTable() { int retVal = cmdHandler->createTable(db, cmd, table_name); table_name = cmdHandler->table_name; db = cmdHandler->db; return retVal; }
+int insertInto() { int retVal = cmdHandler->insertInto(table_name, db, statement, cmd); table_name = cmdHandler->table_name; db = cmdHandler->db; return retVal; }  //tested, should work
+int tableInfo() { int retVal = cmdHandler->tableInfo(db, cmd, table_name); return retVal; }
+int dropTable() { int retVal = cmdHandler->dropTable(db, cmd); db = cmdHandler->db; return retVal; }
+int update() { int retVal = cmdHandler->update(db, cmd); db = cmdHandler->db; return retVal; } //TODO ***************** untested ************************
+int deleteFrom() { int retVal = cmdHandler->deleteFrom(db, statement, cmd); db = cmdHandler->db; return retVal; } //TODO ***************** untested ************************
 
 
 
-/// <summary>
-/// Gets User Input and Route To Correct Function
-/// </summary>
-/// <param name="argc"></param>
-/// <param name="argv"></param>
-/// <returns></returns>
+
 int main(int argc, char** argv)
 {
-	std::string cmd;
+
+	// run unit tests
+	UnitTests* unitTests = new UnitTests;
+	unitTests->test();
+
 
 	setup_intro();
 
-	Database* db = NULL;
 
 	while (Parser::to_lower(cmd) != "exit")
 	{
@@ -62,21 +106,88 @@ int main(int argc, char** argv)
 		std::cout << "SQL>";
 		color(7);
 		std::getline(std::cin, cmd);
-		std::string statement = Parser::to_lower(cmd);
+		statement = Parser::to_lower(cmd);
 
-		// Do something with cmd
+
+
+
+		/// <summary>
+		/// list of sql commands and references to the functions they call
+		/// </summary>
+		/// <param name="argc">command name</param>
+		/// <param name="argv">function reference</param>
+		/// <returns></returns>
+		//std::template <typename T>
+		map<string, int (*)() > sqlCommands;
+		sqlCommands = {
+			{ "exit", &exitDBMS, },
+			{ "help", &helpMenu, },
+			{ "noSemiColon", &noSemiColon, },
+			{ "openDatabase", &openDatabase, },
+			{ "createDatabase", &createDatabase, },
+			
+			{ "listDatabases", &listDatabases, },
+			{ "loadSQLfile", &loadSQLfile, },
+			{ "dropDatabase", &dropDatabase, },
+			{ "noDBopen", &noDBopen, },
+			{ "listTables", &listTables,},
+			{ "dbInfo",&dbInfo, },
+			{ "select", &select, },
+			{ "createTable", &createTable, },
+			{ "insertInto", &insertInto, },
+			{ "tableInfo", &tableInfo, },
+			{ "dropTable", &dropTable, },
+			{ "update", &update, },
+			{ "deleteFrom", &deleteFrom, }
+			
+		};
+
+
+		// Display all of the mapped functions
+		std::map<string, int(*)()>::const_iterator it = sqlCommands.begin();
+		std::map<string, int(*)()>::const_iterator end = sqlCommands.end();
+
+		// condition checking. If true, execute the function pointer (located in sqlCommands)
+		if (statement == "")								cout << "";
+		else if (statement == "exit")							(*sqlCommands.find("exit")).second();
+		else if (statement == "help")						(*sqlCommands.find("help")).second();
+		else if (statement.back() != ';')					(*sqlCommands.find("noSemiColon")).second();
+		else if (statement.find("open database ") == 0)		(*sqlCommands.find("openDatabase")).second();
+		else if (statement.find("create database") == 0)	(*sqlCommands.find("createDatabase")).second();
+		
+		else if (statement == "list databases;")			(*sqlCommands.find("listDatabases")).second();
+		else if (statement.find("load sqlfile ") == 0)		(*sqlCommands.find("loadSQLfile")).second();
+		else if (statement.find("drop database ") == 0)		(*sqlCommands.find("dropDatabase")).second();
+		else if (current_db_name.length() == 0)				(*sqlCommands.find("noDBopen")).second();
+		else if (statement == "list tables;")				(*sqlCommands.find("listTables")).second();
+		else if (statement == "db info;")					(*sqlCommands.find("dbInfo")).second();
+		else if (statement.find("select ") == 0)			(*sqlCommands.find("select")).second();
+		else if (statement.find("create table ") == 0)		(*sqlCommands.find("createTable")).second();
+		else if (statement.find("insert into") == 0)		(*sqlCommands.find("insertInto")).second();
+		else if (statement.find("table info ") == 0)		(*sqlCommands.find("tableInfo")).second();
+		else if (statement.find("drop table ") == 0)		(*sqlCommands.find("dropTable")).second();
+		else if (statement.find("update ") == 0)			(*sqlCommands.find("update")).second();
+		else if (statement.find("delete from ") == 0)		(*sqlCommands.find("deleteFrom")).second();
+		
+		else												std::cout << "Invalid Command." << std::endl;
+
+
+		/*
 		if (statement == "exit")
 		{
 			std::cout << "Good Bye" << std::endl;
 		}
+
 		else if (statement == "help")
 		{
 			show_help();
 
 		}
+
 		else if (statement.back() != ';') {
 			std::cout << "SQL command not properly terminated." << std::endl;
 		}
+
 		else if (statement.find("open database ") == 0) {
 			//current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
 			current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
@@ -253,37 +364,110 @@ int main(int argc, char** argv)
 		{
 			std::cout << "Invalid Command." << std::endl;
 		}
+		*/
 	}
 
 	return 0;
 }
+// end of main function
 
-/// <summary>
-/// Shows the help menu
-/// </summary>
-void show_help()
+
+
+
+///Author: Andrew Nunez
+///Sets the console output color
+void color(int s)
 {
-	std::cout << "Available Commands:" << std::endl;
-	std::cout << "OPEN DATABASE [name] 	- Check if the database exists and open it." << std::endl;
-	std::cout << "CREATE DATABASE 	- Creates and new database and opens a connection to it." << std::endl;
-	std::cout << "DB INFO 		- Lists the current database names." << std::endl;
-	std::cout << "DROP DATABASE 		- Deletes the given database." << std::endl;
-	std::cout << "CREATE TABLE 		- Creates a table in the current database." << std::endl; //USAGE: CREATE TABLE name ( COLNAME COLTYPE, etc );
-	std::cout << "DROP TABLE [name] 	- Drops table in current database." << std::endl; //USAGE: DROP TABLE name;
-	std::cout << "DROP DATABASE 		- Check if the database exists and drops it." << std::endl;
-	std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl;
-	std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl; // USAGE: Unknown.
-	std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl;
-	std::cout << "INSERT INTO 		- Inserts the data into the table. (In Testing))" << std::endl;
-	std::cout << "LIST DATABASES 		- Lists the current database names." << std::endl;
-	std::cout << "LIST TABLES 		- Lists the current database names." << std::endl; // USAGE: LIST TABLES:
-	std::cout << "TABLE INFO [name] 	- Lists the given table's information." << std::endl; // USAGE: TABLE INFO name;
-
+	SetConsoleTextAttribute(h, s);
 }
 
 
+
+
+
+/*
+///Author: Janita Aamir
+	///This function updates an existing value with a new one given the column names and specific row.
+void update_table(Database* db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable) {
+	Table tbl = db->get_table(table_name);
+
+	int col1Index = tbl.get_column_index(col1);
+	int col2Index = tbl.get_column_index(col2);
+
+	std::vector<std::string>::const_iterator col;
+	std::vector<std::vector<std::string> > rows = tbl.rows;
+
+
+	for (std::vector<std::string> row : rows) {
+		if (row[col2Index] == forVariable) {
+			row[col1Index] = toUpdate;
+		}
+
+	}
+
+
+}
+*/
+
+
+/*
+/// Author: Janita Aamir
+/// Creates a table with given column info
+Table* create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info)
+{
+	Table* tbl = new Table(table_name);
+	for (int i = 0; i < columns_info.size(); i++)
+	{
+		tbl->columns.insert({ columns_info[i].first, columns_info[i].second });
+	}
+	return tbl;
+}
+*/
+
+
+/*
+///Author: Janita Aamir
+///This function drops the given table from the current database.
+void drop_table(Database* db, Table* tbl) {
+	tbl->Delete();
+
+	for (std::vector<Table>::iterator it = db->tables.begin(); it != db->tables.end(); ++it)
+	{
+		if (it->table_name == tbl->table_name)
+		{
+			db->tables.erase(it);
+			break;
+		}
+	}
+	db->Save();
+}
+*/
+
+
+
+
+///Janita Aamir
+///This function is used within create table. It checks to see if the
+///database selected has any special characters that aren't allowed.
+bool has_special_char(std::string const& s)
+{
+	for (int i = 0; i < s.length(); i++)
+	{
+		if (!std::isalpha(s[i]) && !std::isdigit(s[i]) && s[i] != '_')
+			return false;
+	}
+}
+
+
+
+
+
+
+
+/// Author: Andrew Nunez
+
 /// <summary>
-/// Setups the intro, emulating a startup
+/// Setups the intro, emulating a startup sequence... we can probably have it set to actually do something interesting
 /// </summary>
 void setup_intro()
 {
@@ -305,190 +489,4 @@ void setup_intro()
 		<< "Success! Here is your shell." << std::endl
 		<< "Type [help] for a list of commands. Type [exit] to quit." << std::endl
 		<< std::endl;
-}
-
-
-/// <summary>
-/// Sets the console output color
-/// </summary>
-/// <param name="s">the color</param>
-void color(int s)
-{
-	SetConsoleTextAttribute(h, s);
-}
-
-
-
-/// <summary>
-/// TODO: UPDATE FUNCTION
-/// This function updates an exisiting value with a new one given the column names and specific row.
-/// </summary>
-/// <param name="db">The database</param>
-/// <param name="table_name">The name of the table to update</param>
-/// <param name="col1">The column name</param>
-/// <param name="toUpdate">The value to update</param>
-/// <param name="col2"></param>
-/// <param name="forVariable"></param>
-void update_table(Database* db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable) {
-	Table tbl = db->get_table(table_name);
-
-	int col1Index = tbl.get_column_index(col1);
-	int col2Index = tbl.get_column_index(col2);
-
-	std::vector<std::string>::const_iterator col;
-	std::vector<std::vector<std::string> > rows = tbl.rows;
-
-
-	for (std::vector<std::string> row : rows) {
-		if (row[col2Index] == forVariable) {
-			row[col1Index] = toUpdate;
-		}
-
-	}
-
-
-}
-
-
-/// <summary>
-/// Creates a table with given column info
-/// </summary>
-/// <param name="table_name">The name of the table</param>
-/// <param name="columns_info">A vector of names for the columns</param>
-/// <returns>The table created</returns>
-Table* create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info)
-{
-	Table* tbl = new Table(table_name);
-	for (int i = 0; i < columns_info.size(); i++)
-	{
-		tbl->columns.insert({ columns_info[i].first, columns_info[i].second });
-	}
-	return tbl;
-}
-
-
-/// <summary>
-/// This function drops the given table from the current database.
-/// </summary>
-/// <param name="db">The database pointer</param>
-/// <param name="tbl">The table pointer</param>
-void drop_table(Database* db, Table* tbl) {
-	tbl->Delete();
-
-	for (std::vector<Table>::iterator it = db->tables.begin(); it != db->tables.end(); ++it)
-	{
-		if (it->table_name == tbl->table_name)
-		{
-			db->tables.erase(it);
-			break;
-		}
-	}
-	db->Save();
-}
-
-
-/// <summary>
-/// This function drops the given database from the dbms.
-/// </summary>
-/// <param name="db_name">The name of the database</param>
-void drop_database(string db_name)
-{
-
-	std::string s = "data/" + db_name + ".db";
-
-	if (std::remove(s.c_str()) != 0)
-	{
-
-		perror("Error deleting file");
-	}
-	else
-	{
-		puts("File successfully deleted");
-		current_db_name = "";
-	}
-}
-
-
-/// <summary>
-/// Shows the given table information
-/// </summary>
-/// <param name="tbl">The table class</param>
-void table_info(Table tbl)
-{
-	std::cout << "Table name: " << tbl.table_name << std::endl;
-	std::cout << "----------------------------- " << std::endl;
-	std::cout << "Column names: " << std::endl;
-	std::vector<std::string> it = tbl.get_column_names();
-
-	for (int i = 0; i < it.size(); i++)
-	{
-		cout << "\t"
-			<< "-" << it.at(i) << '\n';
-	}
-
-	std::cout << "----------------------------- " << std::endl;
-	std::cout << "Number of Rows: " << tbl.rows.size() << std::endl;
-}
-
-
-/// <summary>
-/// This function is used within create table. It checks to see if the database selected has any special characters that aren'MinDegree allowed.
-/// </summary>
-/// <param name="s">The special character</param>
-/// <returns>True if there are any special characters</returns>
-bool has_special_char(std::string const& s)
-{
-	for (int i = 0; i < s.length(); i++)
-	{
-		if (!std::isalpha(s[i]) && !std::isdigit(s[i]) && s[i] != '_')
-			return false;
-	}
-}
-
-
-/// <summary>
-/// Loads the sql file
-/// Parses the data
-/// Runs the queries
-/// Saves the database
-/// </summary>
-/// <param name="path">The path to the sql file</param>
-/// <returns>The pointer to the database</returns>
-Database* read_sql_file(string path)
-{
-	ifstream infile("data/" + path, std::ios::in | std::ios::binary);
-	string file_contents{ istreambuf_iterator<char>(infile), istreambuf_iterator<char>() };
-	file_contents.erase(std::remove(file_contents.begin(), file_contents.end(), '\n'), file_contents.end());
-
-	vector<string> commands = split_text(file_contents, ";");
-	string table_name;
-	string current_db_name;
-	Database* db = new Database();
-
-	for (string statement : commands)
-	{
-		string statement_lowercase = Parser::to_lower(Utils::trim(statement));
-
-		if (statement_lowercase.find("create database") == 0)
-		{
-			current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
-			db->database_name = current_db_name;
-		}
-		else if (statement_lowercase.find("create table ") == 0)
-		{
-			table_name = Parser::get_table_name(statement, "table", "(");
-			cout << "Table Created: " << table_name << endl;
-			vector<string> cols = Parser::get_create_columns(statement);
-			Table* tbl = new Table(table_name, cols);
-			db->AddTable(*tbl);
-		}
-		else if (statement_lowercase.find("insert into") == 0)
-		{
-			table_name = Parser::get_table_name(statement, "into", "(");
-			db->insert_into(statement, table_name);
-			db->Save();
-		}
-	}
-	db->Save();
-	return db;
 }

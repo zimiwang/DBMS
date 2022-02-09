@@ -4,13 +4,15 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include "rowds.h"
+
 using namespace std;
 const int MAX = 3;
 
 
 struct PrimaryKey {
     int key;
-    int* locationPtr;
+    Row* locationPtr;
 };
 
 
@@ -41,7 +43,7 @@ class BPTree {
 public:
     BPTree();                   // constructor
     void search(int);
-    void insert(int, int*);
+    void insert(int, Row*);
     void display(Node*);
     void remove(int);
     Node* getRoot();
@@ -81,7 +83,7 @@ void BPTree::search(int x) {
 }
 
 // Insert Operation
-void BPTree::insert(int x, int* location) {
+void BPTree::insert(int x, Row* location) {
     // create root node 
     if (root == NULL) {
         root = new Node;                        // new node
