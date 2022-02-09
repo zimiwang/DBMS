@@ -24,6 +24,7 @@ public:
 	/// <returns>1 on execution</returns>
 	int exitDBMS()
 	{
+		db->Save();
 		std::cout << "Good Bye user\n";
 		return 1;
 	}
@@ -299,7 +300,7 @@ public:
 	/// command handler: insert table information into the db
 	/// </summary>
 	/// <returns>1 on completion</returns>
-	int insertInto(string new_table_name, Database *new_db, string new_statement)
+	int insertInto(string new_table_name, Database* new_db, string new_statement, string new_cmd)
 	{
 		table_name = new_table_name;
 		db = new_db;
@@ -308,9 +309,13 @@ public:
 		// create a new table by parsing data from the statement
 		table_name = Parser::get_table_name(statement, "into", "(");
 
-		db->insert_into(cmd, table_name);
+		db->insert_into(new_cmd, table_name);
 		db->Save();
 		return 1;
+
+		table_name = Parser::get_table_name(statement, "into", "(");
+		db->insert_into(new_cmd, table_name);
+		db->Save();
 	}
 
 

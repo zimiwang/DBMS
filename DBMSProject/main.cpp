@@ -71,7 +71,7 @@ int listTables() { int retVal = cmdHandler->listTables(db);  db = cmdHandler->db
 int dbInfo() { int retVal = cmdHandler->dbInfo(db); return retVal; }
 int select() { int retVal = cmdHandler->select(db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;} //TODO ***************** untested ************************
 int createTable() { int retVal = cmdHandler->createTable(db, cmd, table_name); table_name = cmdHandler->table_name; db = cmdHandler->db; return retVal; }
-int insertInto() { int retVal = cmdHandler->insertInto(table_name, db, statement); table_name = cmdHandler->table_name; db = cmdHandler->db; return retVal; }  //TODO ***************** untested ************************
+int insertInto() { int retVal = cmdHandler->insertInto(table_name, db, statement, cmd); table_name = cmdHandler->table_name; db = cmdHandler->db; return retVal; }  //tested, should work
 int tableInfo() { int retVal = cmdHandler->tableInfo(db, cmd, table_name); return retVal; }
 int dropTable() { int retVal = cmdHandler->dropTable(db, cmd); db = cmdHandler->db; return retVal; }
 int update() { int retVal = cmdHandler->update(db, cmd); db = cmdHandler->db; return retVal; } //TODO ***************** untested ************************

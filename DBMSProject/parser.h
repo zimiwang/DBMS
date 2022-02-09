@@ -341,10 +341,10 @@ std::string Parser::get_table_name(string cmd, string first_delim, string second
 	string exp = "";
 
 	if (second_delim == "(") {
-		exp = first_delim + "(?:\\s*)([A-Za-z\\-_]*)(?:\\s*)\\(";
+		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)\\(";
 	}
 	else {
-		exp = first_delim + "(?:\\s*)([A-Za-z\\-_]*)(?:\\s*)" + second_delim;
+		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)" + second_delim;
 	}
 
 	regex str_expr(exp, regex_constants::icase);
