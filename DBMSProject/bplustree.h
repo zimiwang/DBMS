@@ -524,42 +524,42 @@ void BPTree::display(Node* cursor) {
 Node* BPTree::getRoot() {
     return root;
 }
-
-int main() {
-    BPTree node;
-    int a = 45;
-    int b = 232;
-    int c = 235;
-    int d = 291;
-    int e = 3209;
-    int f = 21;
-    int ab = 821;
-    int cd = 124;
-    int ef = 29;
-
-    int* g = &a;
-    int* h = &b;
-    int* i = &c;
-    int* j = &d;
-    int* k = &e;
-    int* l = &f;
-    int* m = &ab;
-    int* n = &cd;
-    int* o = &ef;
-
-
-
-    node.insert(5, g);
-    node.insert(15, h);
-    node.insert(25, i);
-    node.insert(35, j);
-    node.insert(45, k);
-    node.insert(55, l);
-    node.insert(40, m);
-    node.insert(30, n);
-    node.insert(20, o);
-    node.remove(35);
-    node.display(node.getRoot());
-
-    node.search(15);
-}
+//
+//int main() {
+//    BPTree node;
+//    int a = 45;
+//    int b = 232;
+//    int c = 235;
+//    int d = 291;
+//    int e = 3209;
+//    int f = 21;
+//    int ab = 821;
+//    int cd = 124;
+//    int ef = 29;
+//
+//    int* g = &a;
+//    int* h = &b;
+//    int* i = &c;
+//    int* j = &d;
+//    int* k = &e;
+//    int* l = &f;
+//    int* m = &ab;
+//    int* n = &cd;
+//    int* o = &ef;
+//
+//
+//
+//    node.insert(5, g);
+//    node.insert(15, h);
+//    node.insert(25, i);
+//    node.insert(35, j);
+//    node.insert(45, k);
+//    node.insert(55, l);
+//    node.insert(40, m);
+//    node.insert(30, n);
+//    node.insert(20, o);
+//    node.remove(35);
+//    node.display(node.getRoot());
+//
+//    node.search(15);
+//}
