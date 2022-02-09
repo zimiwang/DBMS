@@ -92,7 +92,7 @@ void BPTree::insert(int x, int* location) {
     }
     else {
         Node* currentNode = root;   // set current node to root
-        Node* parent;               // parent node
+        Node* parent = NULL;               // parent node
 
         // if the curretNode is not a leaf node then decide to go left or right
         while (currentNode->IS_LEAF == false) {
@@ -238,7 +238,7 @@ void BPTree::remove(int x) {
     }
     else {
         Node* currentNode = root;
-        Node* parent;
+        Node* parent = NULL;
         int leftSibling, rightSibling;
         // move down the tree
         while (currentNode->IS_LEAF == false) {
@@ -485,7 +485,7 @@ void BPTree::removeInternal(PrimaryKey x, Node* currentNode, Node* child) {
 
 // Find the parent
 Node* BPTree::findParent(Node* cursor, Node* child) {
-    Node* parent;
+    Node* parent = NULL;
     if (cursor->IS_LEAF || (cursor->ptr[0])->IS_LEAF) {
         return NULL;
     }
@@ -523,18 +523,41 @@ Node* BPTree::getRoot() {
     return root;
 }
 
-//int main() {
-//    BPTree node;
-//    node.insert(5);
-//    node.insert(15);
-//    node.insert(25);
-//    node.insert(35);
-//    node.insert(45);
-//    node.insert(55);
-//    node.insert(40);
-//    node.insert(30);
-//    node.insert(20);
-//    node.display(node.getRoot());
-//
-//    node.search(15);
-//}
+int main() {
+    BPTree node;
+    int a = 45;
+    int b = 232;
+    int c = 235;
+    int d = 291;
+    int e = 3209;
+    int f = 21;
+    int ab = 821;
+    int cd = 124;
+    int ef = 29;
+
+    int* g = &a;
+    int* h = &b;
+    int* i = &c;
+    int* j = &d;
+    int* k = &e;
+    int* l = &f;
+    int* m = &ab;
+    int* n = &cd;
+    int* o = &ef;
+
+
+
+    node.insert(5, g);
+    node.insert(15, h);
+    node.insert(25, i);
+    node.insert(35, j);
+    node.insert(45, k);
+    node.insert(55, l);
+    node.insert(40, m);
+    node.insert(30, n);
+    node.insert(20, o);
+    node.remove(35);
+    node.display(node.getRoot());
+
+    node.search(15);
+}
