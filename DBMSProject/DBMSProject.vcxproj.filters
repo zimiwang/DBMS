@@ -35,6 +35,9 @@
     <ClInclude Include="bminustree.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="rowds.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

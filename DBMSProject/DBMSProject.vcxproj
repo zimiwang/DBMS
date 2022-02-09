@@ -146,6 +146,7 @@
     <ClInclude Include="filehelper.h" />
     <ClInclude Include="bminustree.h" />
     <ClInclude Include="parser.h" />
+    <ClInclude Include="rowds.h" />
     <ClInclude Include="table.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
