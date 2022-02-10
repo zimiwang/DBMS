@@ -240,13 +240,13 @@ public:
 		try {
 
 			//std::string tbl_name = cmd.substr(statement.find(" from") + 6);
-			std::string tbl_name = Parser::get_table_name(cmd, "from", "where");
-
+			//std::string tbl_name = Parser::get_table_name(cmd, "from", "where");
+			std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
 			cout << "Selecting from Table: " << tbl_name << endl;
 
-			if (tbl_name.length() == 0) {
-				tbl_name = Parser::get_table_name(cmd, "from", ";");
-			}
+			//if (tbl_name.length() == 0) {
+			//	tbl_name = Parser::get_table_name(cmd, "from", ";");
+			//}
 
 			tbl_name = Utils::remove_char(tbl_name, ';');
 
