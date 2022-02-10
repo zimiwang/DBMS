@@ -111,8 +111,7 @@ Update the specified value based on the provided information.
 
     update [Table Name] set [Column Name] = [New value] where [Column Name] = [Existing Value];
 
-Note that before "where" is used to put a new value of a column, after "where" is used to input an existing value of a column.  
-Note that if the table has only one column of type int, then the data cannot be updated according to the value of this column. Otherwise, the program will be terminated.  
+Note that both the column name after set and after where must correspond to the column name in the table. Otherwise, the program will crash and stop.  
 
 **8. Select From**  
 Select table values and print to terminal. This command line can select one or multiple table columns.  
@@ -134,7 +133,7 @@ Delete a existing row by provided column value.
 
     delete from [Table Name] where [Column Name] = [Existing Value];
 
-Note that if the table has only one column of type int, then the data cannot be deleted according to the value of this column. Otherwise, the program will be terminated.  
+Note that the column name after must correspond to the column name in the table. Otherwise, the program will crash and stop.  
 
 **10. Insert Info**  
 Insert values into an existing table.   
