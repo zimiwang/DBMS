@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "rowds.h"
+#include "row.h"
 
 using namespace std;
 const int MAX = 3;
@@ -42,7 +42,7 @@ class BPTree {
 
 public:
     BPTree();                   // constructor
-    void search(int);
+    Row* search(int);
     void insert(int, Row*);
     void display(Node*);
     void remove(int);
@@ -54,28 +54,28 @@ BPTree::BPTree() {
 }
 
 // Search operation
-void BPTree::search(int x) {
+Row* BPTree::search(int x) {
     if (root == NULL) {
         cout << "Tree is empty\n";
     }
     else {
-        Node* cursor = root;
-        while (cursor->IS_LEAF == false) {
-            for (int i = 0; i < cursor->size; i++) {
-                if (x < cursor->key[i].key) {
-                    cursor = cursor->ptr[i];
+        Node* currentNode = root;
+        while (currentNode->IS_LEAF == false) {
+            for (int i = 0; i < currentNode->size; i++) {
+                if (x < currentNode->key[i].key) {
+                    currentNode = currentNode->ptr[i];
                     break;
                 }
-                if (i == cursor->size - 1) {
-                    cursor = cursor->ptr[i + 1];
+                if (i == currentNode->size - 1) {
+                    currentNode = currentNode->ptr[i + 1];
                     break;
                 }
             }
         }
-        for (int i = 0; i < cursor->size; i++) {
-            if (cursor->key[i].key == x) {
+        for (int i = 0; i < currentNode->size; i++) {
+            if (currentNode->key[i].key == x) {
                 cout << "Found\n";
-                return;
+                return currentNode->key[i].locationPtr;
             }
         }
         cout << "Not found\n";

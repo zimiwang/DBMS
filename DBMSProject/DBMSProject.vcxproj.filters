@@ -35,7 +35,7 @@
     <ClInclude Include="bminustree.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="rowds.h">
+    <ClInclude Include="row.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
