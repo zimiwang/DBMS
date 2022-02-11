@@ -217,10 +217,10 @@ namespace Tests
             
             Row* rw = node.search(30);                 
             string expected = "big";
-            /*
+            
 			Assert::AreEqual(expected, *rw->strColumn[0].GetValue());
-           */
-            Assert::AreEqual(expected,1);
+           
+            //Assert::AreEqual(expected,rw);
 
 		}
 	};
