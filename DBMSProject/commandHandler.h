@@ -24,7 +24,10 @@ public:
 	/// <returns>1 on execution</returns>
 	int exitDBMS()
 	{
-		db->Save();
+		// save only if a db is open
+		if( !current_db_name.empty())
+			db->Save();
+	
 		std::cout << "Good Bye user\n";
 		return 1;
 	}

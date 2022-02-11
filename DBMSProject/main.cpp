@@ -17,7 +17,6 @@
 #include <iostream>
 #include <cerrno>
 
-#include "unitTests.h"
 
 #include "commandHandler.h"
 
@@ -83,9 +82,6 @@ int deleteFrom() { int retVal = cmdHandler->deleteFrom(db, statement, cmd); db =
 int main(int argc, char** argv)
 {
 
-	// run unit tests
-	UnitTests* unitTests = new UnitTests;
-	unitTests->test();
 
 
 	setup_intro();
