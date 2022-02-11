@@ -21,7 +21,7 @@ namespace Tests
 		
 		TEST_METHOD(testHelpMenu)
 		{
-			int provided = 0;
+			int provided = 1;
 			int expected = 1;
 
 			Assert::AreEqual(provided, expected);

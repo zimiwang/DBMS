@@ -17,6 +17,8 @@ namespace Tests
 	{
 	public:
 
+        Row* rw;
+
 
         Row row1{ 1,1,1 };
         Row row2{ 1,1,1 };
@@ -200,7 +202,6 @@ namespace Tests
 
 		TEST_METHOD(TestMethod1)
 		{
-            
 
 	        BPTree node;         
 
@@ -215,12 +216,12 @@ namespace Tests
             node.insert(20, &row9);
             
             
-            Row* rw = node.search(30);                 
+            rw = node.search(30);                 
             string expected = "big";
             
-			Assert::AreEqual(expected, *rw->strColumn[0].GetValue());
+			Assert::AreEqual(expected, * rw->strColumn[0].GetValue() );
            
-            //Assert::AreEqual(expected,rw);
+            //Assert::AreEqual(expected, (string)"big");
 
 		}
 	};
