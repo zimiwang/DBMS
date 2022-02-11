@@ -75,8 +75,8 @@ int tableInfo() { int retVal = cmdHandler->tableInfo(db, cmd, table_name); retur
 int dropTable() { int retVal = cmdHandler->dropTable(db, cmd); db = cmdHandler->db; return retVal; }
 int update() { int retVal = cmdHandler->update(db, cmd); db = cmdHandler->db; return retVal; } //TODO ***************** untested ************************
 int deleteFrom() { int retVal = cmdHandler->deleteFrom(db, statement, cmd); db = cmdHandler->db; return retVal; } //TODO ***************** untested ************************
-
-
+int renameTable() { int retVal = cmdHandler->renameTable(db, cmd); db = cmdHandler->db; return retVal; }
+int renameColumn() { int retVal = cmdHandler->renameColumn(db, cmd); db = cmdHandler->db; return retVal; }
 
 
 int main(int argc, char** argv)
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 			{ "noSemiColon", &noSemiColon, },
 			{ "openDatabase", &openDatabase, },
 			{ "createDatabase", &createDatabase, },
-			
+
 			{ "listDatabases", &listDatabases, },
 			{ "loadSQLfile", &loadSQLfile, },
 			{ "dropDatabase", &dropDatabase, },
@@ -134,7 +134,9 @@ int main(int argc, char** argv)
 			{ "tableInfo", &tableInfo, },
 			{ "dropTable", &dropTable, },
 			{ "update", &update, },
-			{ "deleteFrom", &deleteFrom, }
+			{ "deleteFrom", &deleteFrom, },
+			{ "renameTable", &renameTable, },
+			{ "renameColumn", & renameColumn, }
 			
 		};
 
@@ -164,6 +166,8 @@ int main(int argc, char** argv)
 		else if (statement.find("drop table ") == 0)		(*sqlCommands.find("dropTable")).second();
 		else if (statement.find("update ") == 0)			(*sqlCommands.find("update")).second();
 		else if (statement.find("delete from ") == 0)		(*sqlCommands.find("deleteFrom")).second();
+		else if (statement.find("rename table ") == 0)		(*sqlCommands.find("renameTable")).second();
+		else if (statement.find("rename column ") == 0)		(*sqlCommands.find("renameColumn")).second();
 		
 		else												std::cout << "Invalid Command." << std::endl;
 

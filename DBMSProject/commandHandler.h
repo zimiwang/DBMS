@@ -242,14 +242,8 @@ public:
 		// Parses the select command
 		try {
 
-			//std::string tbl_name = cmd.substr(statement.find(" from") + 6);
-			//std::string tbl_name = Parser::get_table_name(cmd, "from", "where");
 			std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
 			cout << "Selecting from Table: " << tbl_name << endl;
-
-			//if (tbl_name.length() == 0) {
-			//	tbl_name = Parser::get_table_name(cmd, "from", ";");
-			//}
 
 			tbl_name = Utils::remove_char(tbl_name, ';');
 
@@ -515,7 +509,39 @@ public:
 		return 1;
 	}
 
-	
+	/// <summary>
+	/// command handler: modified an existing table name
+	/// </summary>
+	/// <returns>1 on completion</returns>
+	//rename table [old table name] to [new table name];
+	int renameTable(Database* new_db, string new_cmd) 
+	{
+		cmd = new_cmd;
+		db = new_db;
+
+		// get old table name by sending command through parser
+		std::string table_name = Parser::get_table_name(cmd, "table", "to");
+		std::string new_table_name = Utils::get_string_between_two_strings(cmd, "to", ";");
+		
+		db->RenameTable(table_name, new_table_name);
+		db->Save();
+
+		return 1;
+	}
+
+	int renameColumn(Database* new_db, string new_cmd)
+	{
+		cmd = new_cmd;
+		db = new_db;
+
+		// get old column name by sending command through parser
+		std::string old_column_name = Utils::get_string_between_two_strings(cmd, "column", "to");
+		std::string new_column_name = Utils::get_string_between_two_strings(cmd, "to", ";");
+
+		db->RenameColumn(old_column_name, new_column_name);
+
+		return 1;
+	}
 
 	/// Author: Andrew Nunez
 
@@ -539,7 +565,7 @@ public:
 		std::cout << "LIST DATABASES 		- Lists the current database names." << std::endl;
 		std::cout << "LIST TABLES 		- Lists the current database names." << std::endl;
 		std::cout << "TABLE INFO [name] 	- Lists the current database names." << std::endl;
-
+		std::cout << "RENAME TABLE		- Modifies an existing table name" << std::endl;
 	}
 
 

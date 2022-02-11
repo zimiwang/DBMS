@@ -42,6 +42,8 @@ public:
 	void List_Info();
 	Table get_table(std::string tbl_name);
 	void UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause);
+	void RenameTable(std::string old_table_name, std::string new_table_name);
+	void RenameColumn(std::string old_column_name, std::string new_column_name);
 
 	
 	/// <summary>
@@ -383,6 +385,33 @@ void Database::SaveTable(Table table)
 	}
 
 	tables[count] = table;
+}
+
+void Database::RenameTable(std::string old_table_name, std::string new_table_name)
+{
+	int count = 0;
+
+	Table tbl = this->get_table(old_table_name);
+
+
+	for (Table tbl : tables) {
+		if (tbl.table_name == old_table_name) {
+			tables.erase(tables.begin() + count);
+			tables.push_back(new_table_name);
+		}
+		count = count + 1;
+	}
+
+	tbl.Rename_table(new_table_name);
+
+	this->Save();
+}
+
+void Database::RenameColumn(std::string old_column_name, std::string new_column_name)
+{
+
+	
+
 }
 
 
