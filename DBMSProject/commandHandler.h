@@ -4,17 +4,19 @@
 */
 
 #pragma once
+#include "database.h"
 
+using namespace std;
 
 class CommandHandler
 {
 public:
 
-	string current_db_name;
+	std::string current_db_name;
 	Database* db;
 	std::string table_name;
-	string cmd;
-	string statement;
+	std::string cmd;
+	std::string statement;
 
 	
 
