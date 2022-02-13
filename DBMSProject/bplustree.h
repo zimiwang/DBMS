@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include "row.h"
+#include <list>
 
 using namespace std;
 const int MAX = 3;
@@ -30,7 +31,8 @@ public:
 
 Node::Node() {
     key = new PrimaryKey[MAX];         // number of keys in a node
-    ptr = new Node * [MAX + 1]; // array of pointers to other nodes
+    ptr = new Node*[MAX + 1]; // array of pointers to other nodes
+    
 }
 
 // BP tree
@@ -39,10 +41,12 @@ class BPTree {
     void insertInternal(PrimaryKey, Node*, Node*); // insert internal function
     void removeInternal(PrimaryKey, Node*, Node*);
     Node* findParent(Node*, Node*);         // find parent of given node
+    Node* searchInternal(int);
 
 public:
     BPTree();                   // constructor
     Row* search(int);
+    list<Row*> searchMultiple(int, int);
     void insert(int, Row*);
     void display(Node*);
     void remove(int);
@@ -53,32 +57,87 @@ BPTree::BPTree() {
     root = NULL;
 }
 
-// Search operation
-Row* BPTree::search(int x) {
+
+Node* BPTree::searchInternal(int x) {
+    Node* currentNode = root;
+    while (currentNode->IS_LEAF == false) {             // Go through non leaf nodes until it gets to a leaf node
+        for (int i = 0; i < currentNode->size; i++) {
+            if (x < currentNode->key[i].key) {
+                currentNode = currentNode->ptr[i];
+                break;
+            }
+            if (i == currentNode->size - 1) {
+                currentNode = currentNode->ptr[i + 1];
+                break;
+            }
+        }
+    }
+    return currentNode;
+}
+
+
+/// <summary>
+/// Search multiple leaves
+/// </summary>
+/// <param name="min"></param>
+/// <param name="max"></param>
+/// <returns>An array of rows</returns>
+list<Row*> BPTree::searchMultiple(int min, int max) {
     if (root == NULL) {
         cout << "Tree is empty\n";
     }
     else {
-        Node* currentNode = root;
-        while (currentNode->IS_LEAF == false) {
+        Node* currentNode = searchInternal(min);        
+        list<Row*> rows;
+        int currentValue = min;
+        while (currentValue < max) {
             for (int i = 0; i < currentNode->size; i++) {
-                if (x < currentNode->key[i].key) {
-                    currentNode = currentNode->ptr[i];
+                if (currentNode->key[i].key == min) {
+                    // add the row
+                    rows.push_front(currentNode->key[i].locationPtr);                                        
+                }
+                else if (currentNode->key[i].key == max) {
+                    // add row and exit
+                    rows.push_front(currentNode->key[i].locationPtr);
+                    currentValue = currentNode->key[i].key;
                     break;
                 }
-                if (i == currentNode->size - 1) {
-                    currentNode = currentNode->ptr[i + 1];
-                    break;
+                else if (currentNode->key[i].key > min) {        
+                    // add row and change current value
+                    rows.push_front(currentNode->key[i].locationPtr);                    
+                    currentValue = currentNode->key[i].key;
                 }
             }
+            // next node
+            for (int i = 2; i < MAX + 1; i++) {
+                Node* checkNode = currentNode->ptr[i];
+                if (checkNode != NULL) {
+                    currentNode = currentNode->ptr[i];
+                    break;
+                }                
+            }            
         }
-        for (int i = 0; i < currentNode->size; i++) {
+
+        return rows;
+    }
+}
+
+// Search operation
+Row* BPTree::search(int x) {
+    if (root == NULL) {
+        cout << "Tree is empty\n";
+        return NULL;
+    }
+    else {
+        Node* currentNode = searchInternal(x);        
+        for (int i = 0; i < currentNode->size; i++) {       // traverse the currentNode keys 
             if (currentNode->key[i].key == x) {
                 cout << "Found\n";
                 return currentNode->key[i].locationPtr;
             }
-        }
+        }        
         cout << "Not found\n";
+        return NULL;
     }
 }
 
@@ -127,7 +186,7 @@ void BPTree::insert(int x, Row* location) {
         }
         else {
             // if currentNode is filled
-            Node* newNode = new Node;                               // create new node
+            Node* newNode = new Node;                               // create new node pointer
             PrimaryKey virtualNode[MAX + 1];                        // create an array of int MAX + 1
             for (int i = 0; i < MAX; i++) {                 
                 virtualNode[i].key = currentNode->key[i].key;       // copies the keys of the currentNode to virtualNode

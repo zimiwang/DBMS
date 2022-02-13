@@ -198,10 +198,12 @@ namespace Tests
             row11.intColumn[0] = column24;
         }
 
-		TEST_METHOD(TestMethod1)
-		{
-            
 
+		/// <summary>
+		/// Search 1
+		/// </summary>
+		TEST_METHOD(TestMethod1)
+		{           
 	        BPTree node;         
 
             node.insert(5,  &row1);
@@ -220,5 +222,166 @@ namespace Tests
 			Assert::AreEqual(expected, *rw->strColumn[0].GetValue());
             
 		}
+        /// <summary>
+        /// Search 2
+        /// </summary>
+        TEST_METHOD(TestMethod2)
+        {
+            BPTree node;
+
+            node.insert(5, &row1);
+            node.insert(15, &row2);
+            node.insert(25, &row3);
+            node.insert(35, &row4);
+            node.insert(45, &row5);
+            node.insert(55, &row6);
+            node.insert(40, &row7);
+            node.insert(30, &row8);
+            node.insert(20, &row9);
+
+            Row* rw = node.search(35);
+            string expected = "big";
+
+            Assert::AreNotEqual(expected, *rw->strColumn[0].GetValue());
+        }
+
+        /// <summary>
+        /// Search 1
+        /// </summary>
+        TEST_METHOD(TestMethod3)
+        {
+            BPTree node;
+
+            node.insert(5, &row1);
+            node.insert(15, &row2);
+            node.insert(25, &row3);
+            node.insert(35, &row4);
+            node.insert(45, &row5);
+            node.insert(55, &row6);
+            node.insert(40, &row7);
+            node.insert(30, &row8);
+            node.insert(20, &row9);
+
+            Row* rw = node.search(5);
+            char expected = 'c';
+
+            Assert::AreEqual(expected, *rw->charColumn[0].GetValue());
+        }
+
+        /// <summary>
+        /// Delete Method
+        /// </summary>
+        TEST_METHOD(TestMethod4)
+        {
+            BPTree node;
+
+            node.insert(5, &row1);
+            node.insert(15, &row2);
+            node.insert(25, &row3);
+            node.insert(35, &row4);
+            node.insert(45, &row5);
+            node.insert(55, &row6);
+            node.insert(40, &row7);
+            node.insert(30, &row8);
+            node.insert(20, &row9);
+            node.remove(40);
+
+            Row* rw = node.search(40);            
+
+            Assert::IsNull(rw);
+        }
+
+
+        /// <summary>
+        /// Delete Method
+        /// </summary>
+        TEST_METHOD(TestMethod5)
+        {
+            BPTree node;
+
+            node.insert(5, &row1);
+            node.insert(15, &row2);
+            node.insert(25, &row3);
+            node.insert(35, &row4);
+            node.insert(45, &row5);
+            node.insert(55, &row6);
+            node.insert(40, &row7);
+            node.insert(30, &row8);
+            node.insert(20, &row9);
+            node.remove(5);
+
+            Row* rw = node.search(5);
+
+            Assert::IsNull(rw);
+        }
+
+
+        /// <summary>
+        /// Delete Method
+        /// </summary>
+        TEST_METHOD(TestMethod6)
+        {
+            BPTree node;
+
+            node.insert(5, &row1);
+            node.insert(15, &row2);
+            node.insert(25, &row3);
+            node.insert(35, &row4);
+            node.insert(45, &row5);
+            node.insert(55, &row6);
+            node.insert(40, &row7);
+            node.insert(30, &row8);
+            node.insert(20, &row9);
+            node.remove(40);
+
+            Row* rw = node.search(40);
+
+            Assert::IsNull(rw);
+        }
+
+        /// <summary>
+        /// Search 4
+        /// </summary>
+        TEST_METHOD(TestMethod7)
+        {
+            BPTree node;
+
+            node.insert(5, &row1);
+            node.insert(15, &row2);
+            node.insert(25, &row3);
+            node.insert(35, &row4);
+            node.insert(45, &row5);
+            node.insert(55, &row6);
+            node.insert(40, &row7);
+            node.insert(30, &row8);
+            node.insert(20, &row9);
+            
+
+            Row* rw = node.search(3);
+
+            Assert::IsNull(rw);
+        }
+
+        TEST_METHOD(TestMethod8)
+        {
+            BPTree node;
+
+            node.insert(5, &row1);
+            node.insert(15, &row2);
+            node.insert(25, &row3);
+            node.insert(35, &row4);
+            node.insert(45, &row5);
+            node.insert(55, &row6);
+            node.insert(40, &row7);
+            node.insert(30, &row8);
+            node.insert(20, &row9);
+
+
+            list<Row*> rw = node.searchMultiple(5, 35);
+
+            Assert::AreEqual(*row1.charColumn[0].GetValue(), *rw.back()->charColumn[0].GetValue());
+            Assert::AreEqual(*row4.intColumn[0].GetValue(), *rw.front()->intColumn[0].GetValue());
+        }
+
 	};
 }
