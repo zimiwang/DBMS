@@ -32,7 +32,9 @@ public:
 Node::Node() {
     key = new PrimaryKey[MAX];         // number of keys in a node
     ptr = new Node*[MAX + 1]; // array of pointers to other nodes
-    
+    for (int i = 0; i < MAX; i++) {
+        ptr[i] = nullptr;
+    }
 }
 
 // BP tree
@@ -91,30 +93,41 @@ list<Row*> BPTree::searchMultiple(int min, int max) {
         list<Row*> rows;
         int currentValue = min;
         while (currentValue < max) {
+            if (!currentNode) {
+                break;
+            }
             for (int i = 0; i < currentNode->size; i++) {
                 if (currentNode->key[i].key == min) {
                     // add the row
-                    rows.push_front(currentNode->key[i].locationPtr);                                        
+                    rows.push_back(currentNode->key[i].locationPtr);                                        
                 }
                 else if (currentNode->key[i].key == max) {
                     // add row and exit
-                    rows.push_front(currentNode->key[i].locationPtr);
+                    rows.push_back(currentNode->key[i].locationPtr);
                     currentValue = currentNode->key[i].key;
                     break;
                 }
-                else if (currentNode->key[i].key > min) {        
+                else if (currentNode->key[i].key > min && currentNode->key[i].key < max) {
                     // add row and change current value
-                    rows.push_front(currentNode->key[i].locationPtr);                    
+                    rows.push_back(currentNode->key[i].locationPtr);                    
                     currentValue = currentNode->key[i].key;
+                }
+                else {
+                    // could not find key
+                    currentValue = max + 1;
+                    break;
                 }
             }
             // next node
-            for (int i = 2; i < MAX + 1; i++) {
-                Node* checkNode = currentNode->ptr[i];
-                if (checkNode != NULL) {
+            for (int i = 2; i < MAX + 1; i++) {                
+                if (currentNode->ptr[i]) {
                     currentNode = currentNode->ptr[i];
                     break;
-                }                
+                }
+                if (!currentNode->ptr[i] && i == MAX) {
+                    currentNode = NULL;
+                    break;
+                }
             }            
         }
 
@@ -182,7 +195,7 @@ void BPTree::insert(int x, Row* location) {
             currentNode->size++;                                        // increase size of node
 
             currentNode->ptr[currentNode->size] = currentNode->ptr[currentNode->size - 1];  // 
-            currentNode->ptr[currentNode->size - 1] = NULL;
+            currentNode->ptr[currentNode->size - 1] = nullptr;
         }
         else {
             // if currentNode is filled
@@ -205,8 +218,9 @@ void BPTree::insert(int x, Row* location) {
             newNode->size = MAX + 1 - (MAX + 1) / 2;        // assign newNode size
 
             currentNode->ptr[currentNode->size] = newNode;  // 
-            newNode->ptr[newNode->size] = currentNode->ptr[MAX];   
-            currentNode->ptr[MAX] = NULL;
+            newNode->ptr[newNode->size] = currentNode->ptr[MAX];  
+            newNode->ptr[MAX] = nullptr;
+            currentNode->ptr[MAX] = nullptr;
 
             for (i = 0; i < currentNode->size; i++) {       // assign keys to curretNode from virtualNode for new currentNode size
                 currentNode->key[i] = virtualNode[i];
