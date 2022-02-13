@@ -44,6 +44,10 @@ public:
 
 	int get_column_index(std::string column_name);
 
+	void Rename_table(std::string new_table_name);
+
+	void Rename_column(std::string new_column_name);
+
 	// TODO: Add column names
 	std::vector<std::vector<std::string> > Select(std::vector<std::string> col_names);
 
@@ -316,3 +320,13 @@ void Table::DeleteRow(vector<string> row) {
 	rows.erase(std::remove(rows.begin(), rows.end(), row), rows.end());
 }
 #pragma once
+
+void Table::Rename_table(std::string new_table_name) 
+{
+	this->table_name = new_table_name;
+}
+
+void Table::Rename_column(std::string new_column_name)
+{
+
+}
