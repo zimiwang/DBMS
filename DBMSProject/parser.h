@@ -33,9 +33,9 @@ public:
 /// <returns>S but lowercase.</returns>
 std::string Parser::to_lower(std::string s)
 {
-	std::string keywords[14] = {"open", "database", "create", "db", "info",
+	std::string keywords[15] = {"open", "database", "create", "db", "info",
 		"table" , "drop" , "select" , "from" , "update", "delete", "insert",
-		"into", "rename" };
+		"into", "rename", "column"};
 	//first save a copy of the input
 	std::string input_copy = s;
 
@@ -62,7 +62,7 @@ std::string Parser::to_lower(std::string s)
 	for (int i = 0; i < split.size(); i++)
 	{
 		bool iskey = false;
-		for (int j = 0; j < 14; j++)
+		for (int j = 0; j < 15; j++)
 		{
 			if (split[i].find(keywords[j]) != string::npos)
 			{

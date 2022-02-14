@@ -190,6 +190,18 @@ public:
 		return 1;
 	}
 
+	/// <summary>
+	/// command handler: drop a named column from a table
+	/// </summary>
+	/// <returns>1 on completion</returns>
+	int dropColumn(string new_cmd)
+	{
+		cmd = new_cmd;
+		string colname = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+		string tablename = cmd.substr(cmd.find("table") + 6, ((cmd.find("drop")) - (cmd.find("table") + 6)) - 1);
+		this->db->delete_column(colname, tablename);
+		return 1;
+	}
 
 
 
@@ -568,6 +580,7 @@ public:
 		std::cout << "LIST TABLES 		- Lists the current database names." << std::endl;
 		std::cout << "TABLE INFO [name] 	- Lists the current database names." << std::endl;
 		std::cout << "RENAME TABLE		- Modifies an existing table name" << std::endl;
+		std::cout << "ALTER TABLE		- Used to modify table, I.E. DROP COLUMN {name}." << std::endl;
 	}
 
 

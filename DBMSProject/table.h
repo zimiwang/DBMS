@@ -48,6 +48,7 @@ public:
 
 	void Rename_column(std::string new_column_name);
 
+
 	// TODO: Add column names
 	std::vector<std::vector<std::string> > Select(std::vector<std::string> col_names);
 
@@ -330,3 +331,4 @@ void Table::Rename_column(std::string new_column_name)
 {
 
 }
+

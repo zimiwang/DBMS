@@ -44,6 +44,7 @@ public:
 	void UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
 	void RenameColumn(std::string old_column_name, std::string new_column_name);
+	void delete_column(std::string column_name, std::string table_name);
 
 	
 	/// <summary>
@@ -484,4 +485,27 @@ void Database::insert_into(std::string statement, std::string table_name)
 
 	SaveTable(current_table);
 
+}
+
+void Database::delete_column(std::string column_name, std::string table_name)
+{
+	//get the index of the column name
+	Table current_table = get_table(table_name);;
+
+	int colindex = current_table.get_column_index(column_name);
+
+	if (colindex != -1)
+	{
+		//loop through rows to delete the value at the column index
+
+		for (int i = 0; i < current_table.rows.size(); i++)
+		{
+			current_table.rows[i].erase(current_table.rows[i].begin() + colindex);
+		}
+
+		//delete the reference in column storage
+		current_table.columns.erase(current_table.columns.find(column_name));
+	}
+
+	SaveTable(current_table);
 }
