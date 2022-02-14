@@ -197,9 +197,7 @@ namespace Tests
 			row11.strColumn[0] = column30;
 			row11.charColumn[0] = column33;
 			row11.intColumn[0] = column24;
-		}
-=
-        Row* rw;
+		}         
 
 
 
@@ -208,25 +206,7 @@ namespace Tests
 		/// </summary>
 		TEST_METHOD(TestMethod1)
 		{
-			BPTree node;
-
-			node.insert(5, &row1);
-			node.insert(15, &row2);
-			node.insert(25, &row3);
-			node.insert(35, &row4);
-			node.insert(45, &row5);
-			node.insert(55, &row6);
-			node.insert(40, &row7);
-			node.insert(30, &row8);
-			node.insert(20, &row9);
-
-
-			rw = node.search(30);
-			string expected = "big";
-=======
-            
-
-	        BPTree node;         
+			BPTree node;				        
 
             node.insert(5,  &row1);
             node.insert(15, &row2);
@@ -239,7 +219,7 @@ namespace Tests
             node.insert(20, &row9);
             
             
-            rw = node.search(30);                 
+			Row* rw = node.search(30);
             string expected = "big";
             
 			Assert::AreEqual(expected, *rw->strColumn[0].GetValue());
@@ -406,9 +386,9 @@ namespace Tests
 
 			list<Row*> rw = node.searchMultiple(5, 35);
 
-			Assert::AreEqual(*row1.charColumn[0].GetValue(), *rw.back()->charColumn[0].GetValue());
-			Assert::AreEqual(*row1.strColumn[0].GetValue(), *rw.back()->strColumn[0].GetValue());
-			Assert::AreEqual(*row4.intColumn[0].GetValue(), *rw.front()->intColumn[0].GetValue());
+			Assert::AreEqual(*row1.charColumn[0].GetValue(), *rw.front()->charColumn[0].GetValue());
+			Assert::AreEqual(*row1.strColumn[0].GetValue(), *rw.front()->strColumn[0].GetValue());
+			Assert::AreEqual(*row1.intColumn[0].GetValue(), *rw.front()->intColumn[0].GetValue());
 		}
 
 
@@ -469,9 +449,9 @@ namespace Tests
 
 			list<Row*> rw = node.searchMultiple(5, 25);
 
-			Assert::AreEqual(*row1.charColumn[0].GetValue(), *rw.back()->charColumn[0].GetValue());
-			Assert::AreEqual(*row1.strColumn[0].GetValue(), *rw.back()->strColumn[0].GetValue());
-			Assert::AreEqual(*row3.intColumn[0].GetValue(), *rw.front()->intColumn[0].GetValue());
+			Assert::AreEqual(*row1.charColumn[0].GetValue(), *rw.front()->charColumn[0].GetValue());
+			Assert::AreEqual(*row1.strColumn[0].GetValue(), *rw.front()->strColumn[0].GetValue());
+			Assert::AreEqual(*row1.intColumn[0].GetValue(), *rw.front()->intColumn[0].GetValue());
 		}
 
 		/// <summary>

@@ -30,7 +30,7 @@ namespace Tests
 		{
 			int provided = 1;
 			CommandHandler *cmdHandler = new CommandHandler;
-			int provided = cmdHandler->helpMenu();
+			provided = cmdHandler->helpMenu();
 
 			int expected = 1;
 

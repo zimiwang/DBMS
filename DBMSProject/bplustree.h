@@ -39,14 +39,15 @@ Node::Node() {
 
 // BP tree
 class BPTree {
-    Node* root;             // root node
-    void insertInternal(PrimaryKey, Node*, Node*); // insert internal function
+    Node* root;                                         // root node
+    void insertInternal(PrimaryKey, Node*, Node*);      // insert internal function
     void removeInternal(PrimaryKey, Node*, Node*);
-    Node* findParent(Node*, Node*);         // find parent of given node
+    Node* findParent(Node*, Node*);                     // find parent of given node
     Node* searchInternal(int);
 
 public:
-    BPTree();                   // constructor
+    string Name;                                        // name of the table
+    BPTree();                                           // constructor
     Row* search(int);
     list<Row*> searchMultiple(int, int);
     void insert(int, Row*);
