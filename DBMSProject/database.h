@@ -43,7 +43,8 @@ public:
 	Table get_table(std::string tbl_name);
 	void UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
-	void RenameColumn(std::string old_column_name, std::string new_column_name);
+	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
+	void delete_column(std::string column_name, std::string table_name);
 
 	
 	/// <summary>
@@ -389,29 +390,37 @@ void Database::SaveTable(Table table)
 
 void Database::RenameTable(std::string old_table_name, std::string new_table_name)
 {
-	int count = 0;
 
 	Table tbl = this->get_table(old_table_name);
 
+	//for (Table tbl : tables) {
+	//	if (tbl.table_name == old_table_name) {
+	//		tables.erase(tables.begin() + count);
+	//		tables.push_back(new_table_name);
+	//	}
+	//	count = count + 1;
+	//}
 
-	for (Table tbl : tables) {
-		if (tbl.table_name == old_table_name) {
-			tables.erase(tables.begin() + count);
-			tables.push_back(new_table_name);
-		}
-		count = count + 1;
-	}
+	tbl.table_name = new_table_name;
 
-	tbl.Rename_table(new_table_name);
+	this->DropTable(old_table_name);
+	this->AddTable(tbl);
 
 	this->Save();
 }
 
-void Database::RenameColumn(std::string old_column_name, std::string new_column_name)
+void Database::RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name)
 {
+	Table tbl = this->get_table(table_name);
+	std::map<std::string, std::string> new_columns;
 
-	
+	new_columns = tbl.Rename_column(new_column_name, old_column_name);
+	tbl.columns = new_columns;
 
+	this->DropTable(table_name);
+	this->AddTable(tbl);
+
+	this->Save();
 }
 
 
@@ -484,4 +493,27 @@ void Database::insert_into(std::string statement, std::string table_name)
 
 	SaveTable(current_table);
 
+}
+
+void Database::delete_column(std::string column_name, std::string table_name)
+{
+	//get the index of the column name
+	Table current_table = get_table(table_name);;
+
+	int colindex = current_table.get_column_index(column_name);
+
+	if (colindex != -1)
+	{
+		//loop through rows to delete the value at the column index
+
+		for (int i = 0; i < current_table.rows.size(); i++)
+		{
+			current_table.rows[i].erase(current_table.rows[i].begin() + colindex);
+		}
+
+		//delete the reference in column storage
+		current_table.columns.erase(current_table.columns.find(column_name));
+	}
+
+	SaveTable(current_table);
 }

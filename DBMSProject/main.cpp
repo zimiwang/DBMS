@@ -77,6 +77,8 @@ int update() { int retVal = cmdHandler->update(db, cmd); db = cmdHandler->db; re
 int deleteFrom() { int retVal = cmdHandler->deleteFrom(db, statement, cmd); db = cmdHandler->db; return retVal; } //TODO ***************** untested ************************
 int renameTable() { int retVal = cmdHandler->renameTable(db, cmd); db = cmdHandler->db; return retVal; }
 int renameColumn() { int retVal = cmdHandler->renameColumn(db, cmd); db = cmdHandler->db; return retVal; }
+int dropColumn() { int retVal = cmdHandler->dropColumn(statement); db = cmdHandler->db; return retVal; }
+
 
 
 int main(int argc, char** argv)
@@ -136,7 +138,8 @@ int main(int argc, char** argv)
 			{ "update", &update, },
 			{ "deleteFrom", &deleteFrom, },
 			{ "renameTable", &renameTable, },
-			{ "renameColumn", & renameColumn, }
+			{ "renameColumn", & renameColumn, },
+			{ "dropColumn", &dropColumn, }
 			
 		};
 
@@ -167,7 +170,9 @@ int main(int argc, char** argv)
 		else if (statement.find("update ") == 0)			(*sqlCommands.find("update")).second();
 		else if (statement.find("delete from ") == 0)		(*sqlCommands.find("deleteFrom")).second();
 		else if (statement.find("rename table ") == 0)		(*sqlCommands.find("renameTable")).second();
-		else if (statement.find("rename column ") == 0)		(*sqlCommands.find("renameColumn")).second();
+		else if (statement.find("alter ") == 0)		(*sqlCommands.find("renameColumn")).second();
+		else if (statement.find("drop column ") == 0)		(*sqlCommands.find("dropColumn")).second(); //merge the alter commands together with a common handler later on
+
 		
 		else												std::cout << "Invalid Command." << std::endl;
 

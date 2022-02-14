@@ -1,9 +1,15 @@
 #pragma once
+
+
 #include <fstream>
 #include <sstream>
 /* Directory that I put the dirent.h file
 C:\Program Files(x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.29.30133\include
 */
+
+#define _CRT_SECURE_NO_WARNINGS		// error occurred because of security reasons. Needed to add this.
+
+
 #include <dirent.h>	// the header file that was needed. Download and add to directory.
 
 #include <string.h>
@@ -51,8 +57,10 @@ void FileHelper::listfiles(std::string directory, std::string ext) {
 		while ((dir = readdir(di)) != NULL)
 		{
 			// strtok error. I security error cause
-			ptr1 = strtok(dir->d_name, ".");
-			ptr2 = strtok(NULL, ".");
+			//ptr1 = strtok(dir->d_name, ".");
+			ptr1 = strtok_s(dir->d_name, ".", NULL);
+			//ptr2 = strtok(NULL, ".");
+			ptr2 = strtok_s(NULL, ".", NULL);
 			if (ptr2 != NULL)
 			{
 				retn = strcmp(ptr2, extension);

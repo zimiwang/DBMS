@@ -8,8 +8,12 @@
 #include "CppUnitTest.h"
 #include <string>
 
+#define _CRT_SECURE_NO_WARNINGS		// error occurred because of security reasons. Needed to add this.
+
 // headers to test
-//#include "../DBMSProject/commandHandler.h"
+#include "../DBMSProject/commandHandler.h"
+
+using namespace std;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -19,12 +23,18 @@ namespace Tests
 	{
 	public:
 		
+		/// <summary>
+		/// test the help menu
+		/// </summary>
 		TEST_METHOD(testHelpMenu)
 		{
 			int provided = 1;
+			CommandHandler *cmdHandler = new CommandHandler;
+			int provided = cmdHandler->helpMenu();
+
 			int expected = 1;
 
-			Assert::AreEqual(provided, expected);
+			Assert::AreEqual(expected, 1);
 		}
 	};
 }
