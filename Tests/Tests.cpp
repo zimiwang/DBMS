@@ -28,9 +28,10 @@ namespace Tests
 		/// </summary>
 		TEST_METHOD(testHelpMenu)
 		{
+			int provided = 1;
 			CommandHandler *cmdHandler = new CommandHandler;
-
 			int provided = cmdHandler->helpMenu();
+
 			int expected = 1;
 
 			Assert::AreEqual(expected, 1);
