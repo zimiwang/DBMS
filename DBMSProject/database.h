@@ -43,7 +43,7 @@ public:
 	Table get_table(std::string tbl_name);
 	void UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
-	void RenameColumn(std::string old_column_name, std::string new_column_name);
+	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
 
 	
 	/// <summary>
@@ -389,7 +389,6 @@ void Database::SaveTable(Table table)
 
 void Database::RenameTable(std::string old_table_name, std::string new_table_name)
 {
-	int count = 0;
 
 	Table tbl = this->get_table(old_table_name);
 
@@ -409,11 +408,18 @@ void Database::RenameTable(std::string old_table_name, std::string new_table_nam
 	this->Save();
 }
 
-void Database::RenameColumn(std::string old_column_name, std::string new_column_name)
+void Database::RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name)
 {
+	Table tbl = this->get_table(table_name);
+	std::map<std::string, std::string> new_columns;
 
-	
+	new_columns = tbl.Rename_column(new_column_name, old_column_name);
+	tbl.columns = new_columns;
 
+	this->DropTable(table_name);
+	this->AddTable(tbl);
+
+	this->Save();
 }
 
 

@@ -46,7 +46,7 @@ public:
 
 	void Rename_table(std::string new_table_name);
 
-	void Rename_column(std::string new_column_name);
+	map<std::string, std::string> Rename_column(std::string new_column_name, std::string old_column_name);
 
 	// TODO: Add column names
 	std::vector<std::vector<std::string> > Select(std::vector<std::string> col_names);
@@ -326,7 +326,31 @@ void Table::Rename_table(std::string new_table_name)
 	this->table_name = new_table_name;
 }
 
-void Table::Rename_column(std::string new_column_name)
+map<std::string, std::string> Table::Rename_column(std::string new_column_name, std::string old_column_name)
 {
+	std::map<std::string, std::string> new_columns;
+	std::map<std::string, std::string>::iterator it;
 
+	//it->first
+
+	for (it = columns.begin(); it != columns.end(); it++)
+	{
+		cout << it->first << ' ' << it->second << endl;
+	}
+
+	for (it = columns.begin(); it != columns.end(); it++) 
+	{
+		if (it->first != old_column_name)
+		{
+			new_columns.insert({ it->first, it->second });
+		}
+		else
+		{
+			new_columns.insert(std::pair<string, std::string>(new_column_name, it->second));
+		}
+	}
+
+
+
+	return new_columns;
 }

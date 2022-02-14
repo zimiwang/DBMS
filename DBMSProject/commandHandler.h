@@ -536,11 +536,14 @@ public:
 		cmd = new_cmd;
 		db = new_db;
 
+		// get old table name by sending command through parser
+		std::string table_name = Parser::get_table_name(cmd, "alter", "rename");
+
 		// get old column name by sending command through parser
 		std::string old_column_name = Utils::get_string_between_two_strings(cmd, "column", "to");
 		std::string new_column_name = Utils::get_string_between_two_strings(cmd, "to", ";");
 
-		db->RenameColumn(old_column_name, new_column_name);
+		db->RenameColumn(old_column_name, new_column_name, table_name);
 
 		return 1;
 	}
@@ -568,6 +571,7 @@ public:
 		std::cout << "LIST TABLES 		- Lists the current database names." << std::endl;
 		std::cout << "TABLE INFO [name] 	- Lists the current database names." << std::endl;
 		std::cout << "RENAME TABLE		- Modifies an existing table name" << std::endl;
+		std::cout << "RENAME COLUMN		- Modifies an existing column name in a table" << std::endl;
 	}
 
 
