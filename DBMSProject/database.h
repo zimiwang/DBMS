@@ -393,16 +393,18 @@ void Database::RenameTable(std::string old_table_name, std::string new_table_nam
 
 	Table tbl = this->get_table(old_table_name);
 
+	//for (Table tbl : tables) {
+	//	if (tbl.table_name == old_table_name) {
+	//		tables.erase(tables.begin() + count);
+	//		tables.push_back(new_table_name);
+	//	}
+	//	count = count + 1;
+	//}
 
-	for (Table tbl : tables) {
-		if (tbl.table_name == old_table_name) {
-			tables.erase(tables.begin() + count);
-			tables.push_back(new_table_name);
-		}
-		count = count + 1;
-	}
+	tbl.table_name = new_table_name;
 
-	tbl.Rename_table(new_table_name);
+	this->DropTable(old_table_name);
+	this->AddTable(tbl);
 
 	this->Save();
 }
