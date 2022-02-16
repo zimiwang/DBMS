@@ -39,6 +39,8 @@ void color(int s);
 
 void setup_intro();
 
+int mainFunct(string cmd);
+
 /*
 void show_help();
 void print_rows(Table tbl);
@@ -58,13 +60,13 @@ CommandHandler* cmdHandler = new CommandHandler;
 	the variables for cmd, db, etc. are updated after these functions run, just in case they are important
 */
 int exitDBMS() { return cmdHandler->exitDBMS(); }
-int helpMenu() { return cmdHandler->helpMenu(); }
+int helpMenu() { return cmdHandler->helpMenu(); } /* test incorperated in test.cpp */
 int noSemiColon() { return cmdHandler->noSemiColon(); }
-int openDatabase() { int retVal = cmdHandler->openDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;}
-int createDatabase() { int retVal = cmdHandler->createDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }
+int openDatabase() { int retVal = cmdHandler->openDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;}/* test incorperated in tests.cpp */
+int createDatabase() { int retVal = cmdHandler->createDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }/* test incorperated in tests.cpp */
 int listDatabases() { int retVal = cmdHandler->listDatabases(); return retVal; }
 int loadSQLfile() { int retVal = cmdHandler->loadSQLfile(db, current_db_name); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }
-int dropDatabase() { int retVal = cmdHandler->dropDatabase(cmd); current_db_name = cmdHandler->current_db_name; return retVal; }
+int dropDatabase() { int retVal = cmdHandler->dropDatabase(cmd); current_db_name = cmdHandler->current_db_name; return retVal; } /* test incorperated in tests.cpp*/
 int noDBopen() { int retVal = cmdHandler->noDBopen(); return retVal; }
 int listTables() { int retVal = cmdHandler->listTables(db);  db = cmdHandler->db; return retVal; }
 int dbInfo() { int retVal = cmdHandler->dbInfo(db); return retVal; }
@@ -79,9 +81,16 @@ int renameTable() { int retVal = cmdHandler->renameTable(db, cmd); db = cmdHandl
 int renameColumn() { int retVal = cmdHandler->renameColumn(db, cmd); db = cmdHandler->db; return retVal; }
 
 
+
+
+/// <summary>
+/// main function
+/// </summary>
+/// <param name="argc">number of inputs to function call</param>
+/// <param name="argv">inputs to functions stored as string array (char**)</param>
+/// <returns></returns>
 int main(int argc, char** argv)
 {
-
 
 
 	setup_intro();
@@ -101,9 +110,23 @@ int main(int argc, char** argv)
 
 		std::cout << "SQL>";
 		color(7);
-		std::getline(std::cin, cmd);
-		statement = Parser::to_lower(cmd);
 
+
+		// if there are no inputs, then use the stdin for user control
+		if ( argc == 1 )
+		{
+			std::getline(std::cin, cmd);
+		}
+		// if there are inputs, use the argc[] string array for inputs
+		else
+		{
+			for (int i = 1; i < argc; i++) 
+			{
+				cmd += argv[i];
+			}
+		}
+
+		statement = Parser::to_lower(cmd);
 
 
 
@@ -152,7 +175,6 @@ int main(int argc, char** argv)
 		else if (statement.back() != ';')					(*sqlCommands.find("noSemiColon")).second();
 		else if (statement.find("open database ") == 0)		(*sqlCommands.find("openDatabase")).second();
 		else if (statement.find("create database") == 0)	(*sqlCommands.find("createDatabase")).second();
-		
 		else if (statement == "list databases;")			(*sqlCommands.find("listDatabases")).second();
 		else if (statement.find("load sqlfile ") == 0)		(*sqlCommands.find("loadSQLfile")).second();
 		else if (statement.find("drop database ") == 0)		(*sqlCommands.find("dropDatabase")).second();

@@ -46,21 +46,31 @@ bool FileHelper::CheckExtension(std::string filename, std::string ext) {
 /// <param name="ext">the extension of the files to be printed</param>
 void FileHelper::listfiles(std::string directory, std::string ext) {
 	DIR* di;
-	char* ptr1, * ptr2;
+	char* ptr1 = NULL;
+	char* ptr2 = NULL;
 	int retn;
 	struct dirent* dir;
 	const char* direc = directory.c_str();
 	const char* extension = ext.c_str();
+
+	char* nextToken1 = NULL;
+	char* nextToken2 = NULL;
+
+	char delim2[] = ".";
+	char delim1[] = ".";
+
 	di = opendir(direc); //specify the directory name
 	if (di)
 	{
 		while ((dir = readdir(di)) != NULL)
 		{
 			// strtok error. I security error cause
+			
 			//ptr1 = strtok(dir->d_name, ".");
-			ptr1 = strtok_s(dir->d_name, ".", NULL);
+			ptr1 = strtok_s(dir->d_name, delim1, &nextToken1);
 			//ptr2 = strtok(NULL, ".");
-			ptr2 = strtok_s(NULL, ".", NULL);
+			ptr2 = strtok_s(NULL, delim2, &nextToken1);
+			//std::cout << ptr2;
 			if (ptr2 != NULL)
 			{
 				retn = strcmp(ptr2, extension);
