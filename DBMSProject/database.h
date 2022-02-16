@@ -9,8 +9,12 @@
 #include <algorithm>
 #include "filehelper.h"
 #include "table.h"
+#include "bplustree.h"
 #include <stdbool.h>
-
+#include"row.h"
+#include <cstring>
+#include<iostream>
+#include<string>
 class Database
 {
 private:
@@ -27,6 +31,8 @@ public:
 	/// The tables associated to <database_name>
 	/// </summary>
 	std::vector<Table> tables;
+
+	std::vector<BPTree> trees;
 
 
 	static void List();
@@ -45,6 +51,7 @@ public:
 	void RenameTable(std::string old_table_name, std::string new_table_name);
 	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
 	void delete_column(std::string column_name, std::string table_name);
+	void updateRows();
 
 	
 	/// <summary>
@@ -136,6 +143,8 @@ void Database::Save()
 
 	out << contents;
 	out.close();
+
+	updateRows();
 }
 
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
@@ -516,4 +525,101 @@ void Database::delete_column(std::string column_name, std::string table_name)
 	}
 
 	SaveTable(current_table);
+}
+
+void Database::updateRows()
+{
+	for (Table tbl : tables)
+	{
+		for (std::vector<std::string> rw : tbl.rows)
+		{
+			Row nrow = Row();
+			int rowfind = 0;
+			int introws = 0;
+			int strrows = 0;
+			int charrows = 0;
+
+			for (std::pair<std::string, std::string> col : tbl.columns)
+			{
+				if (col.second == "string")
+				{
+					Column<string> newcol = Column<string>();
+					newcol.AddValue(rw[rowfind]);
+					nrow.strColumn.push_back(newcol);
+					
+				}
+				else if (col.second == "int")
+				{
+					Column<int> newcol = Column<int>();
+					newcol.AddValue(stoi(rw[rowfind]));
+					nrow.intColumn.push_back(newcol);
+
+				}
+				else if (col.second == "char")
+				{
+					char* char_arr;
+					string str_obj(rw[rowfind]);
+					char_arr = &str_obj[0];
+					cout << char_arr;
+					Column<char*> newcol = Column<char*>();
+					newcol.AddValue(char_arr);
+					nrow.charColumn.push_back(newcol);
+				}
+				else
+				{
+					//unsupported column type - assume string? - come back to this
+					Column<string> newcol = Column<string>();
+					newcol.AddValue(rw[rowfind]);
+					nrow.strColumn.push_back(newcol);
+				}
+				rowfind = rowfind + 1;
+			}
+			tbl.newrows.push_back(nrow);
+		}
+}
+	//	int intindex = 0;
+	//	int stringindex = 0;
+	//	int charindex = 0;
+	//	int typesearch = 0;
+	//	int whichrow = 0;
+	//	for (std::vector<std::string> rw : tbl.rows)
+	//	{
+	//		int whichcol = 0;
+	//		for (std::pair<std::string, std::string> col : tbl.columns)
+	//		{								
+	//			string test = tbl.rows[whichrow][whichcol];
+	//			if (true == true)
+	//			{
+	//				if (col.second == "string")
+	//				{
+	//					tbl.newrows[whichrow].strColumn[stringindex].AddValue(test);
+	//					stringindex = stringindex + 1;
+	//				}
+	//				else if (col.second == "int")
+	//				{
+	//					tbl.newrows[whichrow].intColumn[intindex].AddValue(stoi(tbl.rows[whichrow][whichcol]));
+	//					intindex = intindex + 1;
+	//				}
+	//				else if (col.second == "char")
+	//				{
+	//					char* char_arr;
+	//					string str_obj(tbl.rows[whichrow][whichcol]);
+	//					char_arr = &str_obj[0];
+	//					cout << char_arr;
+	//					tbl.newrows[0].charColumn[charindex].AddValue(char_arr);
+	//					charindex = charindex + 1;
+	//				}
+	//				else
+	//				{
+	//					tbl.newrows[0].strColumn[stringindex].AddValue(tbl.rows[whichrow][whichcol]);
+	//					stringindex = stringindex + 1;
+	//				}
+	//			}
+	//			
+	//			whichcol = whichcol + 1;
+	//		}
+	//		whichrow = whichrow + 1;
+	//	}
+	//	int x = 4;
+	//}
 }

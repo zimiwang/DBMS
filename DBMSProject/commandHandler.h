@@ -203,6 +203,25 @@ public:
 		return 1;
 	}
 
+	/// <summary>
+	/// alter keyword command handler
+	/// </summary>
+	/// <returns>1 on completion</returns>
+	int alterHandler(string new_cmd)
+	{
+		cmd = new_cmd;
+		if (new_cmd.find("rename") != -1)
+		{
+			renameColumn(db, new_cmd);
+		}
+		else if (new_cmd.find("drop column") != -1)
+		{
+			dropColumn(new_cmd);
+		}
+
+		return -1;
+	}
+
 
 
 	/// <summary>

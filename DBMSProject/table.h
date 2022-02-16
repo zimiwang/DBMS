@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 #include "parser.h"
+#include "row.h"
 
 class Table {
 public:
@@ -28,6 +29,7 @@ public:
 
 	/// The collection of arrays of rows for the table.
 	std::vector<std::vector<std::string>> rows;
+	std::vector<Row> newrows;
 
 	/// Counter for row ID
 	int ID_count = 0;

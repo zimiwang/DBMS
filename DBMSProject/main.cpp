@@ -78,6 +78,7 @@ int deleteFrom() { int retVal = cmdHandler->deleteFrom(db, statement, cmd); db =
 int renameTable() { int retVal = cmdHandler->renameTable(db, cmd); db = cmdHandler->db; return retVal; }
 int renameColumn() { int retVal = cmdHandler->renameColumn(db, cmd); db = cmdHandler->db; return retVal; }
 int dropColumn() { int retVal = cmdHandler->dropColumn(statement); db = cmdHandler->db; return retVal; }
+int alterHandler() { int retVal = cmdHandler->alterHandler(statement); db = cmdHandler->db; return retVal; }
 
 
 
@@ -139,7 +140,8 @@ int main(int argc, char** argv)
 			{ "deleteFrom", &deleteFrom, },
 			{ "renameTable", &renameTable, },
 			{ "renameColumn", & renameColumn, },
-			{ "dropColumn", &dropColumn, }
+			{ "dropColumn", &dropColumn, },
+			{ "alterHandler",& alterHandler, }
 			
 		};
 
@@ -150,12 +152,11 @@ int main(int argc, char** argv)
 
 		// condition checking. If true, execute the function pointer (located in sqlCommands)
 		if (statement == "")								cout << "";
-		else if (statement == "exit")							(*sqlCommands.find("exit")).second();
+		else if (statement == "exit")						(*sqlCommands.find("exit")).second();
 		else if (statement == "help")						(*sqlCommands.find("help")).second();
 		else if (statement.back() != ';')					(*sqlCommands.find("noSemiColon")).second();
 		else if (statement.find("open database ") == 0)		(*sqlCommands.find("openDatabase")).second();
 		else if (statement.find("create database") == 0)	(*sqlCommands.find("createDatabase")).second();
-		
 		else if (statement == "list databases;")			(*sqlCommands.find("listDatabases")).second();
 		else if (statement.find("load sqlfile ") == 0)		(*sqlCommands.find("loadSQLfile")).second();
 		else if (statement.find("drop database ") == 0)		(*sqlCommands.find("dropDatabase")).second();
@@ -170,8 +171,7 @@ int main(int argc, char** argv)
 		else if (statement.find("update ") == 0)			(*sqlCommands.find("update")).second();
 		else if (statement.find("delete from ") == 0)		(*sqlCommands.find("deleteFrom")).second();
 		else if (statement.find("rename table ") == 0)		(*sqlCommands.find("renameTable")).second();
-		else if (statement.find("alter ") == 0)		(*sqlCommands.find("renameColumn")).second();
-		else if (statement.find("drop column ") == 0)		(*sqlCommands.find("dropColumn")).second(); //merge the alter commands together with a common handler later on
+		else if (statement.find("alter ") == 0)	        	(*sqlCommands.find("alterHandler")).second();
 
 		
 		else												std::cout << "Invalid Command." << std::endl;

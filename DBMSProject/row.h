@@ -11,18 +11,20 @@ using namespace std;
 /// <typeparam name="T"></typeparam>
 template <typename T> class Column {
 	string name;	// The name of the column || Have not decided if we will use this
-	T* value;
+	T value;
 public:	
-	void AddValue(T*);
-	T* GetValue();
+	void AddValue(T val);
+	T GetValue();
 };
+
 
 /// <summary>
 /// Adds a value
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <param name="val"></param>
-template <typename T> void Column<T>::AddValue(T* val) {
+template <typename T> 
+void Column<T>::AddValue(T val) {
 	value = val;
 }
 
@@ -31,7 +33,7 @@ template <typename T> void Column<T>::AddValue(T* val) {
 /// </summary>
 /// <typeparam name="T"></typeparam>
 /// <returns></returns>
-template <typename T> T* Column<T>::GetValue() {
+template <typename T> T Column<T>::GetValue() {
 	return value;
 }
 
@@ -44,15 +46,15 @@ public:
 	/// <summary>
 	///  Arrays of columns for each type
 	/// </summary>
-	Column<string>* strColumn;
-	Column<int>* intColumn;
-	Column<char>* charColumn;
+	vector<Column<string>> strColumn;
+	vector<Column<int>> intColumn;
+	vector<Column<char*>> charColumn;
 	
 	//Row(int, int, int);
-	Row(int str = 0, int ints = 0, int chars = 0) {
-		strColumn = new Column<string>[str];
-		intColumn = new Column<int>[ints];
-		charColumn = new Column<char>[chars];
+	Row() {
+		//strColumn = new Column<string>[str];
+		//intColumn = new Column<int>[ints];
+		//charColumn = new Column<char*>[chars];
 	}
 };
 
