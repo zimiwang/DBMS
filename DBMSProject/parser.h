@@ -33,10 +33,72 @@ public:
 /// <returns>S but lowercase.</returns>
 std::string Parser::to_lower(std::string s)
 {
-	std::for_each(s.begin(), s.end(), [](char& c)
-		{ c = ::tolower(c); });
+	std::string keywords[15] = {"open", "database", "create", "db", "info",
+		"table" , "drop" , "select" , "from" , "update", "delete", "insert",
+		"into", "rename", "column"};
+	//first save a copy of the input
+	std::string input_copy = s;
 
-	return s;
+	//split the copy into a vector of substrings on every instance of ' '
+	vector<string> split;
+	stringstream b(s);
+	std::string current;
+	
+	while (getline(b, current, ' '))
+	{
+		split.push_back(current);
+	}
+
+	vector<string> new_(split);
+
+	//sanitize all of the substrings to check for keywords later - this prooobably will work
+	std::for_each(split.begin(), split.end(), [](string& st)
+		{std::for_each(st.begin(), st.end(), [](char& c)
+			{ c = ::tolower(c); }); });
+
+	//check the sanitized strings against a dictionary of keywords, if the keyword is found,
+	//merge the sanitized string, if it isnt, merge the original
+	std::string finout = "";
+	for (int i = 0; i < split.size(); i++)
+	{
+		bool iskey = false;
+		for (int j = 0; j < 15; j++)
+		{
+			if (split[i].find(keywords[j]) != string::npos)
+			{
+				iskey = true;
+			}
+		}
+		if (iskey == false)
+		{
+			//merge in the unsanitized string
+			if (i == 0)
+			{
+				finout.append(new_[i]);
+			}
+			else {
+				finout.append(" ");
+				finout.append(new_[i]);
+			}
+		}
+		else
+		{
+			//merge in the sanitized string
+			if (i == 0)
+			{
+				finout.append(split[i]);
+			}
+			else {
+				finout.append(" ");
+				finout.append(split[i]);
+			}
+		}
+	}
+
+	//std::for_each(s.begin(), s.end(), [](char& c)
+	//	{ c = ::tolower(c); });
+
+	return finout;
 }
 
 /// Author: Andrew

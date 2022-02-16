@@ -190,6 +190,37 @@ public:
 		return 1;
 	}
 
+	/// <summary>
+	/// command handler: drop a named column from a table
+	/// </summary>
+	/// <returns>1 on completion</returns>
+	int dropColumn(string new_cmd)
+	{
+		cmd = new_cmd;
+		string colname = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
+		string tablename = cmd.substr(cmd.find("table") + 6, ((cmd.find("drop")) - (cmd.find("table") + 6)) - 1);
+		this->db->delete_column(colname, tablename);
+		return 1;
+	}
+
+	/// <summary>
+	/// alter keyword command handler
+	/// </summary>
+	/// <returns>1 on completion</returns>
+	int alterHandler(string new_cmd)
+	{
+		cmd = new_cmd;
+		if (new_cmd.find("rename") != -1)
+		{
+			renameColumn(db, new_cmd);
+		}
+		else if (new_cmd.find("drop column") != -1)
+		{
+			dropColumn(new_cmd);
+		}
+
+		return -1;
+	}
 
 
 
@@ -531,16 +562,25 @@ public:
 		return 1;
 	}
 
+	/// <summary>
+	/// command handler: modified an existing column in a table
+	/// </summary>
+	/// <param name="new_db"></param>
+	/// <param name="new_cmd"></param>
+	/// <returns></returns>
 	int renameColumn(Database* new_db, string new_cmd)
 	{
 		cmd = new_cmd;
 		db = new_db;
 
+		// get old table name by sending command through parser
+		std::string table_name = Parser::get_table_name(cmd, "alter", "rename");
+
 		// get old column name by sending command through parser
 		std::string old_column_name = Utils::get_string_between_two_strings(cmd, "column", "to");
 		std::string new_column_name = Utils::get_string_between_two_strings(cmd, "to", ";");
 
-		db->RenameColumn(old_column_name, new_column_name);
+		db->RenameColumn(old_column_name, new_column_name, table_name);
 
 		return 1;
 	}
@@ -568,6 +608,8 @@ public:
 		std::cout << "LIST TABLES 		- Lists the current database names." << std::endl;
 		std::cout << "TABLE INFO [name] 	- Lists the current database names." << std::endl;
 		std::cout << "RENAME TABLE		- Modifies an existing table name" << std::endl;
+		std::cout << "RENAME COLUMN		- Modifies an existing column name in a table" << std::endl;
+		std::cout << "ALTER TABLE		- Used to modify table, I.E. DROP COLUMN {name}." << std::endl;
 	}
 
 

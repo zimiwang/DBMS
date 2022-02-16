@@ -9,8 +9,12 @@
 #include <algorithm>
 #include "filehelper.h"
 #include "table.h"
+#include "bplustree.h"
 #include <stdbool.h>
-
+#include"row.h"
+#include <cstring>
+#include<iostream>
+#include<string>
 class Database
 {
 private:
@@ -28,6 +32,8 @@ public:
 	/// </summary>
 	std::vector<Table> tables;
 
+	std::vector<BPTree> trees;
+
 
 	static void List();
 	void List_Tables();
@@ -43,7 +49,9 @@ public:
 	Table get_table(std::string tbl_name);
 	void UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
-	void RenameColumn(std::string old_column_name, std::string new_column_name);
+	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
+	void delete_column(std::string column_name, std::string table_name);
+	void updateRows();
 
 	
 	/// <summary>
@@ -135,6 +143,8 @@ void Database::Save()
 
 	out << contents;
 	out.close();
+
+	updateRows();
 }
 
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
@@ -387,31 +397,42 @@ void Database::SaveTable(Table table)
 	tables[count] = table;
 }
 
+/// <summary>
+/// Rename an existing table
+/// </summary>
+/// <param name="old_table_name"></param>
+/// <param name="new_table_name"></param>
 void Database::RenameTable(std::string old_table_name, std::string new_table_name)
 {
-	int count = 0;
 
 	Table tbl = this->get_table(old_table_name);
 
+	tbl.table_name = new_table_name;
 
-	for (Table tbl : tables) {
-		if (tbl.table_name == old_table_name) {
-			tables.erase(tables.begin() + count);
-			tables.push_back(new_table_name);
-		}
-		count = count + 1;
-	}
-
-	tbl.Rename_table(new_table_name);
+	this->DropTable(old_table_name);
+	this->AddTable(tbl);
 
 	this->Save();
 }
 
-void Database::RenameColumn(std::string old_column_name, std::string new_column_name)
+/// <summary>
+/// Rename a column in an existing table
+/// </summary>
+/// <param name="old_column_name"></param>
+/// <param name="new_column_name"></param>
+/// <param name="table_name"></param>
+void Database::RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name)
 {
+	Table tbl = this->get_table(table_name);
+	std::map<std::string, std::string> new_columns;
 
-	
+	new_columns = tbl.Rename_column(new_column_name, old_column_name);
+	tbl.columns = new_columns;
 
+	this->DropTable(table_name);
+	this->AddTable(tbl);
+
+	this->Save();
 }
 
 
@@ -484,4 +505,124 @@ void Database::insert_into(std::string statement, std::string table_name)
 
 	SaveTable(current_table);
 
+}
+
+void Database::delete_column(std::string column_name, std::string table_name)
+{
+	//get the index of the column name
+	Table current_table = get_table(table_name);;
+
+	int colindex = current_table.get_column_index(column_name);
+
+	if (colindex != -1)
+	{
+		//loop through rows to delete the value at the column index
+
+		for (int i = 0; i < current_table.rows.size(); i++)
+		{
+			current_table.rows[i].erase(current_table.rows[i].begin() + colindex);
+		}
+
+		//delete the reference in column storage
+		current_table.columns.erase(current_table.columns.find(column_name));
+	}
+
+	SaveTable(current_table);
+}
+
+void Database::updateRows()
+{
+	for (Table tbl : tables)
+	{
+		for (std::vector<std::string> rw : tbl.rows)
+		{
+			Row nrow = Row();
+			int rowfind = 0;
+			int introws = 0;
+			int strrows = 0;
+			int charrows = 0;
+
+			for (std::pair<std::string, std::string> col : tbl.columns)
+			{
+				if (col.second == "string")
+				{
+					Column<string> newcol = Column<string>();
+					newcol.AddValue(rw[rowfind]);
+					nrow.strColumn.push_back(newcol);
+					
+				}
+				else if (col.second == "int")
+				{
+					Column<int> newcol = Column<int>();
+					newcol.AddValue(stoi(rw[rowfind]));
+					nrow.intColumn.push_back(newcol);
+
+				}
+				else if (col.second == "char")
+				{
+					char* char_arr;
+					string str_obj(rw[rowfind]);
+					char_arr = &str_obj[0];
+					cout << char_arr;
+					Column<char*> newcol = Column<char*>();
+					newcol.AddValue(char_arr);
+					nrow.charColumn.push_back(newcol);
+				}
+				else
+				{
+					//unsupported column type - assume string? - come back to this
+					Column<string> newcol = Column<string>();
+					newcol.AddValue(rw[rowfind]);
+					nrow.strColumn.push_back(newcol);
+				}
+				rowfind = rowfind + 1;
+			}
+			tbl.newrows.push_back(nrow);
+		}
+}
+	//	int intindex = 0;
+	//	int stringindex = 0;
+	//	int charindex = 0;
+	//	int typesearch = 0;
+	//	int whichrow = 0;
+	//	for (std::vector<std::string> rw : tbl.rows)
+	//	{
+	//		int whichcol = 0;
+	//		for (std::pair<std::string, std::string> col : tbl.columns)
+	//		{								
+	//			string test = tbl.rows[whichrow][whichcol];
+	//			if (true == true)
+	//			{
+	//				if (col.second == "string")
+	//				{
+	//					tbl.newrows[whichrow].strColumn[stringindex].AddValue(test);
+	//					stringindex = stringindex + 1;
+	//				}
+	//				else if (col.second == "int")
+	//				{
+	//					tbl.newrows[whichrow].intColumn[intindex].AddValue(stoi(tbl.rows[whichrow][whichcol]));
+	//					intindex = intindex + 1;
+	//				}
+	//				else if (col.second == "char")
+	//				{
+	//					char* char_arr;
+	//					string str_obj(tbl.rows[whichrow][whichcol]);
+	//					char_arr = &str_obj[0];
+	//					cout << char_arr;
+	//					tbl.newrows[0].charColumn[charindex].AddValue(char_arr);
+	//					charindex = charindex + 1;
+	//				}
+	//				else
+	//				{
+	//					tbl.newrows[0].strColumn[stringindex].AddValue(tbl.rows[whichrow][whichcol]);
+	//					stringindex = stringindex + 1;
+	//				}
+	//			}
+	//			
+	//			whichcol = whichcol + 1;
+	//		}
+	//		whichrow = whichrow + 1;
+	//	}
+	//	int x = 4;
+	//}
 }

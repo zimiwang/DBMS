@@ -31,7 +31,7 @@ namespace Tests
 		TEST_METHOD(testHelpMenu)
 		{
 
-			main(1, commandStringArray);
+			//main(1, commandStringArray);
 			CommandHandler *cmdHandler = new CommandHandler;
 
 			// call the help menu
