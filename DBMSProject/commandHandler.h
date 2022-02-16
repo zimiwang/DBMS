@@ -562,6 +562,12 @@ public:
 		return 1;
 	}
 
+	/// <summary>
+	/// command handler: modified an existing column in a table
+	/// </summary>
+	/// <param name="new_db"></param>
+	/// <param name="new_cmd"></param>
+	/// <returns></returns>
 	int renameColumn(Database* new_db, string new_cmd)
 	{
 		cmd = new_cmd;

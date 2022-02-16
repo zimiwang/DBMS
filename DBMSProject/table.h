@@ -324,17 +324,25 @@ void Table::DeleteRow(vector<string> row) {
 }
 #pragma once
 
+/// <summary>
+/// rename an existing table
+/// </summary>
+/// <param name="new_table_name"></param>
 void Table::Rename_table(std::string new_table_name) 
 {
 	this->table_name = new_table_name;
 }
 
+/// <summary>
+/// Rename a column in an existing table
+/// </summary>
+/// <param name="new_column_name"></param>
+/// <param name="old_column_name"></param>
+/// <returns></returns>
 map<std::string, std::string> Table::Rename_column(std::string new_column_name, std::string old_column_name)
 {
 	std::map<std::string, std::string> new_columns;
 	std::map<std::string, std::string>::iterator it;
-
-	//it->first
 
 	for (it = columns.begin(); it != columns.end(); it++)
 	{
@@ -352,8 +360,6 @@ map<std::string, std::string> Table::Rename_column(std::string new_column_name, 
 			new_columns.insert(std::pair<string, std::string>(new_column_name, it->second));
 		}
 	}
-
-
 
 	return new_columns;
 }

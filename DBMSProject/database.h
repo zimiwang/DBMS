@@ -397,18 +397,15 @@ void Database::SaveTable(Table table)
 	tables[count] = table;
 }
 
+/// <summary>
+/// Rename an existing table
+/// </summary>
+/// <param name="old_table_name"></param>
+/// <param name="new_table_name"></param>
 void Database::RenameTable(std::string old_table_name, std::string new_table_name)
 {
 
 	Table tbl = this->get_table(old_table_name);
-
-	//for (Table tbl : tables) {
-	//	if (tbl.table_name == old_table_name) {
-	//		tables.erase(tables.begin() + count);
-	//		tables.push_back(new_table_name);
-	//	}
-	//	count = count + 1;
-	//}
 
 	tbl.table_name = new_table_name;
 
@@ -418,6 +415,12 @@ void Database::RenameTable(std::string old_table_name, std::string new_table_nam
 	this->Save();
 }
 
+/// <summary>
+/// Rename a column in an existing table
+/// </summary>
+/// <param name="old_column_name"></param>
+/// <param name="new_column_name"></param>
+/// <param name="table_name"></param>
 void Database::RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name)
 {
 	Table tbl = this->get_table(table_name);
