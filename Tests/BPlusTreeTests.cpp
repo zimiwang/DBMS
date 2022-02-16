@@ -1,5 +1,7 @@
+
 #include "pch.h"
 #include "CppUnitTest.h"
+/*
 #include "../DBMSProject/bplustree.h"
 #include "../DBMSProject/row.h"
 #include <string>
@@ -12,13 +14,13 @@ using namespace std;
 
 namespace Tests
 {
-
+	
 	TEST_CLASS(Tests)
 	{
 	public:
 		Row* rw;
 
-
+		
 		Row row1{ 1,1,1 };
 		Row row2{ 1,1,1 };
 		Row row3{ 1,1,1 };
@@ -530,4 +532,6 @@ namespace Tests
 		}
 
 	};
+
 }
+*/

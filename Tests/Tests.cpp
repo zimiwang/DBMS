@@ -31,6 +31,8 @@ namespace Tests
 		TEST_METHOD(testHelpMenu)
 		{
 
+			//char** commandStringArray = ["help"];
+
 			//main(1, commandStringArray);
 			CommandHandler *cmdHandler = new CommandHandler;
 
@@ -45,6 +47,7 @@ namespace Tests
 		/// <summary>
 		/// test the create database script
 		/// </summary>
+		
 		TEST_METHOD(createDatabase)
 		{
 			// this test uses the commandHandler header
@@ -63,12 +66,14 @@ namespace Tests
 
 			Assert::AreEqual(expected, currentDB);
 		}
+		
 
 
 
 		/// <summary>
 		/// test open database script
 		/// </summary>
+		 
 		TEST_METHOD(openDatabase)
 		{
 			// this test uses the commandHandler header
@@ -87,12 +92,14 @@ namespace Tests
 				
 			Assert::AreEqual(expected, currentDB);
 		}
+		
 
 
 
 		/// <summary>
 		/// test the implementation to drop a database
 		/// </summary>
+		
 		TEST_METHOD(dropDatabase)
 		{
 			// this test uses the commandHandler header
@@ -108,5 +115,7 @@ namespace Tests
 
 			Assert::AreNotEqual(notExpected, currentDB);
 		}
+		
+
 	};
 }
