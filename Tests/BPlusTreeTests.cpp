@@ -1,7 +1,7 @@
 
 #include "pch.h"
 #include "CppUnitTest.h"
-/*
+
 #include "../DBMSProject/bplustree.h"
 #include "../DBMSProject/row.h"
 #include <string>
@@ -18,20 +18,18 @@ namespace Tests
 	TEST_CLASS(Tests)
 	{
 	public:
-		Row* rw;
-
-		
-		Row row1{ 1,1,1 };
-		Row row2{ 1,1,1 };
-		Row row3{ 1,1,1 };
-		Row row4{ 1,1,1 };
-		Row row5{ 1,1,1 };
-		Row row6{ 1,1,1 };
-		Row row7{ 1,1,1 };
-		Row row8{ 1,1,1 };
-		Row row9{ 1,1,1 };
-		Row row10{ 1,1,1 };
-		Row row11{ 1,1,1 };
+				
+		Row row1;
+		Row row2;
+		Row row3;
+		Row row4;
+		Row row5;
+		Row row6;
+		Row row7;
+		Row row8;
+		Row row9;
+		Row row10;
+		Row row11;
 
 
 		Column<string> column1;
@@ -47,17 +45,17 @@ namespace Tests
 		Column<string> column30;
 
 
-		Column<char> column6;
-		Column<char> column7;
-		Column<char> column8;
-		Column<char> column9;
-		Column<char> column10;
-		Column<char> column11;
-		Column<char> column12;
-		Column<char> column13;
-		Column<char> column31;
-		Column<char> column32;
-		Column<char> column33;
+		Column<char*> column6;
+		Column<char*> column7;
+		Column<char*> column8;
+		Column<char*> column9;
+		Column<char*> column10;
+		Column<char*> column11;
+		Column<char*> column12;
+		Column<char*> column13;
+		Column<char*> column31;
+		Column<char*> column32;
+		Column<char*> column33;
 
 
 		Column<int> column14;
@@ -114,17 +112,17 @@ namespace Tests
 
 
 			// //string columns
-			column1.AddValue(&value1);
-			column2.AddValue(&value2);
-			column3.AddValue(&value3);
-			column4.AddValue(&value4);
-			column5.AddValue(&value5);
-			column25.AddValue(&value25);
-			column26.AddValue(&value26);
-			column27.AddValue(&value30);
-			column28.AddValue(&value31);
-			column29.AddValue(&value32);
-			column30.AddValue(&value33);
+			column1.AddValue(value1);
+			column2.AddValue(value2);
+			column3.AddValue(value3);
+			column4.AddValue(value4);
+			column5.AddValue(value5);
+			column25.AddValue(value25);
+			column26.AddValue(value26);
+			column27.AddValue(value30);
+			column28.AddValue(value31);
+			column29.AddValue(value32);
+			column30.AddValue(value33);
 
 			// character columns
 			column6.AddValue(&value6);
@@ -140,65 +138,65 @@ namespace Tests
 			column33.AddValue(&value29);
 
 			// int columns
-			column14.AddValue(&value14);
-			column15.AddValue(&value15);
-			column16.AddValue(&value16);
-			column17.AddValue(&value17);
-			column18.AddValue(&value18);
-			column19.AddValue(&value19);
-			column20.AddValue(&value20);
-			column21.AddValue(&value21);
-			column22.AddValue(&value22);
-			column23.AddValue(&value23);
-			column24.AddValue(&value24);
+			column14.AddValue(value14);
+			column15.AddValue(value15);
+			column16.AddValue(value16);
+			column17.AddValue(value17);
+			column18.AddValue(value18);
+			column19.AddValue(value19);
+			column20.AddValue(value20);
+			column21.AddValue(value21);
+			column22.AddValue(value22);
+			column23.AddValue(value23);
+			column24.AddValue(value24);
 
 
 
 
 
-			row1.strColumn[0] = column1;
-			row1.charColumn[0] = column6;
-			row1.intColumn[0] = column14;
+			row1.strColumn.push_back(column1);
+			row1.charColumn.push_back(column6);
+			row1.intColumn.push_back(column14);
 
-			row2.strColumn[0] = column2;
-			row2.charColumn[0] = column7;
-			row2.intColumn[0] = column15;
+			row2.strColumn.push_back(column2);
+			row2.charColumn.push_back(column7);
+			row2.intColumn.push_back(column15);
 
-			row3.strColumn[0] = column3;
-			row3.charColumn[0] = column8;
-			row3.intColumn[0] = column16;
+			row3.strColumn.push_back(column3);
+			row3.charColumn.push_back(column8);
+			row3.intColumn.push_back(column16);
 
-			row4.strColumn[0] = column4;
-			row4.charColumn[0] = column9;
-			row4.intColumn[0] = column17;
+			row4.strColumn.push_back(column4);
+			row4.charColumn.push_back(column9);
+			row4.intColumn.push_back(column17);
 
-			row5.strColumn[0] = column5;
-			row5.charColumn[0] = column10;
-			row5.intColumn[0] = column18;
+			row5.strColumn.push_back(column5);
+			row5.charColumn.push_back(column10);
+			row5.intColumn.push_back(column18);
 
-			row6.strColumn[0] = column25;
-			row6.charColumn[0] = column11;
-			row6.intColumn[0] = column19;
+			row6.strColumn.push_back(column25);
+			row6.charColumn.push_back(column11);
+			row6.intColumn.push_back(column19);
 
-			row7.strColumn[0] = column26;
-			row7.charColumn[0] = column12;
-			row7.intColumn[0] = column20;
+			row7.strColumn.push_back(column26);
+			row7.charColumn.push_back(column12);
+			row7.intColumn.push_back(column20);
 
-			row8.strColumn[0] = column27;
-			row8.charColumn[0] = column13;
-			row8.intColumn[0] = column21;
+			row8.strColumn.push_back(column27);
+			row8.charColumn.push_back(column13);
+			row8.intColumn.push_back(column21);
 
-			row9.strColumn[0] = column28;
-			row9.charColumn[0] = column31;
-			row9.intColumn[0] = column22;
+			row9.strColumn.push_back(column28);
+			row9.charColumn.push_back(column31);
+			row9.intColumn.push_back(column22);
 
-			row10.strColumn[0] = column29;
-			row10.charColumn[0] = column32;
-			row10.intColumn[0] = column23;
+			row10.strColumn.push_back(column29);
+			row10.charColumn.push_back(column32);
+			row10.intColumn.push_back(column23);
 
-			row11.strColumn[0] = column30;
-			row11.charColumn[0] = column33;
-			row11.intColumn[0] = column24;
+			row11.strColumn.push_back(column30);
+			row11.charColumn.push_back(column33);
+			row11.intColumn.push_back(column24);
 		}         
 
 
@@ -222,9 +220,8 @@ namespace Tests
             
             
 			Row* rw = node.search(30);
-            string expected = "big";
-            
-			Assert::AreEqual(expected, *rw->strColumn[0].GetValue());
+            string expected = "big";			
+			Assert::AreEqual(expected, rw->strColumn[0].GetValue());
 
 		}
 		/// <summary>
@@ -247,7 +244,7 @@ namespace Tests
 			Row* rw = node.search(35);
 			string expected = "big";
 
-			Assert::AreNotEqual(expected, *rw->strColumn[0].GetValue());
+			Assert::AreNotEqual(expected, rw->strColumn[0].GetValue());
 		}
 
 		/// <summary>
@@ -269,7 +266,7 @@ namespace Tests
 
 			Row* rw = node.search(5);
 			char expected = 'c';
-
+			
 			Assert::AreEqual(expected, *rw->charColumn[0].GetValue());
 		}
 
@@ -388,9 +385,9 @@ namespace Tests
 
 			list<Row*> rw = node.searchMultiple(5, 35);
 
-			Assert::AreEqual(*row1.charColumn[0].GetValue(), *rw.front()->charColumn[0].GetValue());
-			Assert::AreEqual(*row1.strColumn[0].GetValue(), *rw.front()->strColumn[0].GetValue());
-			Assert::AreEqual(*row1.intColumn[0].GetValue(), *rw.front()->intColumn[0].GetValue());
+			Assert::AreEqual(*row1.charColumn[0].GetValue(),*rw.front()->charColumn[0].GetValue());
+			Assert::AreEqual(row1.strColumn[0].GetValue(), rw.front()->strColumn[0].GetValue());
+			Assert::AreEqual(row1.intColumn[0].GetValue(), rw.front()->intColumn[0].GetValue());
 		}
 
 
@@ -431,8 +428,8 @@ namespace Tests
 				compare2 = **row;				
 
 				Assert::AreEqual(*compare1.charColumn[0].GetValue(), *compare2.charColumn[0].GetValue());
-				Assert::AreEqual(*compare1.intColumn[0].GetValue(), *compare2.intColumn[0].GetValue());
-				Assert::AreEqual(*compare1.strColumn[0].GetValue(), *compare2.strColumn[0].GetValue());
+				Assert::AreEqual(compare1.intColumn[0].GetValue(), compare2.intColumn[0].GetValue());
+				Assert::AreEqual(compare1.strColumn[0].GetValue(), compare2.strColumn[0].GetValue());
 				i++;
 			}
 		}
@@ -452,8 +449,8 @@ namespace Tests
 			list<Row*> rw = node.searchMultiple(5, 25);
 
 			Assert::AreEqual(*row1.charColumn[0].GetValue(), *rw.front()->charColumn[0].GetValue());
-			Assert::AreEqual(*row1.strColumn[0].GetValue(), *rw.front()->strColumn[0].GetValue());
-			Assert::AreEqual(*row1.intColumn[0].GetValue(), *rw.front()->intColumn[0].GetValue());
+			Assert::AreEqual(row1.strColumn[0].GetValue(), rw.front()->strColumn[0].GetValue());
+			Assert::AreEqual(row1.intColumn[0].GetValue(), rw.front()->intColumn[0].GetValue());
 		}
 
 		/// <summary>
@@ -482,9 +479,9 @@ namespace Tests
 			for (row = rw.begin(); row != rw.end(); ++row) {
 				compare1 = rows[i];
 				compare2 = **row;
-				Assert::AreEqual(*compare1.charColumn[0].GetValue(), *compare2.charColumn[0].GetValue());
-				Assert::AreEqual(*compare1.intColumn[0].GetValue(), *compare2.intColumn[0].GetValue());
-				Assert::AreEqual(*compare1.strColumn[0].GetValue(), *compare2.strColumn[0].GetValue());
+				Assert::AreEqual(*compare1.charColumn[0].GetValue(), *compare2.charColumn.at(0).GetValue());
+				Assert::AreEqual(compare1.intColumn[0].GetValue(), compare2.intColumn.at(0).GetValue());
+				Assert::AreEqual(compare1.strColumn[0].GetValue(), compare2.strColumn.at(0).GetValue());
 				i++;
 			}
 			Assert::AreEqual(3, i);
@@ -523,8 +520,8 @@ namespace Tests
 				compare1 = rows[i];
 				compare2 = **row;
 				Assert::AreEqual(*compare1.charColumn[0].GetValue(), *compare2.charColumn[0].GetValue());
-				Assert::AreEqual(*compare1.intColumn[0].GetValue(), *compare2.intColumn[0].GetValue());
-				Assert::AreEqual(*compare1.strColumn[0].GetValue(), *compare2.strColumn[0].GetValue());
+				Assert::AreEqual(compare1.intColumn[0].GetValue(), compare2.intColumn[0].GetValue());
+				Assert::AreEqual(compare1.strColumn[0].GetValue(), compare2.strColumn[0].GetValue());
 				i++;
 			}
 
@@ -534,4 +531,4 @@ namespace Tests
 	};
 
 }
-*/
+
