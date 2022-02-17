@@ -282,7 +282,7 @@ public:
 
 			Table tbl = db->get_table(tbl_name);
 
-			if (tbl.table_name.length() > 0)
+			if (tbl.table_name.length() > 0)				// Why look for table name length? Could use if table is null instead?
 			{
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
 				std::string conditional = Parser::get_conditional(cmd);
