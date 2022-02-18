@@ -1,5 +1,3 @@
-
-
 // main function
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
@@ -480,12 +478,6 @@ bool has_special_char(std::string const& s)
 	}
 }
 
-
-
-
-
-
-
 /// Author: Andrew Nunez
 
 /// <summary>
@@ -512,4 +504,3 @@ void setup_intro()
 		<< "Type [help] for a list of commands. Type [exit] to quit." << std::endl
 		<< std::endl;
 }
-

@@ -15,7 +15,9 @@ template <typename T> class Column {
 	T value;
 public:	
 	void AddValue(T val);
+	void SetName(string na);
 	T GetValue();
+	string GetName();
 };
 
 
@@ -29,6 +31,11 @@ void Column<T>::AddValue(T val) {
 	value = val;
 }
 
+template <typename T>
+void Column<T>::SetName(string na) {
+	name = na;
+}
+
 /// <summary>
 /// Returns the value of the column
 /// </summary>
@@ -36,6 +43,9 @@ void Column<T>::AddValue(T val) {
 /// <returns></returns>
 template <typename T> T Column<T>::GetValue() {
 	return value;
+}
+template <typename T> string Column<T>::GetName() {
+	return name;
 }
 
 

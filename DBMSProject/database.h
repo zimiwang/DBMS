@@ -34,6 +34,8 @@ public:
 
 	std::vector<BPTree> trees;
 
+	const string PRIMARY_KEY = "ID";
+
 
 	static void List();
 	void List_Tables();
@@ -52,6 +54,7 @@ public:
 	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
 	void delete_column(std::string column_name, std::string table_name);
 	void updateRows();
+	void updatePrimaryTrees();
 
 	
 	/// <summary>
@@ -145,6 +148,7 @@ void Database::Save()
 	out.close();
 
 	updateRows();
+	updatePrimaryTrees();
 }
 
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
@@ -465,6 +469,20 @@ void Database::insert_into(std::string statement, std::string table_name)
 	vector<string> columns = Parser::get_insert_columns(statement, table_name);
 	vector<vector<string> > values = Parser::get_insert_rows(statement, table_name);
 
+	//check to see if ID is present in the columns
+	if (std::find(columns.begin(), columns.end(), "ID") != columns.end())
+	{
+		//no worries, the user SHOULD be setting their own ID
+	}
+	else
+	{
+		//manually add ID to columns, then a basic iterator representing row number to the values
+		columns.push_back("ID");
+		string newid = std::to_string(current_table.rows.size() + 1);
+		
+		values[0].push_back(newid);
+	}
+
 	vector<string> col_names = current_table.get_column_names();
 
 	vector<int> order;
@@ -534,6 +552,7 @@ void Database::updateRows()
 {
 	for (Table tbl : tables)
 	{
+		tbl.newrows.clear();
 		for (std::vector<std::string> rw : tbl.rows)
 		{
 			Row nrow = Row();
@@ -548,6 +567,7 @@ void Database::updateRows()
 				{
 					Column<string> newcol = Column<string>();
 					newcol.AddValue(rw[rowfind]);
+					newcol.SetName(col.first);
 					nrow.strColumn.push_back(newcol);
 					
 				}
@@ -555,6 +575,7 @@ void Database::updateRows()
 				{
 					Column<int> newcol = Column<int>();
 					newcol.AddValue(stoi(rw[rowfind]));
+					newcol.SetName(col.first);
 					nrow.intColumn.push_back(newcol);
 
 				}
@@ -566,6 +587,7 @@ void Database::updateRows()
 					cout << char_arr;
 					Column<char*> newcol = Column<char*>();
 					newcol.AddValue(char_arr);
+					newcol.SetName(col.first);
 					nrow.charColumn.push_back(newcol);
 				}
 				else
@@ -573,11 +595,14 @@ void Database::updateRows()
 					//unsupported column type - assume string? - come back to this
 					Column<string> newcol = Column<string>();
 					newcol.AddValue(rw[rowfind]);
+					newcol.SetName(col.first);
 					nrow.strColumn.push_back(newcol);
 				}
 				rowfind = rowfind + 1;
+
+				tbl.newrows.push_back(nrow);
 			}
-			tbl.newrows.push_back(nrow);
+			SaveTable(tbl);
 		}
 }
 	//	int intindex = 0;
@@ -625,4 +650,31 @@ void Database::updateRows()
 	//	}
 	//	int x = 4;
 	//}
+}
+
+inline void Database::updatePrimaryTrees()
+{
+	trees.clear();
+	for (Table tbl : tables)
+	{
+		BPTree newPrimaryKeyIndex;
+		newPrimaryKeyIndex.Name = tbl.table_name;
+
+		for (Row r : tbl.newrows)
+		{
+			Row* rpoint = &r;
+			
+			for (Column<int> c : r.intColumn)
+			{
+				//check to see if the colname is the primary key
+				if (c.GetName() == PRIMARY_KEY)
+				{
+					//index based on the value here
+					newPrimaryKeyIndex.insert(c.GetValue(), rpoint);
+				}
+			}
+
+		}
+		trees.push_back(newPrimaryKeyIndex);
+	}
 }

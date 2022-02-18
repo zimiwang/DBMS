@@ -12,6 +12,7 @@
 #include <vector>
 #include "parser.h"
 #include "row.h"
+#include "bplustree.h"
 
 class Table {
 public:
@@ -30,6 +31,8 @@ public:
 	/// The collection of arrays of rows for the table.
 	std::vector<std::vector<std::string>> rows;
 	std::vector<Row> newrows;
+
+	BPTree primaryKeyTree;
 
 	/// Counter for row ID
 	int ID_count = 0;
