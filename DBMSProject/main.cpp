@@ -17,6 +17,7 @@
 
 
 #include "commandHandler.h"
+//#include "mainReferenceHeader.h"
 
 // global variables
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -80,7 +81,6 @@ int renameColumn() { int retVal = cmdHandler->renameColumn(db, cmd); db = cmdHan
 
 
 
-
 /// <summary>
 /// main function
 /// </summary>
@@ -118,10 +118,16 @@ int main(int argc, char** argv)
 		// if there are inputs, use the argc[] string array for inputs
 		else
 		{
-			for (int i = 1; i < argc; i++) 
+			cmd = string(argv[0]);
+			for (int i = 1; i < argc-1; i++) 
 			{
-				cmd += argv[i];
+				cout << "argv[" << i << "] : " << argv[i] << "\t|\n";
+				cmd += string(argv[i]); 
+				
+				cout << "cmd: \"" << cmd << "\"\n";
 			}
+			argc = 2;
+			argv[0] = (char*) "exit";
 		}
 
 		statement = Parser::to_lower(cmd);
@@ -142,7 +148,6 @@ int main(int argc, char** argv)
 			{ "noSemiColon", &noSemiColon, },
 			{ "openDatabase", &openDatabase, },
 			{ "createDatabase", &createDatabase, },
-
 			{ "listDatabases", &listDatabases, },
 			{ "loadSQLfile", &loadSQLfile, },
 			{ "dropDatabase", &dropDatabase, },
@@ -387,7 +392,7 @@ int main(int argc, char** argv)
 		*/
 	}
 
-	return 0;
+	return 1;
 }
 // end of main function
 

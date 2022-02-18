@@ -12,6 +12,9 @@
 
 // headers to test
 #include "../DBMSProject/commandHandler.h"
+//#include "../DBMSProject/mainReferenceHeader.h"
+
+#include "../DBMSProject/main.cpp"
 
 int main(int argc, char** argv);
 
@@ -31,13 +34,11 @@ namespace Tests
 		TEST_METHOD(testHelpMenu)
 		{
 
-			//char** commandStringArray = ["help"];
+			char* cmd[] = { (char*)"help" };
 
-			//main(1, commandStringArray);
-			CommandHandler *cmdHandler = new CommandHandler;
 
-			// call the help menu
-			int provided = cmdHandler->helpMenu();
+			int provided  = main(2, cmd);
+			
 			int expected = 1;
 
 			Assert::AreEqual(expected, provided);
@@ -50,21 +51,22 @@ namespace Tests
 		
 		TEST_METHOD(createDatabase)
 		{
+
+			// command	
+			char* cmd[] = { (char*)"create ",  (char*)"database ",  (char*)"exampleDatabaseName;" };
+			
+			main(4, cmd);
+
 			// this test uses the commandHandler header
 			CommandHandler* cmdHandler = new CommandHandler;
-
-			Database *exampleDB = NULL;
-			string exampleCurrentDBname;
-
-			// call the createDatabase() function
-			int provided = cmdHandler->createDatabase(exampleCurrentDBname, exampleDB, "create database exampleDatabaseName;");
 			
 			// check the new open database name
-			string currentDB = cmdHandler->current_db_name;
+			string currentDB = current_db_name;
 
 			string expected = "exampleDatabaseName";
 
 			Assert::AreEqual(expected, currentDB);
+
 		}
 		
 
@@ -72,21 +74,16 @@ namespace Tests
 
 		/// <summary>
 		/// test open database script
-		/// </summary>
-		 
+		/// </summary>		 
 		TEST_METHOD(openDatabase)
 		{
-			// this test uses the commandHandler header
-			CommandHandler* cmdHandler = new CommandHandler;
+			
+			char* cmd[] = { (char*)"open ",  (char*)"database ",  (char*)"exampleDatabaseName;" };
 
-			Database* exampleDB = NULL;
-			string exampleCurrentDBname;
-
-			// call the openDatabase() function
-			cmdHandler->openDatabase(exampleCurrentDBname, exampleDB, "open database exampleDatabaseName;");
+			main(4, cmd);
 
 			// check the new open database name
-			string currentDB = cmdHandler->current_db_name;
+			string currentDB = current_db_name;
 
 			string expected = "exampleDatabaseName";
 				
