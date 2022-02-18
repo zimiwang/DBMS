@@ -675,6 +675,9 @@ inline void Database::updatePrimaryTrees()
 			}
 
 		}
+		tbl.primaryKeyTree = newPrimaryKeyIndex;
 		trees.push_back(newPrimaryKeyIndex);
+
+		SaveTable(tbl);
 	}
 }
