@@ -548,6 +548,9 @@ void Database::delete_column(std::string column_name, std::string table_name)
 	SaveTable(current_table);
 }
 
+/// <summary>
+/// Updates the new row data structure from each tree based on the old row storage methodology.
+/// </summary>
 void Database::updateRows()
 {
 	for (Table tbl : tables)
@@ -651,7 +654,10 @@ void Database::updateRows()
 	//	int x = 4;
 	//}
 }
-
+/// <summary>
+/// Updates the primary key trees for each table. TODO - Add a check to see if the table needs to be updated - maybe a bool flag in
+/// table.h that says whether or not it has been altered since the last table was generated.
+/// </summary>
 inline void Database::updatePrimaryTrees()
 {
 	trees.clear();
