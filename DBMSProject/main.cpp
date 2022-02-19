@@ -118,6 +118,7 @@ int main(int argc, char** argv)
 		// if there are inputs, use the argc[] string array for inputs
 		else
 		{
+			// simple parser for when command arguments are placed in the argc[] list
 			cmd = string(argv[0]);
 			for (int i = 1; i < argc-1; i++) 
 			{
