@@ -49,7 +49,7 @@ public:
 	void insert_into(std::string statement, std::string table_name);
 	void List_Info();
 	Table get_table(std::string tbl_name);
-	void UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause);
+	void UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
 	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
 	void delete_column(std::string column_name, std::string table_name);
@@ -191,9 +191,40 @@ void Database::DropTable(std::string name)
 /// <param name="table_name">Name of the table to update</param>
 /// <param name="update_clause">command to execute</param>
 /// <param name="where_clause">table to update based on the command</param>
-void Database::UpdateTable(string table_name, vector<string> update_clause, vector<string> where_clause) {
+void Database::UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause) {
 	Table tbl = this->get_table(table_name);
-	int update_idx = tbl.get_column_index(update_clause[0]);
+
+	for (size_t i = 0; i < update_clause.size(); i++)
+	{
+		vector<vector<string>> new_rows;
+		//cout << "get_where_clause: " << where_clause[0] << endl;
+		//cout << "get_update_clause: " << update_clause[0][i] << endl;
+
+		int where_idx = tbl.get_column_index(where_clause[0]);
+		int update_idx = tbl.get_column_index(update_clause[i][0]);
+
+		cout << "Where idx: " << where_idx << endl;
+		cout << "Update idx: " << update_idx << endl;
+
+		for (vector<string> row : tbl.rows) {
+			if (row[where_idx] == where_clause[1]) {
+
+				//cout << "get_update_clause: " << update_clause[i][1] << endl;
+
+				row[update_idx] = update_clause[i][1];
+			}
+			new_rows.push_back(row);
+		}
+
+		tbl.rows = new_rows;
+
+		this->DropTable(table_name);
+		this->AddTable(tbl);
+	}
+
+		this->Save();
+
+	/*int update_idx = tbl.get_column_index(update_clause[0]);
 	int where_idx = tbl.get_column_index(where_clause[0]);
 	vector<vector<string>> new_rows;
 
@@ -213,7 +244,7 @@ void Database::UpdateTable(string table_name, vector<string> update_clause, vect
 	this->DropTable(table_name);
 	this->AddTable(tbl);
 
-	this->Save();
+	this->Save();*/
 
 }
 

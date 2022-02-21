@@ -22,6 +22,7 @@ public:
 	vector<string> static get_update_clause(string cmd);
 	string static get_conditional(string stm);
 	string static get_table_name(string cmd, string first_delim, string second_delim);
+	vector<vector<string>> static get_update_clauses(string cmd);
 };
 
 /// Converts a string to lower
@@ -101,6 +102,44 @@ std::string Parser::to_lower(std::string s)
 	return finout;
 }
 
+vector<vector<string>> Parser::get_update_clauses(string cmd) {
+	smatch sm;
+	vector<vector<string>> ret;
+	vector<string> upd_clause;
+	vector<string> values;
+
+	regex str_expr("set(?:\\s*)(.*)(?:\\s*where)");
+
+	if (regex_search(cmd, sm, str_expr)) {
+		try {
+
+			values = Utils::split(sm[1], ",");
+
+			for (string str : values)
+			{
+
+				upd_clause = Utils::split(str, "=");
+
+				for (size_t i = 0; i < upd_clause.size(); i++)
+				{
+					upd_clause[i] = Utils::trim(upd_clause[i]);
+					cout << "Update Clause: " << upd_clause[i] << endl;
+				}
+
+				ret.push_back(upd_clause);
+			}
+		}
+			catch (const std::exception& e) {
+			std::cout << "Exception: " << e.what() << std::endl;
+		}
+	}
+	else {
+		cout << "No Match!" << endl;
+	}
+
+	return ret;
+}
+
 /// Author: Andrew
 /// Date: 11-28-2021
 /// Parses an update command
@@ -121,6 +160,16 @@ vector<string> Parser::get_update_clause(string cmd) {
 		try
 		{
 			values = Utils::split(sm[1], "=");
+
+			/*for (size_t i = 0; i < values.size(); i++)
+			{
+				std::cout << "values " << values[i] << std::endl;
+			}
+			
+			for (size_t j = 0; j < sm.size(); j++)
+			{
+				std::cout << "sm " << sm[j] << std::endl;
+			}*/
 
 			for (string str : values) {
 				cout << "Update Clause: " << str << endl;

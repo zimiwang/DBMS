@@ -417,11 +417,16 @@ public:
 		db = new_db;
 
 		// get table name by sending command through parser
+		//std::string table_name = Parser::get_table_name(cmd, "update", "set");
+		//vector<string> upd_clause = Parser::get_update_clause(cmd);
+		//vector<string> where_clause = Parser::get_where_clause(cmd, "=");
+
+
 		std::string table_name = Parser::get_table_name(cmd, "update", "set");
-		vector<string> upd_clause = Parser::get_update_clause(cmd);
+		vector<vector<string>> update_clause = Parser::get_update_clauses(cmd);
 		vector<string> where_clause = Parser::get_where_clause(cmd, "=");
 
-		db->UpdateTable(table_name, upd_clause, where_clause);
+		db->UpdateTable(table_name, update_clause, where_clause);
 		return 1;
 	}
 
