@@ -91,37 +91,9 @@ namespace Tests
 		}
 		
 
-
-
 		/// <summary>
 		/// test the implementation to drop a database
 		/// </summary>
-		
-		TEST_METHOD(dropDatabase)
-		{
-			// this test uses the commandHandler header
-			CommandHandler* cmdHandler = new CommandHandler;
-
-			// call the openDatabase() function
-			cmdHandler->dropDatabase("drop database exampleDatabaseName;");
-
-			// check the new open database name
-			string currentDB = cmdHandler->current_db_name;
-
-			string notExpected = "exampleDatabaseName";
-
-			Assert::AreNotEqual(notExpected, currentDB);
-		}
-		
-
-	
-
-
-
-		/// <summary>
-		/// test the implementation to drop a database
-		/// </summary>
-	
 		TEST_METHOD(dropDatabase)
 		{
 			// this test uses the commandHandler header
@@ -176,5 +148,5 @@ namespace Tests
  
 };
 
-}
+
 
