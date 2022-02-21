@@ -113,6 +113,8 @@ namespace Tests
 
 			string notExpected = "exampleDatabaseName";
 
+			Assert::AreNotEqual(currentDB, notExpected);
+
 		}
 
 
