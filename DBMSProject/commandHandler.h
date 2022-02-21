@@ -520,9 +520,10 @@ public:
 ///This function drops the given database from the dbms.
 	void drop_database(string db_name)
 	{
-
+		// identify the string to wipe
 		std::string s = "data/" + db_name + ".db";
 
+		// remove the file
 		if (std::remove(s.c_str()) != 0)
 		{
 
@@ -533,6 +534,10 @@ public:
 			puts("File successfully deleted");
 			current_db_name = "";
 		}
+
+		// clear the name of the currently open database, if it was the one deleted
+		if (current_db_name == db_name) current_db_name.clear();
+
 	}
 
 

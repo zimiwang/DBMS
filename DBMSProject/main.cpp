@@ -80,6 +80,18 @@ int renameTable() { int retVal = cmdHandler->renameTable(db, cmd); db = cmdHandl
 int renameColumn() { int retVal = cmdHandler->renameColumn(db, cmd); db = cmdHandler->db; return retVal; }
 
 
+/*
+* // short script for testing the unit tests' commands
+int mainT(int argc, char** argv);
+int main() {
+       char* cmdCreateTable[] = { (char*)"create ",  (char*)"tableExample(char a, char b, char c);" };
+
+       mainT(3, cmdCreateTable);
+
+               return 1;
+}
+*/
+
 
 /// <summary>
 /// main function
