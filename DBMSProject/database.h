@@ -648,8 +648,7 @@ void Database::updateRows()
 				rowfind = rowfind + 1;
 			}
 			tbl.newrows.push_back(nrow);
-		}
-		tbl.UpdateTree();
+		}		
 		SaveTable(tbl);
 }
 	//	int intindex = 0;
@@ -713,7 +712,7 @@ inline void Database::updatePrimaryTrees()
 		for (Row r : tbl.newrows)
 		{
 			/*Row* rpoint = &r;*/
-			
+			r.InUse();
 			for (Column<int> c : r.intColumn)
 			{
 				//check to see if the colname is the primary key

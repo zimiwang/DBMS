@@ -98,11 +98,7 @@ public:
 		}
 	}
 
-	void UpdateTree() {
-		for(Row row : newrows) {
-			primaryKeyTree.insert(row.intColumn[0].GetValue(), row);
-		}
-	}
+	
 
 
 };

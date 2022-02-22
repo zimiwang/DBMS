@@ -17,8 +17,8 @@ public:
 	/// <summary>
 	/// Adds a value
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <param name="val"></param>
+	/// <typeparam name="T">The type of value</typeparam>
+	/// <param name="val">The value to save</param>
 	template <typename T> 
 	void AddValue(T val) {
 		value = val;
@@ -26,8 +26,8 @@ public:
 	/// <summary>
 	/// Sets the name of the column
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <param name="na"></param>	
+	/// <typeparam name="T">The type of value</typeparam>
+	/// <param name="na">The name of the column</param>	
 	void SetName(string na) {
 		name = na;
 	}
@@ -36,8 +36,8 @@ public:
 	/// <summary>
 	/// Returns the value of the column
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <returns></returns>	
+	/// <typeparam name="T">The type of value to return</typeparam>
+	/// <returns>Returns the value of the column</returns>	
 	T GetValue() {
 		return value;
 	}
@@ -45,8 +45,8 @@ public:
 	/// <summary>
 	/// Gets the name of the column
 	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <returns></returns>	
+	/// <typeparam name="T">The type of the column</typeparam>
+	/// <returns>The name of the column</returns>	
 	string GetName() {
 		return name;
 	}
@@ -62,6 +62,8 @@ public:
 /// </summary>
 class Row {	
 private:
+	bool empty;
+
 	/// <summary>
 	/// Gets the largest value out of all the columns
 	/// </summary>
@@ -129,14 +131,18 @@ private:
 	/// <summary>
 	/// Prints all column names or values
 	/// </summary>
-	/// <param name="whichColumnValue"></param>
-	/// <param name="columns"></param>
+	/// <param name="whichColumnValue">Print column names or column values (0 - names, 1 - values)</param>
+	/// <param name="columns">A vector of columns to print</param>
 	void PrintColumns(int whichColumnValue, vector<string> columns) {
 		int maxSize = GetLargestColumnSize();
 		
+		// Go through the rows columns 
 		for (Column<int> i : intColumn) {
+			// Got through the incoming columns
 			for (string col : columns) {
+				// check if the incoming column matches row column
 				if (col == "*" || col == i.GetName()) {
+					// print column names or column values
 					if (whichColumnValue == 0) {
 						PrintColumnName(i.GetName(), maxSize);
 					}
@@ -147,6 +153,7 @@ private:
 			}
 		}
 
+		// The same as above
 		for (Column<string> i : strColumn) {
 			for (string col : columns) {
 				if (col == "*" || col == i.GetName()) {
@@ -160,6 +167,7 @@ private:
 			}
 		}
 
+		// The same as above
 		for (Column<char*> i : charColumn) {
 			for (string col : columns) {
 				if (col == "*" || col == i.GetName()) {
@@ -174,14 +182,22 @@ private:
 		}
 	}
 
-	
+	/// <summary>
+	///	Prints spaces between values
+	/// </summary>
+	/// <param name="nameSize">The size of the value that was printed before</param>
+	/// <param name="maxSize">The size of the largest value in any column</param>
 	void PrintSpaces(int nameSize, int maxSize) {		
 		for (int i = 0; i < maxSize - nameSize; i++) {
 			cout << " ";
 		}
 	}
 
-	
+	/// <summary>
+	/// Prints a column name
+	/// </summary>
+	/// <param name="name">The name to print</param>
+	/// <param name="maxSize">The size of the largest value in any column</param>
 	void PrintColumnName(string name, int maxSize) {
 		cout << name;
 
@@ -190,16 +206,22 @@ private:
 		cout << " | ";
 	}
 
+
+	/// <summary>
+	/// Prints the names of columns as headers
+	/// </summary>
+	/// <param name="columns">A vector of column names to print</param>	
 	void PrintHeaders(vector<string> columns) {
 		int maxSize = GetLargestColumnSize();
 		int totalSpace = (TotalColumns(columns) * (maxSize + 3)) + 1;
 		
-		// seperator indecator
+		// top indicator
 		for (int i = 0; i < totalSpace; i++) {
 			cout << "-";
 		}
 		cout << endl;
 
+		// start printing
 		cout << "| ";		
 
 		// print column names
@@ -207,7 +229,6 @@ private:
 		
 		// end headers
 		cout << endl;
-
 
 
 		// seperator indecator
@@ -218,20 +239,33 @@ private:
 
 	}
 
-public:	
-	/// <summary>
-	///  Arrays of columns for each type
-	/// </summary>
+public:		
 	vector<Column<string>> strColumn;
 	vector<Column<int>> intColumn;
 	vector<Column<char*>> charColumn;	
 	
-
-	Row() {		
+	
+	Row() {	
+		empty = true;
 	}
 
+	void InUse() {
+		empty = false;
+	}
+
+	bool isEmpty() {
+		return empty;
+	}
+
+	/// <summary>
+	///	Finds the total columns being used
+	/// </summary>
+	/// <param name="columns">A vector of column names</param>
+	/// <returns>Returns teh total columbs being used</returns>	 
 	int TotalColumns(vector<string> columns) {
 		int total = 0;
+
+		// if all columns are being used count all of the rows columns
 		if (columns[0] == "*") {
 			for (Column<int> i : intColumn) {
 				total++;
@@ -246,26 +280,37 @@ public:
 			}
 		}
 		else {
+			// the total columns is the incoming column names
 			total = columns.size();
 		}
 
 		return total;
 	}
 
+	/// <summary>
+	/// Prints a row with headers
+	/// </summary>
+	/// <param name="columns"></param>
 	void PrintRow(vector<string> columns) {
 		PrintHeaders(columns);
 		PrintSingleRow(columns);
-
 	}
 
+	/// <summary>
+	///	Prints a row without headers
+	/// </summary>
+	/// <param name="columns"></param>
 	void PrintSingleRow(vector<string> columns) {
+		// start printing
 		cout << "| ";
 
 		int maxSize = GetLargestColumnSize();
 		int totalSpace = (TotalColumns(columns) * (maxSize + 3)) + 1;
 
+		// print column values
 		PrintColumns(1, columns);
 
+		// end of column values
 		cout << endl;
 
 		// seperator indecator

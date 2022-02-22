@@ -296,12 +296,17 @@ public:
 					vector<Row> rows = tree.getFullTable();
 					int i = 0;
 					for (Row row : rows) {
-						if (i == 0) {
-							row.PrintRow(cols);
-							i++;
+						if (!row.isEmpty()) {
+							if (i == 0) {
+								row.PrintRow(cols);
+								i++;
+							}
+							else {						
+								row.PrintSingleRow(cols);
+							}
 						}
 						else {
-							row.PrintSingleRow(cols);
+							cout << "Could not find rows" << endl;
 						}
 					}
 				}
@@ -309,7 +314,12 @@ public:
 					// search table
 					string pk = where_clause[1];				
 					Row row = tree.search(stoi(pk));
-					row.PrintRow(cols);
+					if (!row.isEmpty()) {
+						row.PrintRow(cols);
+					}
+					else {
+						cout << "Could not find row" << endl;
+					}
 				}
 				
 			}
