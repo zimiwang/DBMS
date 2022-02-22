@@ -5,6 +5,7 @@
 
 #pragma once
 #include "database.h"
+#include <string>
 
 using namespace std;
 
@@ -281,13 +282,36 @@ public:
 			tbl_name = Utils::remove_char(tbl_name, ';');
 
 			Table tbl = db->get_table(tbl_name);
-
+			BPTree tree = db->get_tree(tbl_name);
 			if (tbl.table_name.length() > 0)				// Why look for table name length? Could use if table is null instead?
-			{
+			{				
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
-				std::string conditional = Parser::get_conditional(cmd);
+				std::string conditional = Parser::get_conditional(cmd);				
+
 				std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
-				tbl.Print_Rows(cols, where_clause, conditional);
+				
+				// decide to print whole table or search table
+				if (where_clause.empty()) {
+					// print whole table
+					vector<Row> rows = tree.getFullTable();
+					int i = 0;
+					for (Row row : rows) {
+						if (i == 0) {
+							row.PrintRow(cols);
+							i++;
+						}
+						else {
+							row.PrintSingleRow(cols);
+						}
+					}
+				}
+				else {			
+					// search table
+					string pk = where_clause[1];				
+					Row row = tree.search(stoi(pk));
+					row.PrintRow(cols);
+				}
+				
 			}
 			else
 			{

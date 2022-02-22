@@ -14,7 +14,7 @@ const int MAX = 3;
 
 struct PrimaryKey {
     int key;
-    Row* locationPtr;
+    Row locationPtr;
 };
 
 
@@ -47,6 +47,8 @@ public:
 // BP tree
 class BPTree {
     Node* root;                                         // root node
+    int minKey;
+    int maxKey;
     void insertInternal(PrimaryKey x, Node* parentNode, Node* child) {
         if (parentNode->size < MAX) {
             int i = 0;
@@ -275,10 +277,11 @@ public:
         root = NULL;
     };                                           // constructor
 
-    Row* search(int x) {
+    Row search(int x) {
+        Row row;
         if (root == NULL) {
-            cout << "Tree is empty\n";
-            return NULL;
+            cout << "Tree is empty\n";            
+            return row;
         }
         else {
             Node* currentNode = searchInternal(x);
@@ -289,18 +292,21 @@ public:
                 }
             }
             cout << "Not found\n";
-            return NULL;
+            return row;
         }
     };
 
+    vector<Row> getFullTable() {
+        return searchMultiple(minKey, maxKey);
+    }
 
-    list<Row*> searchMultiple(int min, int max) {
+    vector<Row> searchMultiple(int min, int max) {
         if (root == NULL) {
             cout << "Tree is empty\n";
         }
         else {
             Node* currentNode = searchInternal(min);
-            list<Row*> rows;
+            vector<Row> rows;
             int currentValue = min;
             while (currentValue < max) {
                 if (!currentNode) {
@@ -346,7 +352,7 @@ public:
     }
 
 
-    void insert(int x, Row* location) {
+    void insert(int x, Row location) {
         // create root node 
         if (root == NULL) {
             root = new Node;                        // new node
@@ -354,8 +360,18 @@ public:
             root->key[0].locationPtr = location;
             root->IS_LEAF = true;   // set IS_LEAF
             root->size = 1;         // current size = 1
+            minKey = x;
+            maxKey = x;
         }
         else {
+            // set max and min nodes
+            if (x > maxKey) {
+                maxKey = x;
+            }
+            if (x < minKey) {
+                minKey = x;
+            }
+
             Node* currentNode = root;   // set current node to root
             Node* parent = NULL;               // parent node
 

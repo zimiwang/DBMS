@@ -49,6 +49,7 @@ public:
 	void insert_into(std::string statement, std::string table_name);
 	void List_Info();
 	Table get_table(std::string tbl_name);
+	BPTree get_tree(string name);
 	void UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
 	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
@@ -409,6 +410,18 @@ Table Database::get_table(std::string name)
 	return ret;
 }
 
+BPTree Database::get_tree(string name) {
+	BPTree ret;
+
+	for (BPTree tree : trees) {
+		if (tree.Name == name) {
+			ret = tree;
+			break;
+		}
+	}
+
+	return ret;
+}
 
 
 /// Author: Saurav Gautam
@@ -633,11 +646,11 @@ void Database::updateRows()
 					nrow.strColumn.push_back(newcol);
 				}
 				rowfind = rowfind + 1;
-
-				tbl.newrows.push_back(nrow);
 			}
-			SaveTable(tbl);
+			tbl.newrows.push_back(nrow);
 		}
+		tbl.UpdateTree();
+		SaveTable(tbl);
 }
 	//	int intindex = 0;
 	//	int stringindex = 0;
@@ -699,7 +712,7 @@ inline void Database::updatePrimaryTrees()
 
 		for (Row r : tbl.newrows)
 		{
-			Row* rpoint = &r;
+			/*Row* rpoint = &r;*/
 			
 			for (Column<int> c : r.intColumn)
 			{
@@ -707,7 +720,7 @@ inline void Database::updatePrimaryTrees()
 				if (c.GetName() == PRIMARY_KEY)
 				{
 					//index based on the value here
-					newPrimaryKeyIndex.insert(c.GetValue(), rpoint);
+					newPrimaryKeyIndex.insert(c.GetValue(), r);
 				}
 			}
 

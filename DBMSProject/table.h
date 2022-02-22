@@ -98,6 +98,12 @@ public:
 		}
 	}
 
+	void UpdateTree() {
+		for(Row row : newrows) {
+			primaryKeyTree.insert(row.intColumn[0].GetValue(), row);
+		}
+	}
+
 
 };
 
@@ -149,6 +155,8 @@ int Table::get_column_index(std::string column_name) {
 	return ret;
 }
 
+
+
 /// <summary>
 /// Prints the rows using the specified where clause and column names
 /// </summary>
@@ -156,6 +164,7 @@ int Table::get_column_index(std::string column_name) {
 /// <param name="where_clause"></param>
 /// <param name="conditional"></param>
 void Table::Print_Rows(std::vector<std::string> column_names, vector<string> where_clause, string conditional) {
+	
 	int row_count = 0;
 
 	std::map<std::string, std::string> print_cols;
