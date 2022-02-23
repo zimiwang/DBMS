@@ -49,10 +49,13 @@ public:
 	void insert_into(std::string statement, std::string table_name);
 	void List_Info();
 	Table get_table(std::string tbl_name);
+	BPTree get_tree(string name);
 	void UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
 	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
 	void delete_column(std::string column_name, std::string table_name);
+	void keytotable(std::string keytype, std::string keyname, std::string table_name);
+	void sortKeys();
 	void updateRows();
 	void updatePrimaryTrees();
 
@@ -148,6 +151,7 @@ void Database::Save()
 	out.close();
 
 	updateRows();
+	sortKeys();
 	updatePrimaryTrees();
 }
 
@@ -295,7 +299,13 @@ void Database::Read(std::string db_name)
 			}
 			else if (line.find("keys:") == 0)
 			{
-				//keys.insert({ tmp_child_array[0], tmp_child_array[1] }); fix later
+				tmp_parent_array = Parser::split_str(line, ',');
+				for (i = 0; i < tmp_size; i++)
+				{
+					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+					keys.insert({ tmp_child_array[0], tmp_child_array[1] });
+				}
+
 			}
 			else if (line.find("columns:") == 0)
 			{
@@ -410,6 +420,18 @@ Table Database::get_table(std::string name)
 	return ret;
 }
 
+BPTree Database::get_tree(string name) {
+	BPTree ret;
+
+	for (BPTree tree : trees) {
+		if (tree.Name == name) {
+			ret = tree;
+			break;
+		}
+	}
+
+	return ret;
+}
 
 
 /// Author: Saurav Gautam
@@ -502,14 +524,14 @@ void Database::insert_into(std::string statement, std::string table_name)
 	vector<vector<string> > values = Parser::get_insert_rows(statement, table_name);
 
 	//check to see if ID is present in the columns
-	if (std::find(columns.begin(), columns.end(), "ID") != columns.end())
+	if (std::find(columns.begin(), columns.end(), ("ID_" + table_name)) != columns.end())
 	{
 		//no worries, the user SHOULD be setting their own ID
 	}
 	else
 	{
 		//manually add ID to columns, then a basic iterator representing row number to the values
-		columns.push_back("ID");
+		columns.push_back(("ID_" + table_name));
 		string newid = std::to_string(current_table.rows.size() + 1);
 		
 		values[0].push_back(newid);
@@ -579,6 +601,55 @@ void Database::delete_column(std::string column_name, std::string table_name)
 
 	SaveTable(current_table);
 }
+/// <summary>
+/// adds a key to the old key storage from the table
+/// </summary>
+/// <param name="keytype"></param>
+/// <param name="keyname"></param>
+/// <param name="table_name"></param>
+void Database::keytotable(std::string keytype, std::string keyname, std::string table_name)
+{
+	//get the index of the column name
+	Table current_table = get_table(table_name);;
+	
+	current_table.AddKey(keytype, keyname);
+
+	SaveTable(current_table);
+}
+
+/// <summary>
+/// sorts keys into the lists they belong in. Something to note: Since we only have 1 primary key, it will be set to the most recently specified primary
+/// </summary>
+void Database::sortKeys()
+{
+	for (Table tbl : tables)
+	{
+		tbl.secondaryKeys.clear();
+		tbl.foreignKeys.clear();
+		for (std::pair<std::string, std::string> current_key : tbl.keys)
+		{
+			if (current_key.first == "primary")
+			{
+				//found primary key
+				tbl.primaryKeyName = current_key.second;
+			}
+			else if (current_key.first == "secondary")
+			{
+				//found secondary key
+				tbl.secondaryKeys.push_back(current_key.second);
+			}
+			else if (current_key.first == "foreign")
+			{
+				//foreign key found
+				tbl.foreignKeys.push_back(current_key.second);
+
+			}
+
+		}
+		SaveTable(tbl);
+	}
+}
+
 
 /// <summary>
 /// Updates the new row data structure from each tree based on the old row storage methodology.
@@ -634,11 +705,10 @@ void Database::updateRows()
 					nrow.strColumn.push_back(newcol);
 				}
 				rowfind = rowfind + 1;
-
-				tbl.newrows.push_back(nrow);
 			}
-			SaveTable(tbl);
-		}
+			tbl.newrows.push_back(nrow);
+		}		
+		SaveTable(tbl);
 }
 	//	int intindex = 0;
 	//	int stringindex = 0;
@@ -700,15 +770,15 @@ inline void Database::updatePrimaryTrees()
 
 		for (Row r : tbl.newrows)
 		{
-			Row* rpoint = &r;
-			
+			/*Row* rpoint = &r;*/
+			r.InUse();
 			for (Column<int> c : r.intColumn)
 			{
 				//check to see if the colname is the primary key
-				if (c.GetName() == PRIMARY_KEY)
+				if (c.GetName() == tbl.primaryKeyName)
 				{
 					//index based on the value here
-					newPrimaryKeyIndex.insert(c.GetValue(), rpoint);
+					newPrimaryKeyIndex.insert(c.GetValue(), r);
 				}
 			}
 

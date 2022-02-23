@@ -22,6 +22,7 @@ public:
 	vector<string> static get_update_clause(string cmd);
 	string static get_conditional(string stm);
 	string static get_table_name(string cmd, string first_delim, string second_delim);
+	string static get_table_name(string cmd);
 	vector<vector<string>> static get_update_clauses(string cmd);
 };
 
@@ -213,8 +214,7 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 		{
 			tmp = Utils::split(Utils::remove_char(sm[1], ';'), op);
 
-			for (string str : tmp) {
-				cout << "Where Clause: " << str << endl;
+			for (string str : tmp) {				
 				ret.push_back(Utils::trim(str));
 			}
 
@@ -439,6 +439,20 @@ vector<string> Parser::get_create_columns(string cmd) {
 	return ret;
 
 }
+
+
+std::string Parser::get_table_name(string cmd) {
+	smatch sm;
+	string ret;
+	string keyword = "from";
+
+	size_t found = cmd.find(keyword);
+	
+
+	return ret;
+
+}
+
 /// <summary>
 /// table name retriever
 /// </summary>
@@ -455,7 +469,8 @@ std::string Parser::get_table_name(string cmd, string first_delim, string second
 		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)\\(";
 	}
 	else {
-		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)" + second_delim;
+		/*exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)" + second_delim;		*/
+		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)";
 	}
 
 	regex str_expr(exp, regex_constants::icase);
@@ -463,7 +478,7 @@ std::string Parser::get_table_name(string cmd, string first_delim, string second
 	// Check if the match was found, and add to the vector
 	if (regex_search(cmd, sm, str_expr)) {
 		try
-		{
+		{			
 			ret = Utils::trim(sm[1]);
 
 		}

@@ -5,6 +5,7 @@
 
 #pragma once
 #include "database.h"
+#include <string>
 
 using namespace std;
 
@@ -218,6 +219,10 @@ public:
 		{
 			dropColumn(new_cmd);
 		}
+		else if (new_cmd.find("key") != -1)
+		{
+			addKey(db, new_cmd);
+		}
 
 		return -1;
 	}
@@ -281,13 +286,46 @@ public:
 			tbl_name = Utils::remove_char(tbl_name, ';');
 
 			Table tbl = db->get_table(tbl_name);
-
+			BPTree tree = db->get_tree(tbl_name);
 			if (tbl.table_name.length() > 0)				// Why look for table name length? Could use if table is null instead?
-			{
+			{				
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
-				std::string conditional = Parser::get_conditional(cmd);
+				std::string conditional = Parser::get_conditional(cmd);				
+
 				std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
-				tbl.Print_Rows(cols, where_clause, conditional);
+				
+				// decide to print whole table or search table
+				if (where_clause.empty()) {
+					// print whole table
+					vector<Row> rows = tree.getFullTable();
+					int i = 0;
+					for (Row row : rows) {
+						if (!row.isEmpty()) {
+							if (i == 0) {
+								row.PrintRow(cols);
+								i++;
+							}
+							else {						
+								row.PrintSingleRow(cols);
+							}
+						}
+						else {
+							cout << "Could not find rows" << endl;
+						}
+					}
+				}
+				else {			
+					// search table
+					string pk = where_clause[1];				
+					Row row = tree.search(stoi(pk));
+					if (!row.isEmpty()) {
+						row.PrintRow(cols);
+					}
+					else {
+						cout << "Could not find row" << endl;
+					}
+				}
+				
 			}
 			else
 			{
@@ -387,6 +425,7 @@ public:
 
 		std::cout << "----------------------------- " << std::endl;
 		std::cout << "Number of Rows: " << tbl.rows.size() << std::endl;
+		std::cout << "Number of Keys: " << tbl.keys.size() << std::endl;
 	}
 
 
@@ -590,6 +629,43 @@ public:
 
 		db->RenameColumn(old_column_name, new_column_name, table_name);
 
+		return 1;
+	}
+	/// <summary>
+	/// Adds a key to the specified table.
+	/// </summary>
+	/// <param name="new_db"></param>
+	/// <param name="new_cmd"></param>
+	/// <returns></returns>
+	int addKey(Database* new_db, string new_cmd)
+	{
+		cmd = new_cmd;
+		db = new_db;
+
+		std::string tablename = Parser::get_table_name(cmd, "table", "add");
+		std::string keytype = Utils::get_string_between_two_strings(cmd, "add", "key");
+		std::string keyname = Utils::get_string_between_two_strings(cmd, "key", ";");
+
+		//ensure the key type is valid, then check to see if the key is a column in the table
+		if (keytype == "primary" || keytype == "secondary" || keytype == "foreign")
+		{
+			if (db->get_table(tablename).get_column_index(keyname) != -1)
+			{
+				db->keytotable(keytype, keyname, tablename);
+			}
+			else
+			{
+				//key isn't in the table, no point in adding it
+				std::cout << "KEY NOT FOUND IN TABLE." << std::endl;
+			}
+		}
+		else
+		{
+			//unsupported key type
+			std::cout << "KEY NOT PRIMARY, SECONDARY, OR FOREIGN." << std::endl;
+		}
+
+		
 		return 1;
 	}
 
