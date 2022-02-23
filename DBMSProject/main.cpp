@@ -78,7 +78,7 @@ int dropColumn() { int retVal = cmdHandler->dropColumn(cmd); db = cmdHandler->db
 
 
 
-
+/*
 // short script for testing the unit tests' commands
 // basically, you just rename main() to mainT() and follow the example below to parse in a command array and array size
 int mainT(int argc, char** argv);
@@ -88,7 +88,7 @@ int main() {
 
                return 1;
 }
-
+*/
 
 
 /// <summary>
@@ -97,7 +97,7 @@ int main() {
 /// <param name="argc">number of inputs to function call</param>
 /// <param name="argv">inputs to functions stored as string array (char**)</param>
 /// <returns></returns>
-int mainT(int argc, char** argv)
+int main(int argc, char** argv)
 {
 
 	// function for "setup", this is simply the opening animation sequence
