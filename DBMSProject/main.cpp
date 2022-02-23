@@ -43,16 +43,6 @@ void setup_intro();
 
 int mainFunct(string cmd);
 
-/*
-void show_help();
-void print_rows(Table tbl);
-void table_info(Table tbl);
-void insert_into(Database* db, vector<string> split_commands);
-void drop_table(Database* db, Table* tbl);
-void drop_database(string db_name);
-bool has_special_char(std::string const& str);
-void update_table(Database* db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable);
-*/
 
 CommandHandler* cmdHandler = new CommandHandler;
 
@@ -88,7 +78,7 @@ int dropColumn() { int retVal = cmdHandler->dropColumn(cmd); db = cmdHandler->db
 
 
 
-/*
+
 // short script for testing the unit tests' commands
 // basically, you just rename main() to mainT() and follow the example below to parse in a command array and array size
 int mainT(int argc, char** argv);
@@ -98,7 +88,7 @@ int main() {
 
                return 1;
 }
-*/
+
 
 
 /// <summary>
@@ -107,17 +97,15 @@ int main() {
 /// <param name="argc">number of inputs to function call</param>
 /// <param name="argv">inputs to functions stored as string array (char**)</param>
 /// <returns></returns>
-int main(int argc, char** argv)
+int mainT(int argc, char** argv)
 {
 
-
+	// function for "setup", this is simply the opening animation sequence
 	setup_intro();
 
 
 	while (Parser::to_lower(cmd) != "exit")
 	{
-		cmd = "";
-
 
 		// Setup the command to wait for input
 		color(10);
@@ -125,62 +113,36 @@ int main(int argc, char** argv)
 		{
 			std::cout << current_db_name << "@";
 		}
-
 		std::cout << "SQL>";
 		color(7);
 
 
+		cmd = "";
+
 		// if there are no inputs, then use the stdin for user control
-		if ( argc == 1 )
-		{
-			std::getline(std::cin, cmd);
-		}
+		if ( argc == 1 )	std::getline(std::cin, cmd);
+
 		// if there are inputs, use the argc[] string array for inputs
 		else
 		{
-			// simple parser for when command arguments are placed in the argc[] list
 			cmd = string(argv[traversed]);
 			traversed++;
-			for (int i = traversed; i < argc - 1; i++)
-			{
-				cout << "Reading inputted command... "<< "size:" << argc << "\ti:"<<i<<"\tnubmer of semi colons:"<<numberSemiColons<<"\ttraversed:"<<traversed<<"\tend?:"<< (i >= (argc - numberSemiColons)) << "\n";
-				cout << "argv[" << i << "] : " << argv[i] << "\t||||\n";
+			for (int i = traversed; i < argc - 1; i++) {
+				cout << "Reading inputted command from creation terminal...\n";
+				
 				cmd += string(argv[i]);
 
-				cout << "cmd: \"" << cmd << "\"\n";
-
-
 				// if a semicolon is found, 
-				if (cmd[(cmd.length()) - 1] == ';') \
-				{
+				if (cmd[(cmd.length()) - 1] == ';') {
 					numberSemiColons++;
-					cout << "there was a semicolon!\n";
-					// if there are no inputted commands past it
-					if (i >= (argc-numberSemiColons)-1 )
-					{
-						//cmd = "";
-						traversed = 1;
-						i = 1;
-						argc = 2;
-						argv[1] = (char*)"exit";
-						argv[2] = (char*)"exit";
-						//break;
-					}
-					else
-					{
-						//cmd = "";
-						traversed = i + 1;
-						i = traversed;
-						break;
-
-					}
-
+					// if there are no inputted commands past this command, exit the dbms
+					if (i >= (argc - numberSemiColons) - 1) { traversed = 1;		argc = 2;	argv[1] = (char*)"exit"; }
+					else								 {	traversed = i + 1;	break;	}
+					i = traversed;
 				}
-
 			}
-			
 		}
-		cout << "command: " << cmd << "\n";
+
 
 		statement = Parser::to_lower(cmd);
 
@@ -271,28 +233,6 @@ void color(int s)
 
 
 
-
-/*
-///Author: Janita Aamir
-///This function drops the given table from the current database.
-void drop_table(Database* db, Table* tbl) {
-	tbl->Delete();
-
-	for (std::vector<Table>::iterator it = db->tables.begin(); it != db->tables.end(); ++it)
-	{
-		if (it->table_name == tbl->table_name)
-		{
-			db->tables.erase(it);
-			break;
-		}
-	}
-	db->Save();
-}
-*/
-
-
-
-
 ///Janita Aamir
 ///This function is used within create table. It checks to see if the
 ///database selected has any special characters that aren't allowed.
@@ -305,7 +245,7 @@ bool has_special_char(std::string const& s)
 	}
 }
 
-/// Author: Andrew Nunez
+
 
 /// <summary>
 /// Setups the intro, emulating a startup sequence... we can probably have it set to actually do something interesting

@@ -118,6 +118,7 @@ namespace Tests
 		}
 
 
+		
 		/// <summary>
 		/// Test the implementation for creating a table
 		/// </summary>
@@ -139,6 +140,7 @@ namespace Tests
 		
 			Assert::IsTrue(tableExists);
 		}
+		
 	};
  
  
