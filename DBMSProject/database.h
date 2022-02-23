@@ -264,7 +264,7 @@ void Database::Read(std::string db_name)
 			}
 			else if (line.find("keys:") == 0)
 			{
-				//keys.insert({ tmp_child_array[0], tmp_child_array[1] }); fix later
+				keys.insert({ tmp_child_array[0], tmp_child_array[1] });
 			}
 			else if (line.find("columns:") == 0)
 			{

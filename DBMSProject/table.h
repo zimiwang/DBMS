@@ -22,7 +22,7 @@ public:
 	/// The name of the Database
 	std::string database_name;
 
-	/// The collection of keys <type, value> of the table
+	/// The collection of keys <type, name> of the table
 	std::map<std::string, std::string> keys;
 
 	/// The collection of column names and types to a table
@@ -271,10 +271,10 @@ void Table::Print_Rows(std::vector<std::string> column_names, vector<string> whe
 /// </summary>
 /// <param name="key"></param>
 /// <param name="value"></param>
-void Table::AddKey(std::string key, std::string value) {
-	std::cout << "Adding: " << key << " " << value << std::endl;
+void Table::AddKey(std::string type, std::string name) {
+	std::cout << "Adding: " << type << " " << name << std::endl;
 
-	keys.insert(std::pair<std::string, std::string>(key, value));
+	keys.insert(std::pair<std::string, std::string>(type, name));
 
 }
 
