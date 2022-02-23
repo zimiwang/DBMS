@@ -33,6 +33,9 @@ std::string statement;
 Database* read_sql_file(string path);
 Database* db = NULL;
 
+int traversed = 0;	// traversed commands in the inputted string (implemented to make testing easier)
+int numberSemiColons = 0;
+
 // function initializers
 void color(int s);
 
@@ -80,13 +83,14 @@ int renameTable() { int retVal = cmdHandler->renameTable(db, cmd); db = cmdHandl
 int renameColumn() { int retVal = cmdHandler->renameColumn(db, cmd); db = cmdHandler->db; return retVal; }
 
 
+
 /*
-* // short script for testing the unit tests' commands
+// short script for testing the unit tests' commands
+// basically, you just rename main() to mainT() and follow the example below to parse in a command array and array size
 int mainT(int argc, char** argv);
 int main() {
-       char* cmdCreateTable[] = { (char*)"create ",  (char*)"tableExample(char a, char b, char c);" };
-
-       mainT(3, cmdCreateTable);
+			char* cmdCreateDb[] = { (char*)"create ",  (char*)"database ",  (char*)"exampleDatabaseName;", (char*)"create ",  (char*)"table ", (char*)"tableExample(char a, char b, char c);" };
+			mainT(8, cmdCreateDb);
 
                return 1;
 }
@@ -131,17 +135,48 @@ int main(int argc, char** argv)
 		else
 		{
 			// simple parser for when command arguments are placed in the argc[] list
-			cmd = string(argv[0]);
-			for (int i = 1; i < argc-1; i++) 
+			cmd = string(argv[traversed]);
+			traversed++;
+			for (int i = traversed; i < argc - 1; i++)
 			{
-				cout << "argv[" << i << "] : " << argv[i] << "\t|\n";
-				cmd += string(argv[i]); 
-				
+				cout << "Reading inputted command... "<< "size:" << argc << "\ti:"<<i<<"\tnubmer of semi colons:"<<numberSemiColons<<"\ttraversed:"<<traversed<<"\tend?:"<< (i >= (argc - numberSemiColons)) << "\n";
+				cout << "argv[" << i << "] : " << argv[i] << "\t||||\n";
+				cmd += string(argv[i]);
+
 				cout << "cmd: \"" << cmd << "\"\n";
+
+
+				// if a semicolon is found, 
+				if (cmd[(cmd.length()) - 1] == ';') \
+				{
+					numberSemiColons++;
+					cout << "there was a semicolon!\n";
+					// if there are no inputted commands past it
+					if (i >= (argc-numberSemiColons)-1 )
+					{
+						//cmd = "";
+						traversed = 1;
+						i = 1;
+						argc = 2;
+						argv[1] = (char*)"exit";
+						argv[2] = (char*)"exit";
+						//break;
+					}
+					else
+					{
+						//cmd = "";
+						traversed = i + 1;
+						i = traversed;
+						break;
+
+					}
+
+				}
+
 			}
-			argc = 2;
-			argv[0] = (char*) "exit";
+			
 		}
+		cout << "command: " << cmd << "\n";
 
 		statement = Parser::to_lower(cmd);
 

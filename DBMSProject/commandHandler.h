@@ -535,8 +535,6 @@ public:
 			current_db_name = "";
 		}
 
-		// clear the name of the currently open database, if it was the one deleted
-		if (current_db_name == db_name) current_db_name.clear();
 
 	}
 

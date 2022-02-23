@@ -113,7 +113,7 @@ namespace Tests
 
 			string notExpected = "exampleDatabaseName";
 
-			Assert::AreNotEqual(currentDB, notExpected);
+			Assert::AreNotSame(notExpected, currentDB);
 
 		}
 
@@ -124,15 +124,9 @@ namespace Tests
 		TEST_METHOD(createTable)
 		 {
 		                       // ensure that the database is created and exists
-			char* cmdCreateDb[] = { (char*)"create ",  (char*)"database ",  (char*)"exampleDatabaseName;" };
-			main(4, cmdCreateDb);
+			char* cmdCreateDb[] = { (char*)"create ",  (char*)"database ",  (char*)"exampleDatabaseName;", (char*)"create ",  (char*)"table ", (char*)"tableExample(char a, char b, char c);" };
+			main(8, cmdCreateDb);
 		
-			char* cmdCreateTable[] = { (char*)"create ",  (char*)"tableExample(char a, char b, char c);" };
-			main(3, cmdCreateTable);
-		
-			Database * db = new Database;
-			CommandHandler * cmdHandler = new CommandHandler;
-			cmdHandler->openDatabase("exampleDatabaseName", db, "open database exampleDatabaseName;");
 		
 			std::vector<Table> tables = db->tables;
 		

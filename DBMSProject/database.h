@@ -371,6 +371,7 @@ void Database::List_Tables()
 {
 	for (Table tbl : tables)
 	{
+		if (tbl.table_name == "exT") cout << "exT table found\n";
 		std::cout << tbl.table_name << std::endl;
 	}
 }
