@@ -87,7 +87,7 @@ public:
 		bool hasID = false;
 		for (std::string col : cols) {
 			vector<string> tmp = Utils::split(col, " ");
-			if (tmp[0] == "ID")
+			if (tmp[0] == ("ID_" + name))
 			{
 				hasID = true;
 			}
@@ -98,7 +98,7 @@ public:
 		}
 		if (hasID == false) //We have no ID column defined by the user, manually add one
 		{
-			columns.insert(std::pair<std::string, std::string>("ID", "int"));
+			columns.insert(std::pair<std::string, std::string>(("ID_" + name), "int"));
 		}
 	}
 

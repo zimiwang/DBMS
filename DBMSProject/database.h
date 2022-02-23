@@ -151,6 +151,7 @@ void Database::Save()
 	out.close();
 
 	updateRows();
+	sortKeys();
 	updatePrimaryTrees();
 }
 
