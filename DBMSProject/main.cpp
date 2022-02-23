@@ -17,6 +17,7 @@
 
 
 #include "commandHandler.h"
+//#include "mainReferenceHeader.h"
 
 // global variables
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -79,6 +80,17 @@ int renameTable() { int retVal = cmdHandler->renameTable(db, cmd); db = cmdHandl
 int renameColumn() { int retVal = cmdHandler->renameColumn(db, cmd); db = cmdHandler->db; return retVal; }
 
 
+/*
+* // short script for testing the unit tests' commands
+int mainT(int argc, char** argv);
+int main() {
+       char* cmdCreateTable[] = { (char*)"create ",  (char*)"tableExample(char a, char b, char c);" };
+
+       mainT(3, cmdCreateTable);
+
+               return 1;
+}
+*/
 
 
 /// <summary>
@@ -118,10 +130,17 @@ int main(int argc, char** argv)
 		// if there are inputs, use the argc[] string array for inputs
 		else
 		{
-			for (int i = 1; i < argc; i++) 
+			// simple parser for when command arguments are placed in the argc[] list
+			cmd = string(argv[0]);
+			for (int i = 1; i < argc-1; i++) 
 			{
-				cmd += argv[i];
+				cout << "argv[" << i << "] : " << argv[i] << "\t|\n";
+				cmd += string(argv[i]); 
+				
+				cout << "cmd: \"" << cmd << "\"\n";
 			}
+			argc = 2;
+			argv[0] = (char*) "exit";
 		}
 
 		statement = Parser::to_lower(cmd);
@@ -142,7 +161,6 @@ int main(int argc, char** argv)
 			{ "noSemiColon", &noSemiColon, },
 			{ "openDatabase", &openDatabase, },
 			{ "createDatabase", &createDatabase, },
-
 			{ "listDatabases", &listDatabases, },
 			{ "loadSQLfile", &loadSQLfile, },
 			{ "dropDatabase", &dropDatabase, },
@@ -191,203 +209,9 @@ int main(int argc, char** argv)
 		
 		else												std::cout << "Invalid Command." << std::endl;
 
-
-		/*
-		if (statement == "exit")
-		{
-			std::cout << "Good Bye" << std::endl;
-		}
-
-		else if (statement == "help")
-		{
-			show_help();
-
-		}
-
-		else if (statement.back() != ';') {
-			std::cout << "SQL command not properly terminated." << std::endl;
-		}
-
-		else if (statement.find("open database ") == 0) {
-			//current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
-			current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
-			db = new Database(current_db_name);
-
-			if (db->database_name != current_db_name) {
-				current_db_name = "";
-			}
-
-		}
-		else if (statement.find("create database") == 0) {
-			current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-			db = new Database();
-			db->database_name = current_db_name;
-			db->Save();
-
-		}
-		else if (statement == "list databases;") {
-			Database::List();
-		}
-		else if (statement.find("load sqlfile ") == 0) {
-			string target_file_path = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-			db = read_sql_file(target_file_path);
-
-			current_db_name = db->database_name;
-
-			cout << "Database Created: " << current_db_name << endl;
-		}
-		else if (statement.find("drop database ") == 0) {
-			string db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-			//db = new Database(current_db_name);
-			drop_database(db_name);
-		}
-		else if (current_db_name.length() == 0) {
-			std::cout << "Open a database first." << std::endl;
-		}
-		else if (statement == "list tables;") {
-			db->List_Tables();
-
-		}
-		else if (statement == "db info;") {
-			db->List_Info();
-		}
-		else if (statement.find("select ") == 0) {
-			// Parses the select command
-			try {
-
-				//std::string tbl_name = cmd.substr(statement.find(" from") + 6);
-				std::string tbl_name = Parser::get_table_name(cmd, "from", "where");
-
-				cout << "Selecting from Table: " << tbl_name << endl;
-
-				if (tbl_name.length() == 0) {
-					tbl_name = Parser::get_table_name(cmd, "from", ";");
-				}
-
-				tbl_name = Utils::remove_char(tbl_name, ';');
-
-				Table tbl = db->get_table(tbl_name);
-
-				if (tbl.table_name.length() > 0)
-				{
-					std::vector<std::string> cols = Parser::get_select_columns(cmd);
-					std::string conditional = Parser::get_conditional(cmd);
-					std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
-					tbl.Print_Rows(cols, where_clause, conditional);
-				}
-				else
-				{
-					std::cout << "Table does not exist." << std::endl;
-				}
-			}
-			catch (const std::exception&)
-			{
-			}
-		}
-		else if (statement.find("create table ") == 0) {
-			table_name = Parser::get_table_name(cmd, "table", "(");
-			vector<string> cols = Parser::get_create_columns(cmd);
-			Table* tbl = new Table(table_name, cols);
-			db->AddTable(*tbl);
-		}
-		else if (statement.find("insert into") == 0) {
-			table_name = Parser::get_table_name(statement, "into", "(");
-			db->insert_into(cmd, table_name);
-			db->Save();
-		}
-		else if (statement.find("table info ") == 0) {
-
-			table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-			Table tbl = db->get_table(table_name);
-			table_info(tbl);
-		}
-		else if (statement.find("drop table ") == 0) {
-			string table_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
-			db->DropTable(table_name);
-			db->Save();
-		}
-		else if (statement.find("update ") == 0) {
-			std::string table_name = Parser::get_table_name(cmd, "update", "set");
-			vector<string> upd_clause = Parser::get_update_clause(cmd);
-			vector<string> where_clause = Parser::get_where_clause(cmd, "=");
-
-			db->UpdateTable(table_name, upd_clause, where_clause);
-
-		}
-		else if (statement.find("delete from ") == 0) {
-			string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
-
-			int count = 0;
-			string conditional = Parser::get_conditional(statement);
-			vector<string> clause = Parser::get_where_clause(statement, conditional);
-			string value = clause[1];
-			Table currentTable = db->get_table(tbl_name);
-			int col_ndx = currentTable.get_column_index(clause[0]);
-			vector<vector<string> > rows = currentTable.rows;
-			for (vector<string> row : rows) {
-				cout << row[col_ndx] << conditional << value << endl;
-
-				if (conditional == "=") {
-					if (row[col_ndx] == value)
-					{
-						currentTable.DeleteRow(row);
-						count += 1;
-					}
-				}
-				else if (conditional == ">=") {
-					if (row[col_ndx] >= value)
-					{
-						currentTable.DeleteRow(row);
-						count += 1;
-					}
-				}
-				else if (conditional == "<=") {
-					if (row[col_ndx] <= value)
-					{
-						currentTable.DeleteRow(row);
-						count += 1;
-					}
-				}
-				else if (conditional == ">") {
-					if (row[col_ndx] > value)
-					{
-						currentTable.DeleteRow(row);
-						count += 1;
-					}
-				}
-				else if (conditional == "<") {
-					if (row[col_ndx] < value)
-					{
-						currentTable.DeleteRow(row);
-						count += 1;
-					}
-				}
-				else if (conditional == "!=") {
-					if (row[col_ndx] != value)
-					{
-						currentTable.DeleteRow(row);
-						count += 1;
-					}
-				}
-				else {
-					std::cout << "Given conditional statement is not supported!" << std::endl;
-				}
-			}
-
-			db->SaveTable(currentTable);
-
-			db->Save();
-
-			std::cout << count << " rows deleted." << endl;
-		}
-		else
-		{
-			std::cout << "Invalid Command." << std::endl;
-		}
-		*/
 	}
 
-	return 0;
+	return 1;
 }
 // end of main function
 
@@ -402,47 +226,6 @@ void color(int s)
 }
 
 
-
-
-
-/*
-///Author: Janita Aamir
-	///This function updates an existing value with a new one given the column names and specific row.
-void update_table(Database* db, std::string table_name, std::string col1, std::string toUpdate, std::string col2, std::string forVariable) {
-	Table tbl = db->get_table(table_name);
-
-	int col1Index = tbl.get_column_index(col1);
-	int col2Index = tbl.get_column_index(col2);
-
-	std::vector<std::string>::const_iterator col;
-	std::vector<std::vector<std::string> > rows = tbl.rows;
-
-
-	for (std::vector<std::string> row : rows) {
-		if (row[col2Index] == forVariable) {
-			row[col1Index] = toUpdate;
-		}
-
-	}
-
-
-}
-*/
-
-
-/*
-/// Author: Janita Aamir
-/// Creates a table with given column info
-Table* create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info)
-{
-	Table* tbl = new Table(table_name);
-	for (int i = 0; i < columns_info.size(); i++)
-	{
-		tbl->columns.insert({ columns_info[i].first, columns_info[i].second });
-	}
-	return tbl;
-}
-*/
 
 
 /*

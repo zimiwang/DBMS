@@ -22,6 +22,8 @@ public:
 	vector<string> static get_update_clause(string cmd);
 	string static get_conditional(string stm);
 	string static get_table_name(string cmd, string first_delim, string second_delim);
+	string static get_table_name(string cmd);
+	vector<vector<string>> static get_update_clauses(string cmd);
 };
 
 /// Converts a string to lower
@@ -101,6 +103,44 @@ std::string Parser::to_lower(std::string s)
 	return finout;
 }
 
+vector<vector<string>> Parser::get_update_clauses(string cmd) {
+	smatch sm;
+	vector<vector<string>> ret;
+	vector<string> upd_clause;
+	vector<string> values;
+
+	regex str_expr("set(?:\\s*)(.*)(?:\\s*where)");
+
+	if (regex_search(cmd, sm, str_expr)) {
+		try {
+
+			values = Utils::split(sm[1], ",");
+
+			for (string str : values)
+			{
+
+				upd_clause = Utils::split(str, "=");
+
+				for (size_t i = 0; i < upd_clause.size(); i++)
+				{
+					upd_clause[i] = Utils::trim(upd_clause[i]);
+					cout << "Update Clause: " << upd_clause[i] << endl;
+				}
+
+				ret.push_back(upd_clause);
+			}
+		}
+			catch (const std::exception& e) {
+			std::cout << "Exception: " << e.what() << std::endl;
+		}
+	}
+	else {
+		cout << "No Match!" << endl;
+	}
+
+	return ret;
+}
+
 /// Author: Andrew
 /// Date: 11-28-2021
 /// Parses an update command
@@ -121,6 +161,16 @@ vector<string> Parser::get_update_clause(string cmd) {
 		try
 		{
 			values = Utils::split(sm[1], "=");
+
+			/*for (size_t i = 0; i < values.size(); i++)
+			{
+				std::cout << "values " << values[i] << std::endl;
+			}
+			
+			for (size_t j = 0; j < sm.size(); j++)
+			{
+				std::cout << "sm " << sm[j] << std::endl;
+			}*/
 
 			for (string str : values) {
 				cout << "Update Clause: " << str << endl;
@@ -164,8 +214,7 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 		{
 			tmp = Utils::split(Utils::remove_char(sm[1], ';'), op);
 
-			for (string str : tmp) {
-				cout << "Where Clause: " << str << endl;
+			for (string str : tmp) {				
 				ret.push_back(Utils::trim(str));
 			}
 
@@ -390,6 +439,20 @@ vector<string> Parser::get_create_columns(string cmd) {
 	return ret;
 
 }
+
+
+std::string Parser::get_table_name(string cmd) {
+	smatch sm;
+	string ret;
+	string keyword = "from";
+
+	size_t found = cmd.find(keyword);
+	
+
+	return ret;
+
+}
+
 /// <summary>
 /// table name retriever
 /// </summary>
@@ -406,7 +469,8 @@ std::string Parser::get_table_name(string cmd, string first_delim, string second
 		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)\\(";
 	}
 	else {
-		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)" + second_delim;
+		/*exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)" + second_delim;		*/
+		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)";
 	}
 
 	regex str_expr(exp, regex_constants::icase);
@@ -414,7 +478,7 @@ std::string Parser::get_table_name(string cmd, string first_delim, string second
 	// Check if the match was found, and add to the vector
 	if (regex_search(cmd, sm, str_expr)) {
 		try
-		{
+		{			
 			ret = Utils::trim(sm[1]);
 
 		}

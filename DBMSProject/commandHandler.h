@@ -5,6 +5,7 @@
 
 #pragma once
 #include "database.h"
+#include <string>
 
 using namespace std;
 
@@ -281,13 +282,46 @@ public:
 			tbl_name = Utils::remove_char(tbl_name, ';');
 
 			Table tbl = db->get_table(tbl_name);
-
+			BPTree tree = db->get_tree(tbl_name);
 			if (tbl.table_name.length() > 0)				// Why look for table name length? Could use if table is null instead?
-			{
+			{				
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
-				std::string conditional = Parser::get_conditional(cmd);
+				std::string conditional = Parser::get_conditional(cmd);				
+
 				std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
-				tbl.Print_Rows(cols, where_clause, conditional);
+				
+				// decide to print whole table or search table
+				if (where_clause.empty()) {
+					// print whole table
+					vector<Row> rows = tree.getFullTable();
+					int i = 0;
+					for (Row row : rows) {
+						if (!row.isEmpty()) {
+							if (i == 0) {
+								row.PrintRow(cols);
+								i++;
+							}
+							else {						
+								row.PrintSingleRow(cols);
+							}
+						}
+						else {
+							cout << "Could not find rows" << endl;
+						}
+					}
+				}
+				else {			
+					// search table
+					string pk = where_clause[1];				
+					Row row = tree.search(stoi(pk));
+					if (!row.isEmpty()) {
+						row.PrintRow(cols);
+					}
+					else {
+						cout << "Could not find row" << endl;
+					}
+				}
+				
 			}
 			else
 			{
@@ -417,11 +451,16 @@ public:
 		db = new_db;
 
 		// get table name by sending command through parser
+		//std::string table_name = Parser::get_table_name(cmd, "update", "set");
+		//vector<string> upd_clause = Parser::get_update_clause(cmd);
+		//vector<string> where_clause = Parser::get_where_clause(cmd, "=");
+
+
 		std::string table_name = Parser::get_table_name(cmd, "update", "set");
-		vector<string> upd_clause = Parser::get_update_clause(cmd);
+		vector<vector<string>> update_clause = Parser::get_update_clauses(cmd);
 		vector<string> where_clause = Parser::get_where_clause(cmd, "=");
 
-		db->UpdateTable(table_name, upd_clause, where_clause);
+		db->UpdateTable(table_name, update_clause, where_clause);
 		return 1;
 	}
 
@@ -515,9 +554,10 @@ public:
 ///This function drops the given database from the dbms.
 	void drop_database(string db_name)
 	{
-
+		// identify the string to wipe
 		std::string s = "data/" + db_name + ".db";
 
+		// remove the file
 		if (std::remove(s.c_str()) != 0)
 		{
 
@@ -528,6 +568,10 @@ public:
 			puts("File successfully deleted");
 			current_db_name = "";
 		}
+
+		// clear the name of the currently open database, if it was the one deleted
+		if (current_db_name == db_name) current_db_name.clear();
+
 	}
 
 
