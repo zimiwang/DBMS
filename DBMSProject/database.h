@@ -381,6 +381,7 @@ void Database::List_Tables()
 {
 	for (Table tbl : tables)
 	{
+		if (tbl.table_name == "exT") cout << "exT table found\n";
 		std::cout << tbl.table_name << std::endl;
 	}
 }
@@ -514,13 +515,20 @@ void Database::List_Info() {
 	std::cout << "Total Size: " << size << " bytes" << endl;
 }
 
-/// Author: Saurav Gautam, Andrew Nunez
+
+
+/// <summary>
 /// Read the insert statement and insert values in the table
+/// </summary>
+/// <param name="statement">user-inputted command</param>
+/// <param name="table_name">name of the table</param>
 void Database::insert_into(std::string statement, std::string table_name)
 {
 	Table current_table = get_table(table_name);;
 	vector<string> columns = Parser::get_insert_columns(statement, table_name);
 	vector<vector<string> > values = Parser::get_insert_rows(statement, table_name);
+
+	for (int i = 0; i < columns.size(); i++) cout << "column:" << columns[i] << "\n";
 
 	//check to see if ID is present in the columns
 	if (std::find(columns.begin(), columns.end(), ("ID_" + table_name)) != columns.end())
