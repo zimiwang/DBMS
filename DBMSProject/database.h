@@ -782,7 +782,7 @@ inline void Database::updatePrimaryTrees()
 			}
 
 		}
-		tbl.primaryKeyTree = newPrimaryKeyIndex;
+		//tbl.primaryKeyTree = newPrimaryKeyIndex;
 		trees.push_back(newPrimaryKeyIndex);
 
 		SaveTable(tbl);

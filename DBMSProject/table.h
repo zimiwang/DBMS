@@ -26,6 +26,7 @@ public:
 	std::map<std::string, std::string> keys;
 
 	std::string primaryKeyName = "ID";
+
 	std::vector<std::string> secondaryKeys;
 	std::vector<std::string> foreignKeys;
 
@@ -66,13 +67,15 @@ public:
 	void Delete();
 
 	Table() {
-
 	}
 
 	// Use this as as create in DB CreateTable method
 	// TODO: Tie into user input
 	Table(std::string name) {
-		this->table_name = name;
+		table_name = name;
+		primaryKeyName = "ID_" + name;
+		keys.insert(std::pair<std::string, std::string>("primary", primaryKeyName));
+
 	}
 
 
