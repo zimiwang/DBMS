@@ -22,8 +22,12 @@ public:
 	/// The name of the Database
 	std::string database_name;
 
-	/// The collection of keys <type, name> of the table
+	/// The collection of keys <type, name> of the table -- depreciate this later.
 	std::map<std::string, std::string> keys;
+
+	std::string primaryKeyName = "ID";
+	std::vector<std::string> secondaryKeys;
+	std::vector<std::string> foreignKeys;
 
 	/// The collection of column names and types to a table
 	std::map<std::string, std::string> columns;
