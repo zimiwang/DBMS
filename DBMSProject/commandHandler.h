@@ -285,9 +285,9 @@ public:
 
 			tbl_name = Utils::remove_char(tbl_name, ';');
 
-			Table tbl = db->get_table(tbl_name);
+			//Table tbl = db->get_table(tbl_name);
 			BPTree tree = db->get_tree(tbl_name);
-			if (tbl.table_name.length() > 0)				// Why look for table name length? Could use if table is null instead?
+			if (tree.Name.length() > 0)				
 			{				
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
 				std::string conditional = Parser::get_conditional(cmd);				

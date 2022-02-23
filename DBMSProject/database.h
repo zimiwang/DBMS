@@ -528,7 +528,7 @@ void Database::insert_into(std::string statement, std::string table_name)
 	vector<string> columns = Parser::get_insert_columns(statement, table_name);
 	vector<vector<string> > values = Parser::get_insert_rows(statement, table_name);
 
-	for (int i = 0; i < columns.size(); i++) cout << "column:" << columns[i] << "\n";
+	//for (int i = 0; i < columns.size(); i++) cout << "column:" << columns[i] << "\n";
 
 	//check to see if ID is present in the columns
 	if (std::find(columns.begin(), columns.end(), ("ID_" + table_name)) != columns.end())
