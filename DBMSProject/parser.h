@@ -162,16 +162,6 @@ vector<string> Parser::get_update_clause(string cmd) {
 		{
 			values = Utils::split(sm[1], "=");
 
-			/*for (size_t i = 0; i < values.size(); i++)
-			{
-				std::cout << "values " << values[i] << std::endl;
-			}
-			
-			for (size_t j = 0; j < sm.size(); j++)
-			{
-				std::cout << "sm " << sm[j] << std::endl;
-			}*/
-
 			for (string str : values) {
 				cout << "Update Clause: " << str << endl;
 

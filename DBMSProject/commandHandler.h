@@ -456,11 +456,6 @@ public:
 		db = new_db;
 
 		// get table name by sending command through parser
-		//std::string table_name = Parser::get_table_name(cmd, "update", "set");
-		//vector<string> upd_clause = Parser::get_update_clause(cmd);
-		//vector<string> where_clause = Parser::get_where_clause(cmd, "=");
-
-
 		std::string table_name = Parser::get_table_name(cmd, "update", "set");
 		vector<vector<string>> update_clause = Parser::get_update_clauses(cmd);
 		vector<string> where_clause = Parser::get_where_clause(cmd, "=");
@@ -685,7 +680,7 @@ public:
 		std::cout << "DROP TABLE [NAME] 	- Creates a table in the current database." << std::endl;
 		std::cout << "DROP DATABASE [NAME]		- Check if the database exists and drop it." << std::endl;
 		std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl;
-		std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl;
+		std::cout << "UPDATE TABLE 		- Updates the single column and meta or multiple columns and meta for the given table." << std::endl;
 		std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl;
 		std::cout << "INSERT INTO 		- Inserts the data into the table. (In Testing))" << std::endl;
 		std::cout << "LIST DATABASES 		- Lists the current database names." << std::endl;

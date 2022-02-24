@@ -190,11 +190,12 @@ void Database::DropTable(std::string name)
 
 
 /// <summary>
-/// with an inputted name and update clause, the table is updated by creating a new table and deleting the old one, then saving it.
+/// with an inputted name and update clause or multiple update clauses, 
+/// the table is updated by creating a new table and deleting the old one, then saving it.
 /// </summary>
-/// <param name="table_name">Name of the table to update</param>
-/// <param name="update_clause">command to execute</param>
-/// <param name="where_clause">table to update based on the command</param>
+/// <param name="table_name"></param>
+/// <param name="update_clause"></param>
+/// <param name="where_clause"></param>
 void Database::UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause) {
 	Table tbl = this->get_table(table_name);
 
@@ -227,28 +228,6 @@ void Database::UpdateTable(string table_name, vector<vector<string>> update_clau
 	}
 
 		this->Save();
-
-	/*int update_idx = tbl.get_column_index(update_clause[0]);
-	int where_idx = tbl.get_column_index(where_clause[0]);
-	vector<vector<string>> new_rows;
-
-	cout << "Where idx: " << where_idx << endl;
-	cout << "Update idx: " << update_idx << endl;
-
-	for (vector<string> row : tbl.rows) {
-		if (row[where_idx] == where_clause[1]) {
-			row[update_idx] = update_clause[1];
-		}
-
-		new_rows.push_back(row);
-	}
-
-	tbl.rows = new_rows;
-
-	this->DropTable(table_name);
-	this->AddTable(tbl);
-
-	this->Save();*/
 
 }
 
