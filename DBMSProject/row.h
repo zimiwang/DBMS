@@ -65,6 +65,50 @@ private:
 	bool empty;
 
 	/// <summary>
+	/// Checks to see if all the columns in the columns parameter are in the columns of the row
+	/// </summary>
+	/// <param name="columns">The columns to check</param>
+	/// <returns>Returns True if all of the columns are in the row else False</returns>
+	bool CheckAllColumnsFound(vector<string> columns) {
+		vector<string> rowColumns = GetColumnNames();
+		bool found = true;
+		for (string column : rowColumns) {
+			if (!(find(rowColumns.begin(), rowColumns.end(), column) != rowColumns.end())) {
+				cout << "Column " << column << "not found." << endl;
+				found = false;
+			}
+		}
+
+		return found;
+	}
+
+	/// <summary>
+	/// Gets all the column names in the row
+	/// </summary>
+	/// <returns></returns>
+	vector<string> GetColumnNames() {
+		vector<string> columns;
+
+		// Go through the rows columns 
+		for (Column<int> i : intColumn) {
+			// Got through the incoming columns
+			columns.push_back(i.GetName());
+		}
+
+		// The same as above
+		for (Column<string> i : strColumn) {
+			columns.push_back(i.GetName());
+		}
+
+		// The same as above
+		for (Column<char*> i : charColumn) {
+			columns.push_back(i.GetName());
+		}
+
+		return columns;
+	}
+
+	/// <summary>
 	/// Gets the largest value out of all the columns
 	/// </summary>
 	/// <returns>The size of the largest value</returns>
@@ -135,13 +179,15 @@ private:
 	/// <param name="columns">A vector of columns to print</param>
 	void PrintColumns(int whichColumnValue, vector<string> columns) {
 		int maxSize = GetLargestColumnSize();
-		
+		int totalColumnsFound = 0;
+
 		// Go through the rows columns 
 		for (Column<int> i : intColumn) {
 			// Got through the incoming columns
 			for (string col : columns) {
 				// check if the incoming column matches row column
 				if (col == "*" || col == i.GetName()) {
+					totalColumnsFound++;
 					// print column names or column values
 					if (whichColumnValue == 0) {
 						PrintColumnName(i.GetName(), maxSize);
@@ -157,6 +203,7 @@ private:
 		for (Column<string> i : strColumn) {
 			for (string col : columns) {
 				if (col == "*" || col == i.GetName()) {
+					totalColumnsFound++;
 					if (whichColumnValue == 0) {
 						PrintColumnName(i.GetName(), maxSize);
 					}
@@ -171,6 +218,7 @@ private:
 		for (Column<char*> i : charColumn) {
 			for (string col : columns) {
 				if (col == "*" || col == i.GetName()) {
+					totalColumnsFound++;
 					if (whichColumnValue == 0) {
 						PrintColumnName(i.GetName(), maxSize);
 					}
@@ -180,6 +228,8 @@ private:
 				}
 			}
 		}
+
+		CheckAllColumnsFound(columns);
 	}
 
 	/// <summary>
@@ -215,27 +265,33 @@ private:
 		int maxSize = GetLargestColumnSize();
 		int totalSpace = (TotalColumns(columns) * (maxSize + 3)) + 1;
 		
-		// top indicator
-		for (int i = 0; i < totalSpace; i++) {
-			cout << "-";
-		}
-		cout << endl;
 
-		// start printing
-		cout << "| ";		
+		// checks that all the columns are contained in the row
+		// if not then don't start printing the table
+		if (CheckAllColumnsFound(columns)) {
+			// top indicator
+			for (int i = 0; i < totalSpace; i++) {
+				cout << "-";
+			}
+			cout << endl;
 
-		// print column names
-		PrintColumns(0, columns);
+			// start printing
+			cout << "| ";		
+
+			// print column names
+			PrintColumns(0, columns);
 		
-		// end headers
-		cout << endl;
+			// end headers
+			cout << endl;
 
 
-		// seperator indecator
-		for (int i = 0; i < totalSpace; i++) {
-			cout << "=";
+			// seperator indecator
+			for (int i = 0; i < totalSpace; i++) {
+				cout << "=";
+			}
+			cout << endl;
+
 		}
-		cout << endl;
 
 	}
 
@@ -301,23 +357,27 @@ public:
 	/// </summary>
 	/// <param name="columns"></param>
 	void PrintSingleRow(vector<string> columns) {
-		// start printing
-		cout << "| ";
+		// checks that all the columns are contained in the row
+		// if not then don't start printing
+		if (CheckAllColumnsFound(columns)) {
+			// start printing
+			cout << "| ";
 
-		int maxSize = GetLargestColumnSize();
-		int totalSpace = (TotalColumns(columns) * (maxSize + 3)) + 1;
+			int maxSize = GetLargestColumnSize();
+			int totalSpace = (TotalColumns(columns) * (maxSize + 3)) + 1;
 
-		// print column values
-		PrintColumns(1, columns);
+			// print column values
+			PrintColumns(1, columns);
 
-		// end of column values
-		cout << endl;
+			// end of column values
+			cout << endl;
 
-		// seperator indecator
-		for (int i = 0; i < totalSpace; i++) {
-			cout << "-";
+			// seperator indecator
+			for (int i = 0; i < totalSpace; i++) {
+				cout << "-";
+			}
+			cout << endl;
 		}
-		cout << endl;
 	}
 };
 
