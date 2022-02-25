@@ -717,9 +717,15 @@ inline void Database::updatePrimaryTrees()
 			{
 				//check to see if the colname is the primary key
 				if (c.GetName() == PRIMARY_KEY)
-				{
+				{					
 					//index based on the value here
 					newPrimaryKeyIndex.insert(c.GetValue(), r);
+
+					// set primary key
+					if (!newPrimaryKeyIndex.HasPrimaryKey()) {
+						newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
+					}
+
 				}
 			}
 

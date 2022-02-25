@@ -313,22 +313,30 @@ public:
 				}
 				else {			
 					// decide to use search based on pk, sk, or full search
+					string column = where_clause[0];
 					string pk = where_clause[1];				
 
 					// search based on pk
-					
-					// search based on sk
+					if (tree.IsPrimaryKey(column)) {
+						// search table
+						Row row = tree.search(stoi(pk));
+						if (!row.isEmpty()) {
+							row.PrintRow(cols);
+						}
+						else {
+							cout << "Could not find row" << endl;
+						}
 
+					}
+					// search based on sk
+					else if (tree.IsSecondaryKey(column)) {
+
+					}
 					// full searh
-					
-					// search table
-					Row row = tree.search(stoi(pk));
-					if (!row.isEmpty()) {
-						row.PrintRow(cols);
-					}
 					else {
-						cout << "Could not find row" << endl;
+
 					}
+					
 				}
 				
 			}
