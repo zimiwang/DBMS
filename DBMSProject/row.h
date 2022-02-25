@@ -70,11 +70,12 @@ private:
 	/// <param name="columns">The columns to check</param>
 	/// <returns>Returns True if all of the columns are in the row else False</returns>
 	bool CheckAllColumnsFound(vector<string> columns) {
-		vector<string> rowColumns = GetColumnNames();
 		bool found = true;
-		for (string column : rowColumns) {
-			if (!(find(rowColumns.begin(), rowColumns.end(), column) != rowColumns.end())) {
-				cout << "Column " << column << "not found." << endl;
+		vector<string> rowColumns = GetColumnNames();
+		for (string column : columns) {			
+			if (!(find(rowColumns.begin(), rowColumns.end(), column) != rowColumns.end())) {				
+				cout << "Column " <<  "'" << column << "'" << " not found." << endl;
+				
 				found = false;
 			}
 		}
@@ -228,8 +229,7 @@ private:
 				}
 			}
 		}
-
-		CheckAllColumnsFound(columns);
+		
 	}
 
 	/// <summary>
@@ -261,7 +261,7 @@ private:
 	/// Prints the names of columns as headers
 	/// </summary>
 	/// <param name="columns">A vector of column names to print</param>	
-	void PrintHeaders(vector<string> columns) {
+	bool PrintHeaders(vector<string> columns) {
 		int maxSize = GetLargestColumnSize();
 		int totalSpace = (TotalColumns(columns) * (maxSize + 3)) + 1;
 		
@@ -291,7 +291,10 @@ private:
 			}
 			cout << endl;
 
+			return true;
+
 		}
+		return false;
 
 	}
 
@@ -348,18 +351,18 @@ public:
 	/// </summary>
 	/// <param name="columns"></param>
 	void PrintRow(vector<string> columns) {
-		PrintHeaders(columns);
-		PrintSingleRow(columns);
+		bool shouldPrint = PrintHeaders(columns);
+		PrintSingleRow(columns, shouldPrint);
 	}
 
 	/// <summary>
 	///	Prints a row without headers
 	/// </summary>
 	/// <param name="columns"></param>
-	void PrintSingleRow(vector<string> columns) {
+	void PrintSingleRow(vector<string> columns, bool checkColumns = true) {
 		// checks that all the columns are contained in the row
-		// if not then don't start printing
-		if (CheckAllColumnsFound(columns)) {
+		// if not then don't start printing		
+		if (checkColumns && CheckAllColumnsFound(columns)) {
 			// start printing
 			cout << "| ";
 
@@ -377,7 +380,7 @@ public:
 				cout << "-";
 			}
 			cout << endl;
-		}
+		}		
 	}
 };
 
