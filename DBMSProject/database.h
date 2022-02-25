@@ -54,6 +54,8 @@ public:
 	void RenameTable(std::string old_table_name, std::string new_table_name);
 	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
 	void delete_column(std::string column_name, std::string table_name);
+	void keytotable(std::string keytype, std::string keyname, std::string table_name);
+	void sortKeys();
 	void updateRows();
 	void updatePrimaryTrees();
 
@@ -149,6 +151,7 @@ void Database::Save()
 	out.close();
 
 	updateRows();
+	sortKeys();
 	updatePrimaryTrees();
 }
 
@@ -187,11 +190,12 @@ void Database::DropTable(std::string name)
 
 
 /// <summary>
-/// with an inputted name and update clause, the table is updated by creating a new table and deleting the old one, then saving it.
+/// with an inputted name and update clause or multiple update clauses, 
+/// the table is updated by creating a new table and deleting the old one, then saving it.
 /// </summary>
-/// <param name="table_name">Name of the table to update</param>
-/// <param name="update_clause">command to execute</param>
-/// <param name="where_clause">table to update based on the command</param>
+/// <param name="table_name"></param>
+/// <param name="update_clause"></param>
+/// <param name="where_clause"></param>
 void Database::UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause) {
 	Table tbl = this->get_table(table_name);
 
@@ -224,28 +228,6 @@ void Database::UpdateTable(string table_name, vector<vector<string>> update_clau
 	}
 
 		this->Save();
-
-	/*int update_idx = tbl.get_column_index(update_clause[0]);
-	int where_idx = tbl.get_column_index(where_clause[0]);
-	vector<vector<string>> new_rows;
-
-	cout << "Where idx: " << where_idx << endl;
-	cout << "Update idx: " << update_idx << endl;
-
-	for (vector<string> row : tbl.rows) {
-		if (row[where_idx] == where_clause[1]) {
-			row[update_idx] = update_clause[1];
-		}
-
-		new_rows.push_back(row);
-	}
-
-	tbl.rows = new_rows;
-
-	this->DropTable(table_name);
-	this->AddTable(tbl);
-
-	this->Save();*/
 
 }
 
@@ -296,7 +278,13 @@ void Database::Read(std::string db_name)
 			}
 			else if (line.find("keys:") == 0)
 			{
-				//keys.insert({ tmp_child_array[0], tmp_child_array[1] }); fix later
+				tmp_parent_array = Parser::split_str(line, ',');
+				for (i = 0; i < tmp_size; i++)
+				{
+					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+					keys.insert({ tmp_child_array[0], tmp_child_array[1] });
+				}
+
 			}
 			else if (line.find("columns:") == 0)
 			{
@@ -372,6 +360,7 @@ void Database::List_Tables()
 {
 	for (Table tbl : tables)
 	{
+		if (tbl.table_name == "exT") cout << "exT table found\n";
 		std::cout << tbl.table_name << std::endl;
 	}
 }
@@ -505,23 +494,30 @@ void Database::List_Info() {
 	std::cout << "Total Size: " << size << " bytes" << endl;
 }
 
-/// Author: Saurav Gautam, Andrew Nunez
+
+
+/// <summary>
 /// Read the insert statement and insert values in the table
+/// </summary>
+/// <param name="statement">user-inputted command</param>
+/// <param name="table_name">name of the table</param>
 void Database::insert_into(std::string statement, std::string table_name)
 {
 	Table current_table = get_table(table_name);;
 	vector<string> columns = Parser::get_insert_columns(statement, table_name);
 	vector<vector<string> > values = Parser::get_insert_rows(statement, table_name);
 
+	//for (int i = 0; i < columns.size(); i++) cout << "column:" << columns[i] << "\n";
+
 	//check to see if ID is present in the columns
-	if (std::find(columns.begin(), columns.end(), "ID") != columns.end())
+	if (std::find(columns.begin(), columns.end(), ("ID_" + table_name)) != columns.end())
 	{
 		//no worries, the user SHOULD be setting their own ID
 	}
 	else
 	{
 		//manually add ID to columns, then a basic iterator representing row number to the values
-		columns.push_back("ID");
+		columns.push_back(("ID_" + table_name));
 		string newid = std::to_string(current_table.rows.size() + 1);
 		
 		values[0].push_back(newid);
@@ -591,6 +587,55 @@ void Database::delete_column(std::string column_name, std::string table_name)
 
 	SaveTable(current_table);
 }
+/// <summary>
+/// adds a key to the old key storage from the table
+/// </summary>
+/// <param name="keytype"></param>
+/// <param name="keyname"></param>
+/// <param name="table_name"></param>
+void Database::keytotable(std::string keytype, std::string keyname, std::string table_name)
+{
+	//get the index of the column name
+	Table current_table = get_table(table_name);;
+	
+	current_table.AddKey(keytype, keyname);
+
+	SaveTable(current_table);
+}
+
+/// <summary>
+/// sorts keys into the lists they belong in. Something to note: Since we only have 1 primary key, it will be set to the most recently specified primary
+/// </summary>
+void Database::sortKeys()
+{
+	for (Table tbl : tables)
+	{
+		tbl.secondaryKeys.clear();
+		tbl.foreignKeys.clear();
+		for (std::pair<std::string, std::string> current_key : tbl.keys)
+		{
+			if (current_key.first == "primary")
+			{
+				//found primary key
+				tbl.primaryKeyName = current_key.second;
+			}
+			else if (current_key.first == "secondary")
+			{
+				//found secondary key
+				tbl.secondaryKeys.push_back(current_key.second);
+			}
+			else if (current_key.first == "foreign")
+			{
+				//foreign key found
+				tbl.foreignKeys.push_back(current_key.second);
+
+			}
+
+		}
+		SaveTable(tbl);
+	}
+}
+
 
 /// <summary>
 /// Updates the new row data structure from each tree based on the old row storage methodology.
@@ -716,8 +761,8 @@ inline void Database::updatePrimaryTrees()
 			for (Column<int> c : r.intColumn)
 			{
 				//check to see if the colname is the primary key
-				if (c.GetName() == PRIMARY_KEY)
-				{					
+				if (c.GetName() == tbl.primaryKeyName)
+				{
 					//index based on the value here
 					newPrimaryKeyIndex.insert(c.GetValue(), r);
 
@@ -730,7 +775,7 @@ inline void Database::updatePrimaryTrees()
 			}
 
 		}
-		tbl.primaryKeyTree = newPrimaryKeyIndex;
+		//tbl.primaryKeyTree = newPrimaryKeyIndex;
 		trees.push_back(newPrimaryKeyIndex);
 
 		SaveTable(tbl);

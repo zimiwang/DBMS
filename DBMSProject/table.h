@@ -22,8 +22,13 @@ public:
 	/// The name of the Database
 	std::string database_name;
 
-	/// The collection of keys <type, value> of the table
+	/// The collection of keys <type, name> of the table -- depreciate this later.
 	std::map<std::string, std::string> keys;
+
+	std::string primaryKeyName = "ID";
+
+	std::vector<std::string> secondaryKeys;
+	std::vector<std::string> foreignKeys;
 
 	/// The collection of column names and types to a table
 	std::map<std::string, std::string> columns;
@@ -62,13 +67,15 @@ public:
 	void Delete();
 
 	Table() {
-
 	}
 
 	// Use this as as create in DB CreateTable method
 	// TODO: Tie into user input
 	Table(std::string name) {
-		this->table_name = name;
+		table_name = name;
+		primaryKeyName = "ID_" + name;
+		keys.insert(std::pair<std::string, std::string>("primary", primaryKeyName));
+
 	}
 
 
@@ -83,7 +90,7 @@ public:
 		bool hasID = false;
 		for (std::string col : cols) {
 			vector<string> tmp = Utils::split(col, " ");
-			if (tmp[0] == "ID")
+			if (tmp[0] == ("ID_" + name))
 			{
 				hasID = true;
 			}
@@ -94,7 +101,7 @@ public:
 		}
 		if (hasID == false) //We have no ID column defined by the user, manually add one
 		{
-			columns.insert(std::pair<std::string, std::string>("ID", "int"));
+			columns.insert(std::pair<std::string, std::string>(("ID_" + name), "int"));
 		}
 	}
 
@@ -276,10 +283,10 @@ void Table::Print_Rows(std::vector<std::string> column_names, vector<string> whe
 /// </summary>
 /// <param name="key"></param>
 /// <param name="value"></param>
-void Table::AddKey(std::string key, std::string value) {
-	std::cout << "Adding: " << key << " " << value << std::endl;
+void Table::AddKey(std::string type, std::string name) {
+	std::cout << "Adding: " << type << " " << name << std::endl;
 
-	keys.insert(std::pair<std::string, std::string>(key, value));
+	keys.insert(std::pair<std::string, std::string>(type, name));
 
 }
 

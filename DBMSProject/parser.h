@@ -162,16 +162,6 @@ vector<string> Parser::get_update_clause(string cmd) {
 		{
 			values = Utils::split(sm[1], "=");
 
-			/*for (size_t i = 0; i < values.size(); i++)
-			{
-				std::cout << "values " << values[i] << std::endl;
-			}
-			
-			for (size_t j = 0; j < sm.size(); j++)
-			{
-				std::cout << "sm " << sm[j] << std::endl;
-			}*/
-
 			for (string str : values) {
 				cout << "Update Clause: " << str << endl;
 
@@ -253,9 +243,7 @@ std::string* Parser::split_str(std::string str, char delim) {
 	return ret;
 }
 
-/// Author: Andrew
-/// Date: 11-15-2021
-/// Splits the provided string on the specified delimiter - it obviously does not do this lol
+
 
 /// <summary>
 /// Appears to figure out whether or not what is asked to be inserted into a table is possible
@@ -267,9 +255,8 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	smatch sm;
 	vector<string> ret;
 	vector<string> tmp;
-
-	//regex str_expr("insert into " + table_name + " \\((.*)\\)", regex::icase);
-	regex str_expr(table_name + "(?:\\s*\\()(.*)\\)(?:\\s*)values", regex::icase);
+;
+	regex str_expr(table_name + "(?:\\s*\\()(.*)\\)(?:\\s*)values", regex::icase);	//regex str_expr("insert into " + table_name + " \\((.*)\\)", regex::icase)
 
 	// Check if the match was found, and add to the vector
 	if (regex_search(cmd, sm, str_expr)) {
@@ -293,6 +280,8 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 
 	return ret;
 }
+
+
 
 /// Author: Andrew
 /// Date: 12-12-2021

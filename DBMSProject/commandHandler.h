@@ -219,6 +219,10 @@ public:
 		{
 			dropColumn(new_cmd);
 		}
+		else if (new_cmd.find("key") != -1)
+		{
+			addKey(db, new_cmd);
+		}
 
 		return -1;
 	}
@@ -281,9 +285,9 @@ public:
 
 			tbl_name = Utils::remove_char(tbl_name, ';');
 
-			Table tbl = db->get_table(tbl_name);
+			//Table tbl = db->get_table(tbl_name);
 			BPTree tree = db->get_tree(tbl_name);
-			if (tbl.table_name.length() > 0)				// Why look for table name length? Could use if table is null instead?
+			if (tree.Name.length() > 0)				
 			{				
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
 				std::string conditional = Parser::get_conditional(cmd);				
@@ -438,6 +442,7 @@ public:
 
 		std::cout << "----------------------------- " << std::endl;
 		std::cout << "Number of Rows: " << tbl.rows.size() << std::endl;
+		std::cout << "Number of Keys: " << tbl.keys.size() << std::endl;
 	}
 
 
@@ -468,11 +473,6 @@ public:
 		db = new_db;
 
 		// get table name by sending command through parser
-		//std::string table_name = Parser::get_table_name(cmd, "update", "set");
-		//vector<string> upd_clause = Parser::get_update_clause(cmd);
-		//vector<string> where_clause = Parser::get_where_clause(cmd, "=");
-
-
 		std::string table_name = Parser::get_table_name(cmd, "update", "set");
 		vector<vector<string>> update_clause = Parser::get_update_clauses(cmd);
 		vector<string> where_clause = Parser::get_where_clause(cmd, "=");
@@ -586,8 +586,6 @@ public:
 			current_db_name = "";
 		}
 
-		// clear the name of the currently open database, if it was the one deleted
-		if (current_db_name == db_name) current_db_name.clear();
 
 	}
 
@@ -645,6 +643,43 @@ public:
 
 		return 1;
 	}
+	/// <summary>
+	/// Adds a key to the specified table.
+	/// </summary>
+	/// <param name="new_db"></param>
+	/// <param name="new_cmd"></param>
+	/// <returns></returns>
+	int addKey(Database* new_db, string new_cmd)
+	{
+		cmd = new_cmd;
+		db = new_db;
+
+		std::string tablename = Parser::get_table_name(cmd, "table", "add");
+		std::string keytype = Utils::get_string_between_two_strings(cmd, "add", "key");
+		std::string keyname = Utils::get_string_between_two_strings(cmd, "key", ";");
+
+		//ensure the key type is valid, then check to see if the key is a column in the table
+		if (keytype == "primary" || keytype == "secondary" || keytype == "foreign")
+		{
+			if (db->get_table(tablename).get_column_index(keyname) != -1)
+			{
+				db->keytotable(keytype, keyname, tablename);
+			}
+			else
+			{
+				//key isn't in the table, no point in adding it
+				std::cout << "KEY NOT FOUND IN TABLE." << std::endl;
+			}
+		}
+		else
+		{
+			//unsupported key type
+			std::cout << "KEY NOT PRIMARY, SECONDARY, OR FOREIGN." << std::endl;
+		}
+
+		
+		return 1;
+	}
 
 	/// Author: Andrew Nunez
 
@@ -662,7 +697,7 @@ public:
 		std::cout << "DROP TABLE [NAME] 	- Creates a table in the current database." << std::endl;
 		std::cout << "DROP DATABASE [NAME]		- Check if the database exists and drop it." << std::endl;
 		std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl;
-		std::cout << "UPDATE TABLE 		- Updates the columns and meta for the given table." << std::endl;
+		std::cout << "UPDATE TABLE 		- Updates the single column and meta or multiple columns and meta for the given table." << std::endl;
 		std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl;
 		std::cout << "INSERT INTO 		- Inserts the data into the table. (In Testing))" << std::endl;
 		std::cout << "LIST DATABASES 		- Lists the current database names." << std::endl;

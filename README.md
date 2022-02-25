@@ -16,7 +16,7 @@
 This team project is to extend the provided ISU relational DBMS using C++ to be a full-blown DBMS. This database management system works with standard SQL.
 
 ## Tests
-The current test contains operations on SQL. Among them, operations on tables and databases are the primary test objects. Includes create, insert, update, etc.
+The current test contains operations on SQL. Among them, operations on tables and databases are the primary test objects. Includes create, insert, update, etc. The project also uses unit tests to check the correctness of each function.  
 
 After testing, some command lines have stringent syntax requirements, easily leading to program termination. In addition to this, some command lines have potential bugs which appear because the user does not strictly follow the format of the command line. If you enter the command line according to the instructions, you will avoid the appearance of bugs.
 ## Installation
@@ -28,7 +28,8 @@ After testing, some command lines have stringent syntax requirements, easily lea
     cd DBMSProject
 **Run the code**
 
-    main.cpp
+    main.cpp  
+
 ## Instructions  
 The database management system is capable of performing the following operations:
 
@@ -46,6 +47,11 @@ The database management system is capable of performing the following operations
 12. List Tables
 13. Table Info
 14. Database Info
+15. Rename Table
+16. Rename Column
+17. Drop Column  
+18. Add Key  
+
 
 **Get help**  
 Get a list of all command lines and their functionality.
@@ -71,6 +77,8 @@ Create a database with the provided name.
 If the database is successfully created, the DBMS will take you to the newly created database and the terminal name will be changed to the newly created database name.  
 
     [Database Name]@SQL>  
+
+Note: Don't create the database in the same name.  
 
 **3. Open Database**  
 Open an existing database.  
@@ -107,11 +115,15 @@ Once the table is dropped, the list tables command line can check whether the ta
     list tables;
 
 **7. Update Table**  
-Update the specified value based on the provided information.  
+Update a specified value based on the provided information.  
 
-    update [Table Name] set [Column Name] = [New value] where [Column Name] = [Existing Value];
+    update [Table Name] set [Column Name] = [New value] where [Column Name] = [Existing Value];  
 
-Note that both the column name after set and after where must correspond to the column name in the table. Otherwise, the program will crash and stop.  
+Update multiple values based on the provided information.
+
+    update [Table Name] set [Column Name 1] = [New value 1], [Column Name 2] = [New value 2], ... where [Column Name] = [Existing Value];  
+
+Note: Both the column name after set and after where must correspond to the column name in the table. Otherwise, the program will crash and stop.  
 
 **8. Select From**  
 Select table values and print to terminal. This command line can select one or multiple table columns.  
@@ -126,21 +138,27 @@ Select one column from table.
 
 Select multiple columns from table.  
 
-    select [Column Name],[Column Name] from [Table Name];
+    select [Column Name],[Column Name],... from [Table Name];
+
+Use where clause to select a row.  
+
+    select */[Column Name] from [Table Name] where [Column Name] = [Existing Value];
+
+Note: If you type a nonexistent column, the table will give a wrong feedback.  
 
 **9. Delete From**  
-Delete a existing row by provided column value.  
+Delete an existing row by provided column value.  
 
     delete from [Table Name] where [Column Name] = [Existing Value];
 
-Note that the column name after must correspond to the column name in the table. Otherwise, the program will crash and stop.  
+Note: The column name after must correspond to the column name in the table. Otherwise, the program will crash and stop.  
 
 **10. Insert Info**  
 Insert values into an existing table.   
 
     insert into [Table Name] ([Column Name], [Column Name]) values ([New Value], [New Value]);
 
-Note the capitalization of table and column names so that the DBMS can recognize the names. If the values are not inserted into the columns correctly, then the values in the columns will display NULL.  
+Note: Capitalization of table and column names so that the DBMS can recognize the names. If the values are not inserted into the columns correctly, then the values in the columns will display NULL.  
 
 **11. List Databases**  
 List all existing databases.  
@@ -157,12 +175,36 @@ Get the table information in a database. This will print the table names, column
 
     table info [Table Name];
 
-**14. Database Info**  
+**14. Database Info**   
 Get the Database information. This will print the database name, number of tables, name of tables, and the size of database.  
 
     db info;
 
+**15. Rename Table**  
+Rename an existing table and give it a new table name.  
 
+    rename table [Existing Table Name] = [New Table Name];  
+
+**16. Rename Table**  
+Rename an existing column in a table and give it a new column name.
+
+    alter [Table Name] rename column [Existing Column Name] to [New Column Name];  
+
+**17. Drop Column**  
+Drop an existing column in a table.  
+
+    alter table [Table Name] drop column [Existing Column Name];  
+
+**18. Add Key**  
+Add a key to the specified table. The key type has primary, secondary, and foreign.
+
+    alter table [Table name] add [Key Type] key [Key Name];  
+
+**Please Note**
+1. All commands should end with a semicolon. Without it, the system will not be able to detect the entered command.  
+2. Most commands are not case-sensitive. Table, value, and database names are case-sensitive.  
+3. Some commands are space-sensitive, so please strictly follow the instructions when entering the command line.
+4. When entering an existing database name, table name, and column name, check the existence of these names multiple times. In some command lines if the wrong input will cause the program to crash and terminate.  
 
 ## Authors
 
