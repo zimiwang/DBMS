@@ -211,24 +211,32 @@ void Database::UpdateTable(string table_name, vector<vector<string>> update_clau
 		cout << "Where idx: " << where_idx << endl;
 		cout << "Update idx: " << update_idx << endl;
 
-		for (vector<string> row : tbl.rows) {
-			if (row[where_idx] == where_clause[1]) {
-
-				//cout << "get_update_clause: " << update_clause[i][1] << endl;
-
-				row[update_idx] = update_clause[i][1];
-			}
-			new_rows.push_back(row);
+		if (where_idx == -1 || update_idx == -1) {
+			std::cout << "The column name is incorrect" << std::endl;
+			break;
 		}
 
-		tbl.rows = new_rows;
+		else
+		{
+			for (vector<string> row : tbl.rows) {
+				if (row[where_idx] == where_clause[1]) {
 
-		this->DropTable(table_name);
-		this->AddTable(tbl);
+					//cout << "get_update_clause: " << update_clause[i][1] << endl;
+
+					row[update_idx] = update_clause[i][1];
+				}
+				new_rows.push_back(row);
+			}
+
+			tbl.rows = new_rows;
+
+			this->DropTable(table_name);
+			this->AddTable(tbl);
+
+		}
+
 	}
-
 		this->Save();
-
 }
 
 /// Author: Andrew Nunez
