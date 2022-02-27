@@ -418,6 +418,47 @@ Table Database::get_table(std::string name)
 Table Database::join_table(std::string src_table, std::string dest_table, std::string foreign_key)
 {
 	Table join;
+	Table src = this->get_table(src_table);
+	Table dest = this->get_table(dest_table);
+	join.table_name = src_table + "_" + dest_table;
+	int colindex = src.get_column_index(foreign_key);
+	if (colindex != -1)
+	{
+		//colindex shouldn't ever be -1 but from here we loop through the rows and match local foreign key to foreign 
+		//primary key --- TO NOTE | CURRENTLY FOREIGN KEY WILL BE AN INTEGER BY NATURE OF PRIMARY KEYS ONLY SUPPORTING INTEGERS.
+		for (Row r : src.newrows)
+		{
+			
+			for (Column<int> col : r.intColumn)
+			{
+				if (col.GetName() == foreign_key) //this should pass exactly once per row
+				{
+					//we have the local row value, search through the primary index of the destination tree for the matching row
+					Row foreignRow = dest.primaryKeyTree.search(col.GetValue());
+
+					//combine the two table's row structure
+					Row combinedRow = Row(r); //i believe this is how you do a deep copy in C++
+					for (Column<int> loc : foreignRow.intColumn)
+					{
+						combinedRow.intColumn.push_back(loc);
+					}
+					for (Column<string> loc : foreignRow.strColumn)
+					{
+						combinedRow.strColumn.push_back(loc);
+					}
+					for (Column<char *> loc : foreignRow.charColumn)
+					{
+						combinedRow.charColumn.push_back(loc);
+					}
+
+					//push our merged row into the new table
+
+					join.newrows.push_back(combinedRow);
+				}
+			}
+		}
+	}
+	this->join_tables.push_back(join);
 	return join;
 }
 
