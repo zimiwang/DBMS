@@ -296,7 +296,8 @@ public:
 				std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
 				
 				// decide to print whole table or search table
-				if (where_clause.empty()) {
+				if (where_clause.empty()) {										
+
 					// print whole table
 					vector<Row> rows = tree.getFullTable();
 					int i = 0;
@@ -316,15 +317,31 @@ public:
 					}
 				}
 				else {			
-					// search table
+					// decide to use search based on pk, sk, or full search
+					string column = where_clause[0];
 					string pk = where_clause[1];				
-					Row row = tree.search(stoi(pk));
-					if (!row.isEmpty()) {
-						row.PrintRow(cols);
+
+					// search based on pk
+					if (tree.IsPrimaryKey(column)) {
+						// search table
+						Row row = tree.search(stoi(pk));
+						if (!row.isEmpty()) {
+							row.PrintRow(cols);
+						}
+						else {
+							cout << "Could not find row" << endl;
+						}
+
 					}
+					// search based on sk
+					else if (tree.IsSecondaryKey(column)) {
+
+					}
+					// full searh
 					else {
-						cout << "Could not find row" << endl;
+
 					}
+					
 				}
 				
 			}

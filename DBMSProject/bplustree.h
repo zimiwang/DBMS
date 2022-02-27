@@ -49,6 +49,9 @@ class BPTree {
     Node* root;                                         // root node
     int minKey;
     int maxKey;
+    string PrimaryKeyColumn;
+    vector<string> SecondaryKeyColumns;
+
     void insertInternal(PrimaryKey x, Node* parentNode, Node* child) {
         if (parentNode->size < MAX) {
             int i = 0;
@@ -275,7 +278,72 @@ public:
 
     BPTree() {
         root = NULL;
+        PrimaryKeyColumn = "";
     };                                           // constructor
+
+    /// <summary>
+    /// Checks to see if the tree has a primary key
+    /// </summary>
+    /// <returns>Returns True if the tree has a primary key</returns>
+    bool HasPrimaryKey() {
+        if (PrimaryKeyColumn != "") {
+            return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Sets the primary key column
+    /// </summary>
+    /// <param name="column">The column name</param>
+    void SetPrimaryKey(string column) {
+        if (column == "") {
+            cout << "Corruption in the data. Incoming Column Name is empty." << endl;
+        }
+        else {
+            PrimaryKeyColumn = column;
+        }
+
+    }
+
+    /// <summary>
+    /// Adds a secondary key column
+    /// </summary>
+    /// <param name="column">The column name</param>
+    void AddSecondaryKey(string column) {
+        if (column == "") {
+            cout << "Corruption in the data. Incoming Column Name is empty." << endl;
+        }
+        else {
+            SecondaryKeyColumns.push_back(column);
+        }
+    }
+
+    /// <summary>
+    /// Checks if the given column name is a primarky key
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns>Returns true if column name is a primary key</returns>
+    bool IsPrimaryKey(string column) {
+        if (column == PrimaryKeyColumn) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if the given column name is a secondary key
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns>Returns true if column name is a secondary key</returns>
+    bool IsSecondaryKey(string column) {
+        if (find(SecondaryKeyColumns.begin(), SecondaryKeyColumns.end(), column) != SecondaryKeyColumns.end()) {
+            return true;
+        }
+
+        return false;
+    }
 
     Row search(int x) {
         Row row;
