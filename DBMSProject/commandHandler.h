@@ -200,7 +200,8 @@ public:
 		cmd = new_cmd;
 		string colname = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		string tablename = cmd.substr(cmd.find("table") + 6, ((cmd.find("drop")) - (cmd.find("table") + 6)) - 1);
-		this->db->delete_column(colname, tablename);
+		db->delete_column(colname, tablename);
+		db->updateRows();
 		return 1;
 	}
 

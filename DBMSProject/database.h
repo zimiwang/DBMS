@@ -31,8 +31,9 @@ public:
 	/// The tables associated to <database_name>
 	/// </summary>
 	std::vector<Table> tables;
+	std::vector<Table> join_tables;
 
-	std::vector<BPTree> trees;
+	std::vector<BPTree> primary_key_trees;
 
 	const string PRIMARY_KEY = "ID";
 
@@ -49,6 +50,7 @@ public:
 	void insert_into(std::string statement, std::string table_name);
 	void List_Info();
 	Table get_table(std::string tbl_name);
+	Table join_table(std::string src_table, std::string dest_table, std::string foreign_key);
 	BPTree get_tree(string name);
 	void UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
@@ -398,11 +400,23 @@ Table Database::get_table(std::string name)
 
 	return ret;
 }
+/// <summary>
+/// Joins two tables based on a foreign key
+/// </summary>
+/// <param name="src_table">table that has the foreign key</param>
+/// <param name="dest_table">table who's primary key is the foreign key</param>
+/// <param name="foreign_key">which column of table 1 is the foreign key</param>
+/// <returns></returns>
+Table Database::join_table(std::string src_table, std::string dest_table, std::string foreign_key)
+{
+	Table join;
+	return join;
+}
 
 BPTree Database::get_tree(string name) {
 	BPTree ret;
 
-	for (BPTree tree : trees) {
+	for (BPTree tree : primary_key_trees) {
 		if (tree.Name == name) {
 			ret = tree;
 			break;
@@ -564,7 +578,11 @@ void Database::insert_into(std::string statement, std::string table_name)
 	SaveTable(current_table);
 
 }
-
+/// <summary>
+/// Deletes a column from the database
+/// </summary>
+/// <param name="column_name"></param>
+/// <param name="table_name"></param>
 void Database::delete_column(std::string column_name, std::string table_name)
 {
 	//get the index of the column name
@@ -581,11 +599,20 @@ void Database::delete_column(std::string column_name, std::string table_name)
 			current_table.rows[i].erase(current_table.rows[i].begin() + colindex);
 		}
 
+		
+
+
+		//loop through the new rows to delete that value
 		//delete the reference in column storage
 		current_table.columns.erase(current_table.columns.find(column_name));
-	}
 
+	}
+	
 	SaveTable(current_table);
+	updateRows();
+	updatePrimaryTrees();
+	
+	
 }
 /// <summary>
 /// adds a key to the old key storage from the table
@@ -694,53 +721,8 @@ void Database::updateRows()
 			}
 			tbl.newrows.push_back(nrow);
 		}		
-		SaveTable(tbl);
-}
-	//	int intindex = 0;
-	//	int stringindex = 0;
-	//	int charindex = 0;
-	//	int typesearch = 0;
-	//	int whichrow = 0;
-	//	for (std::vector<std::string> rw : tbl.rows)
-	//	{
-	//		int whichcol = 0;
-	//		for (std::pair<std::string, std::string> col : tbl.columns)
-	//		{								
-	//			string test = tbl.rows[whichrow][whichcol];
-	//			if (true == true)
-	//			{
-	//				if (col.second == "string")
-	//				{
-	//					tbl.newrows[whichrow].strColumn[stringindex].AddValue(test);
-	//					stringindex = stringindex + 1;
-	//				}
-	//				else if (col.second == "int")
-	//				{
-	//					tbl.newrows[whichrow].intColumn[intindex].AddValue(stoi(tbl.rows[whichrow][whichcol]));
-	//					intindex = intindex + 1;
-	//				}
-	//				else if (col.second == "char")
-	//				{
-	//					char* char_arr;
-	//					string str_obj(tbl.rows[whichrow][whichcol]);
-	//					char_arr = &str_obj[0];
-	//					cout << char_arr;
-	//					tbl.newrows[0].charColumn[charindex].AddValue(char_arr);
-	//					charindex = charindex + 1;
-	//				}
-	//				else
-	//				{
-	//					tbl.newrows[0].strColumn[stringindex].AddValue(tbl.rows[whichrow][whichcol]);
-	//					stringindex = stringindex + 1;
-	//				}
-	//			}
-	//			
-	//			whichcol = whichcol + 1;
-	//		}
-	//		whichrow = whichrow + 1;
-	//	}
-	//	int x = 4;
-	//}
+	SaveTable(tbl);
+	}
 }
 /// <summary>
 /// Updates the primary key trees for each table. TODO - Add a check to see if the table needs to be updated - maybe a bool flag in
@@ -748,7 +730,7 @@ void Database::updateRows()
 /// </summary>
 inline void Database::updatePrimaryTrees()
 {
-	trees.clear();
+	primary_key_trees.clear();
 	for (Table tbl : tables)
 	{
 		BPTree newPrimaryKeyIndex;
@@ -770,7 +752,7 @@ inline void Database::updatePrimaryTrees()
 
 		}
 		//tbl.primaryKeyTree = newPrimaryKeyIndex;
-		trees.push_back(newPrimaryKeyIndex);
+		primary_key_trees.push_back(newPrimaryKeyIndex);
 
 		SaveTable(tbl);
 	}
