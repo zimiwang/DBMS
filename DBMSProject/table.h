@@ -88,11 +88,14 @@ public:
 		: Table(name) {
 		this->table_name = name;
 		bool hasID = false;
+		bool isCreate = true;
 
-		if (cols.size() % 2 == 0) {
-			for (std::string col : cols) {
+		for (std::string col : cols) {
 
-				vector<string> tmp = Utils::split(col, " ");
+			vector<string> tmp = Utils::split(col, " ");
+
+			if (tmp.size() == 2)
+			{
 				if (tmp[0] == ("ID_" + name))
 				{
 					hasID = true;
@@ -100,18 +103,24 @@ public:
 				//columns.insert(Utils::trim(tmp[0]), Utils::trim(tmp[1]));
 				columns.insert(std::pair<std::string, std::string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
 				int letstes = 0;
-
 			}
+			else
+			{
+				std::cout << "Invalid format " << std::endl;
+				isCreate = false;
+				break;
+			}
+		}
+		if (isCreate = true)
+		{
 			if (hasID == false) //We have no ID column defined by the user, manually add one
 			{
 				columns.insert(std::pair<std::string, std::string>(("ID_" + name), "int"));
 			}
 		}
-		else
-		{
-			std::cout << "Invalid format "<< std::endl;
-		}
+
 	}
+
 };
 
 
