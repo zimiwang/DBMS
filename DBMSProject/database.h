@@ -431,7 +431,7 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 		{
 			
 			for (Column<int> col : r.intColumn)
-			{
+			{	
 				if (col.GetName() == foreign_key) //this should pass exactly once per row
 				{
 					//we have the local row value, search through the primary index of the destination tree for the matching row

@@ -73,10 +73,10 @@ private:
 		bool found = true;
 		vector<string> rowColumns = GetColumnNames();
 		for (string column : columns) {			
-			if (!(find(rowColumns.begin(), rowColumns.end(), column) != rowColumns.end())) {				
-				cout << "Column " <<  "'" << column << "'" << " not found." << endl;
-				
+			if (column != "*" && !(find(rowColumns.begin(), rowColumns.end(), column) != rowColumns.end())) {
+				cout << "Column " <<  "'" << column << "'" << " not found." << endl;				
 				found = false;
+				break;
 			}
 		}
 
