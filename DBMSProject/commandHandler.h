@@ -496,69 +496,10 @@ public:
 
 	
 		string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
-
-		int count = 0;
 		string conditional = Parser::get_conditional(statement);
 		vector<string> clause = Parser::get_where_clause(statement, conditional);
-		string value = clause[1];
-		Table currentTable = db->get_table(tbl_name);
-		int col_ndx = currentTable.get_column_index(clause[0]);
-		vector<vector<string> > rows = currentTable.rows;
-		for (vector<string> row : rows) {
-			cout << row[col_ndx] << conditional << value << endl;
 
-			if (conditional == "=") {
-				if (row[col_ndx] == value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
-				}
-			}
-			else if (conditional == ">=") {
-				if (row[col_ndx] >= value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
-				}
-			}
-			else if (conditional == "<=") {
-				if (row[col_ndx] <= value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
-				}
-			}
-			else if (conditional == ">") {
-				if (row[col_ndx] > value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
-				}
-			}
-			else if (conditional == "<") {
-				if (row[col_ndx] < value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
-				}
-			}
-			else if (conditional == "!=") {
-				if (row[col_ndx] != value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
-				}
-			}
-			else {
-				std::cout << "Given conditional statement is not supported!" << std::endl;
-			}
-		}
-
-		db->SaveTable(currentTable);
-
-		db->Save();
-
-		std::cout << count << " rows deleted." << endl;
+		db->DeleteFrom(tbl_name, conditional, clause);
 
 		return 1;
 	}

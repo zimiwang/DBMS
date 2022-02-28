@@ -55,6 +55,7 @@ public:
 	void UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
 	void RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name);
+	void DeleteFrom(std::string tbl_name, std::string conditional, vector<string> clause);
 	void delete_column(std::string column_name, std::string table_name);
 	void keytotable(std::string keytype, std::string keyname, std::string table_name);
 	void sortKeys();
@@ -513,6 +514,76 @@ void Database::RenameTable(std::string old_table_name, std::string new_table_nam
 	this->AddTable(tbl);
 
 	this->Save();
+}
+
+void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<string> clause) {
+
+	int count = 0;
+	string value = clause[1];
+
+	Table currentTable = this->get_table(tbl_name);
+	int col_ndx = currentTable.get_column_index(clause[0]);
+	vector<vector<string> > rows = currentTable.rows;
+	for (vector<string> row : rows) {
+
+		if (col_ndx != -1)
+		{
+			cout << row[col_ndx] << conditional << value << endl;
+
+			if (conditional == "=") {
+				if (row[col_ndx] == value)
+				{
+					currentTable.DeleteRow(row);
+					count += 1;
+				}
+			}
+			else if (conditional == ">=") {
+				if (row[col_ndx] >= value)
+				{
+					currentTable.DeleteRow(row);
+					count += 1;
+				}
+			}
+			else if (conditional == "<=") {
+				if (row[col_ndx] <= value)
+				{
+					currentTable.DeleteRow(row);
+					count += 1;
+				}
+			}
+			else if (conditional == ">") {
+				if (row[col_ndx] > value)
+				{
+					currentTable.DeleteRow(row);
+					count += 1;
+				}
+			}
+			else if (conditional == "<") {
+				if (row[col_ndx] < value)
+				{
+					currentTable.DeleteRow(row);
+					count += 1;
+				}
+			}
+			else if (conditional == "!=") {
+				if (row[col_ndx] != value)
+				{
+					currentTable.DeleteRow(row);
+					count += 1;
+				}
+			}
+			else {
+				std::cout << "Given conditional statement is not supported!" << std::endl;
+			}
+
+
+		}
+		else {
+			std::cout << count << "Incorrect column name" << endl;
+			break;
+		}
+	}
+	SaveTable(currentTable);
 }
 
 /// <summary>
