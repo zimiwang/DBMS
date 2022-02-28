@@ -280,14 +280,20 @@ public:
 
 		// Parses the select command
 		try {
+			BPTree tree;
+			// check for join
 
+			// use if there is a join
+			
+			// use if there is no join
 			std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
 			cout << "Selecting from Table: " << tbl_name << endl;
 
-			tbl_name = Utils::remove_char(tbl_name, ';');
+			tbl_name = Utils::remove_char(tbl_name, ';');			
+			tree = db->get_tree(tbl_name);
 
-			//Table tbl = db->get_table(tbl_name);
-			BPTree tree = db->get_tree(tbl_name);
+
+
 			if (tree.Name.length() > 0)				
 			{				
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
