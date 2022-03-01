@@ -275,23 +275,27 @@ public:
 	/// <returns>1 on completion</returns>
 	int select(Database * new_db, string new_cmd)
 	{
+		// should convert to lowercase 
 		cmd = new_cmd;
 		db = new_db;
-
+		
 		// Parses the select command
 		try {
 			BPTree tree;
 			// check for join
-
+						
 			// use if there is a join
-			
-			// use if there is no join
-			std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
-			cout << "Selecting from Table: " << tbl_name << endl;
+			if (Utils::contains(cmd, "join")) {
+				cout << "Found: " << endl;
+			}
+			else {
+				// use if there is no join
+				std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
+				cout << "Selecting from Table: " << tbl_name << endl;
 
-			tbl_name = Utils::remove_char(tbl_name, ';');			
-			tree = db->get_tree(tbl_name);
-
+				tbl_name = Utils::remove_char(tbl_name, ';');
+				tree = db->get_tree(tbl_name);
+			}
 
 
 			if (tree.Name.length() > 0)				
