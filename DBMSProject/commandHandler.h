@@ -345,21 +345,7 @@ public:
 
 					// print whole table
 					vector<Row> rows = tree.getFullTable();
-					int i = 0;
-					for (Row row : rows) {
-						if (!row.isEmpty()) {
-							if (i == 0) {
-								row.PrintRow(cols);
-								i++;
-							}
-							else {						
-								row.PrintSingleRow(cols);
-							}
-						}
-						else {
-							cout << "Could not find rows" << endl;
-						}
-					}
+					rows[0].PrintFullTable(rows, cols);
 				}
 				else {			
 					// decide to use search based on pk, sk, or full search
@@ -371,7 +357,7 @@ public:
 						// search table
 						Row row = tree.search(stoi(pk));						
 						if (!row.isEmpty()) {
-							row.PrintRow(cols);
+							row.PrintRow(cols, row.GetLargestColumnSize());
 						}
 						else {
 							cout << "Could not find row" << endl;
