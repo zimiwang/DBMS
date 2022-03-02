@@ -286,7 +286,40 @@ public:
 						
 			// use if there is a join
 			if (Utils::contains(cmd, "join")) {
-				cout << "Found: " << endl;
+				std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
+				std::string dest_table = Utils::get_string_between_two_strings(cmd, "join ", " on");
+				std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
+
+				Table t = db->join_table(src_table, dest_table, fkey);
+				// index the new table
+				BPTree newPrimaryKeyIndex;
+				newPrimaryKeyIndex.Name = t.table_name;
+
+				for (Row r : t.newrows)
+				{
+					/*Row* rpoint = &r;*/
+					r.InUse();
+					for (Column<int> c : r.intColumn)
+					{
+						//check to see if the colname is the primary key
+						if (c.GetName() == t.primaryKeyName)
+						{
+							//index based on the value here
+							newPrimaryKeyIndex.insert(c.GetValue(), r);
+
+							// set primary key
+							if (!newPrimaryKeyIndex.HasPrimaryKey()) {
+								newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
+							}
+
+						}
+					}
+
+				}
+				tree = newPrimaryKeyIndex;
+				t.primaryKeyTree = newPrimaryKeyIndex;
+
+				cout << "Joined: " << src_table <<" with " << dest_table << " as " << t.table_name << endl;
 			}
 			else {
 				// use if there is no join

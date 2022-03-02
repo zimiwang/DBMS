@@ -459,6 +459,7 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 			}
 		}
 	}
+	join.primaryKeyName = dest.primaryKeyName;
 	this->join_tables.push_back(join);
 	return join;
 }
@@ -877,7 +878,7 @@ inline void Database::updatePrimaryTrees()
 			}
 
 		}
-		//tbl.primaryKeyTree = newPrimaryKeyIndex;
+		tbl.primaryKeyTree = newPrimaryKeyIndex;
 		primary_key_trees.push_back(newPrimaryKeyIndex);
 
 		SaveTable(tbl);
