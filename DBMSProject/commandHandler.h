@@ -334,6 +334,8 @@ public:
 			if (tree.Name.length() > 0)				
 			{				
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
+				cols = Utils::trimColumns(cols);
+
 				std::string conditional = Parser::get_conditional(cmd);				
 
 				std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
@@ -367,7 +369,7 @@ public:
 					// search based on pk
 					if (tree.IsPrimaryKey(column)) {
 						// search table
-						Row row = tree.search(stoi(pk));
+						Row row = tree.search(stoi(pk));						
 						if (!row.isEmpty()) {
 							row.PrintRow(cols);
 						}
@@ -395,6 +397,7 @@ public:
 		}
 		catch (const std::exception&)
 		{
+			cout << "An error occured while trying to select a table" << endl;
 		}
 		return 1;
 	}

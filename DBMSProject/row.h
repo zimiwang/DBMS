@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include "utils.h"
 #pragma once
 
 
@@ -72,10 +73,10 @@ private:
 	bool CheckAllColumnsFound(vector<string> columns) {
 		bool found = true;
 		vector<string> rowColumns = GetColumnNames();
-		for (string column : columns) {			
+		for (string column : columns) {					
 			if (column != "*" && !(find(rowColumns.begin(), rowColumns.end(), column) != rowColumns.end())) {
 				cout << "Column " <<  "'" << column << "'" << " not found." << endl;				
-				found = false;
+				found = false;				
 				break;
 			}
 		}
@@ -301,11 +302,10 @@ private:
 public:		
 	vector<Column<string>> strColumn;
 	vector<Column<int>> intColumn;
-	vector<Column<char*>> charColumn;	
-	
+	vector<Column<char*>> charColumn;		
 	
 	Row() {	
-		empty = true;
+		empty = true;	
 	}
 
 	void InUse() {
@@ -362,7 +362,7 @@ public:
 	void PrintSingleRow(vector<string> columns, bool checkColumns = true) {
 		// checks that all the columns are contained in the row
 		// if not then don't start printing		
-		if (checkColumns && CheckAllColumnsFound(columns)) {
+		if (checkColumns) {
 			// start printing
 			cout << "| ";
 

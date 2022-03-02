@@ -86,6 +86,8 @@ namespace Utils {
 		return rtrim(ltrim(s));
 	}
 
+	
+
 
 	/// <summary>
 	/// Determines if a string is a substring of another
@@ -104,6 +106,19 @@ namespace Utils {
 
 	}
 
+	/// <summary>
+	/// Trims all columns in a vector
+	/// </summary>
+	/// <param name="columns"></param>
+	/// <returns></returns>
+	std::vector<std::string> trimColumns(std::vector<std::string> columns) {
+		std::vector<std::string> newColumns;
+		for (std::string col : columns) {
+			newColumns.push_back(trim(col));
+		}
+
+		return newColumns;
+	}
 	
 	
 	/// <summary>
