@@ -288,7 +288,8 @@ public:
 			if (Utils::contains(cmd, "join")) {
 				std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
 				std::string dest_table = Utils::get_string_between_two_strings(cmd, "join ", " on");
-				std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
+				//std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
+				string fkey = Parser::get_foreign_key(cmd);
 
 				Table t = db->join_table(src_table, dest_table, fkey);
 				// index the new table
@@ -316,7 +317,7 @@ public:
 					}
 
 				}
-				tree = newPrimaryKeyIndex;
+				tree = newPrimaryKeyIndex;				
 				t.primaryKeyTree = newPrimaryKeyIndex;
 
 				cout << "Joined: " << src_table <<" with " << dest_table << " as " << t.table_name << endl;

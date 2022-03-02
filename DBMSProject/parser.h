@@ -23,6 +23,7 @@ public:
 	string static get_conditional(string stm);
 	string static get_table_name(string cmd, string first_delim, string second_delim);
 	string static get_table_name(string cmd);
+	string static get_foreign_key(string cmd);
 	vector<vector<string>> static get_update_clauses(string cmd);
 };
 
@@ -139,6 +140,27 @@ vector<vector<string>> Parser::get_update_clauses(string cmd) {
 	}
 
 	return ret;
+}
+
+string Parser::get_foreign_key(string cmd) {
+	string keyword = "on";
+	string foreignKey;
+	size_t first_delim_pos = cmd.find(keyword);
+	size_t end_pos_of_first_delim = first_delim_pos + keyword.length();
+	size_t last_delim_pos = cmd.find(" ", end_pos_of_first_delim + 1);	
+	size_t last_delim_pos2 = cmd.find(";");
+
+	if (last_delim_pos != string::npos) {
+		foreignKey = cmd.substr(end_pos_of_first_delim, last_delim_pos - end_pos_of_first_delim);
+	}
+	else if (last_delim_pos2 != string::npos) {
+		foreignKey = cmd.substr(end_pos_of_first_delim, last_delim_pos2 - end_pos_of_first_delim);
+	}
+	else {
+
+	}
+
+	return foreignKey;
 }
 
 /// Author: Andrew
