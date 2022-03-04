@@ -143,7 +143,7 @@ vector<vector<string>> Parser::get_update_clauses(string cmd) {
 }
 
 string Parser::get_foreign_key(string cmd) {
-	string keyword = "on";
+	string keyword = "on ";
 	string foreignKey;
 	size_t first_delim_pos = cmd.find(keyword);
 	size_t end_pos_of_first_delim = first_delim_pos + keyword.length();

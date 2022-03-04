@@ -164,7 +164,7 @@ int Table::get_column_index(std::string column_name) {
 	//it = columns.find(column_name);
 	auto it = columns.find(column_name);
 
-	if (it == columns.end()) {
+	if (it != columns.end()) {
 		col_index = std::distance(columns.begin(), it);
 		ret = col_index;
 	}

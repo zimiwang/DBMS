@@ -289,9 +289,20 @@ public:
 				std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
 				std::string dest_table = Utils::get_string_between_two_strings(cmd, "join ", " on");
 				//std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
+				
 				string fkey = Parser::get_foreign_key(cmd);
+				std::vector<std::string> splitkeys;
 
-				Table t = db->join_table(src_table, dest_table, fkey);
+				char* token = strtok(const_cast<char*>(fkey.c_str()), "=");
+				while (token != nullptr)
+				{
+					splitkeys.push_back(std::string(token));
+					token = strtok(nullptr, "=");
+				}
+				string localkey = splitkeys[0];
+				string foreignkey = splitkeys[1];
+
+				Table t = db->join_table(src_table, dest_table, localkey, foreignkey);
 				// index the new table
 				BPTree newPrimaryKeyIndex;
 				newPrimaryKeyIndex.Name = t.table_name;

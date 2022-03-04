@@ -50,7 +50,7 @@ public:
 	void insert_into(std::string statement, std::string table_name);
 	void List_Info();
 	Table get_table(std::string tbl_name);
-	Table join_table(std::string src_table, std::string dest_table, std::string foreign_key);
+	Table join_table(std::string src_table, std::string dest_table, std::string foreign_key, std::string exkey);
 	BPTree get_tree(string name);
 	void UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause);
 	void RenameTable(std::string old_table_name, std::string new_table_name);
@@ -416,17 +416,19 @@ Table Database::get_table(std::string name)
 /// <param name="dest_table">table who's primary key is the foreign key</param>
 /// <param name="foreign_key">which column of table 1 is the foreign key</param>
 /// <returns></returns>
-Table Database::join_table(std::string src_table, std::string dest_table, std::string foreign_key)
+Table Database::join_table(std::string src_table, std::string dest_table, std::string foreign_key, std::string exkey)
 {
 	Table join;
 	Table src = this->get_table(src_table);
 	Table dest = this->get_table(dest_table);
 	join.table_name = src_table + "_" + dest_table;
 	int colindex = src.get_column_index(foreign_key);
-	if (colindex != -1)
+	int col2index = dest.get_column_index(exkey);
+	int rowcount = 1;
+	if (colindex != -1 && col2index != -1)
 	{
 		//colindex shouldn't ever be -1 but from here we loop through the rows and match local foreign key to foreign 
-		//primary key --- TO NOTE | CURRENTLY FOREIGN KEY WILL BE AN INTEGER BY NATURE OF PRIMARY KEYS ONLY SUPPORTING INTEGERS.
+		//primary key --- TO NOTE | CURRENTLY CAN ONLY JOIN ON INT COLUMNS
 		for (Row r : src.newrows)
 		{
 			
@@ -436,30 +438,49 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 				{
 					//we have the local row value, search through the primary index of the destination tree for the matching row
 					Row foreignRow = dest.primaryKeyTree.search(col.GetValue());
-
-					//combine the two table's row structure
-					Row combinedRow = Row(r); //i believe this is how you do a deep copy in C++
-					for (Column<int> loc : foreignRow.intColumn)
+					Row destrow = Row();  //empty by default
+					bool keeprow = false;
+					for (Row r2 : dest.newrows)
 					{
-						combinedRow.intColumn.push_back(loc);
-					}
-					for (Column<string> loc : foreignRow.strColumn)
-					{
-						combinedRow.strColumn.push_back(loc);
-					}
-					for (Column<char *> loc : foreignRow.charColumn)
-					{
-						combinedRow.charColumn.push_back(loc);
-					}
+						for (Column<int> col2 : r2.intColumn)
+						{
+							if (col2.GetName() == exkey)
+							{
+								if (col.GetValue() == col2.GetValue())
+								{
+									destrow = r2;
+									//combine the two table's row structure
+									Row combinedRow = Row(r); //i believe this is how you do a deep copy in C++
+									for (Column<int> loc : destrow.intColumn)
+									{
+										combinedRow.intColumn.push_back(loc);
+									}
+									for (Column<string> loc : destrow.strColumn)
+									{
+										combinedRow.strColumn.push_back(loc);
+									}
+									for (Column<char*> loc : destrow.charColumn)
+									{
+										combinedRow.charColumn.push_back(loc);
+									}
 
-					//push our merged row into the new table
-
-					join.newrows.push_back(combinedRow);
+									//push our merged row into the new table
+									Column<int> newindex;
+									newindex.SetName("ID_" + join.table_name);
+									newindex.AddValue(rowcount);
+									rowcount++;
+									combinedRow.intColumn.push_back(newindex);
+									join.newrows.push_back(combinedRow);
+								}
+							}
+						}
+					}
+					
 				}
 			}
 		}
 	}
-	join.primaryKeyName = dest.primaryKeyName;
+	join.primaryKeyName = "ID_" + join.table_name;
 	this->join_tables.push_back(join);
 	return join;
 }
