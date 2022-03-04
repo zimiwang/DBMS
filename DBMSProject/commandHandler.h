@@ -288,7 +288,8 @@ public:
 			if (Utils::contains(cmd, "join")) {
 				std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
 				std::string dest_table = Utils::get_string_between_two_strings(cmd, "join ", " on");
-				std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
+				//std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
+				string fkey = Parser::get_foreign_key(cmd);
 
 				Table t = db->join_table(src_table, dest_table, fkey);
 				// index the new table
@@ -378,7 +379,7 @@ public:
 					}
 
 				}
-				tree = newPrimaryKeyIndex;
+				tree = newPrimaryKeyIndex;				
 				t.primaryKeyTree = newPrimaryKeyIndex;
 
 				cout << "Joined: " << src_table <<" with " << dest_table << " as " << t.table_name << endl;
@@ -397,6 +398,8 @@ public:
 			if (tree.Name.length() > 0)				
 			{				
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
+				cols = Utils::trimColumns(cols);
+
 				std::string conditional = Parser::get_conditional(cmd);				
 
 				std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
@@ -406,21 +409,7 @@ public:
 
 					// print whole table
 					vector<Row> rows = tree.getFullTable();
-					int i = 0;
-					for (Row row : rows) {
-						if (!row.isEmpty()) {
-							if (i == 0) {
-								row.PrintRow(cols);
-								i++;
-							}
-							else {						
-								row.PrintSingleRow(cols);
-							}
-						}
-						else {
-							cout << "Could not find rows" << endl;
-						}
-					}
+					rows[0].PrintFullTable(rows, cols);
 				}
 				else {			
 					// decide to use search based on pk, sk, or full search
@@ -430,9 +419,9 @@ public:
 					// search based on pk
 					if (tree.IsPrimaryKey(column)) {
 						// search table
-						Row row = tree.search(stoi(pk));
+						Row row = tree.search(stoi(pk));						
 						if (!row.isEmpty()) {
-							row.PrintRow(cols);
+							row.PrintRow(cols, row.GetLargestColumnSize());
 						}
 						else {
 							cout << "Could not find row" << endl;
@@ -458,6 +447,7 @@ public:
 		}
 		catch (const std::exception&)
 		{
+			cout << "An error occured while trying to select a table" << endl;
 		}
 		return 1;
 	}

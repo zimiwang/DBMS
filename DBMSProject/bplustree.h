@@ -354,12 +354,10 @@ public:
         else {
             Node* currentNode = searchInternal(x);
             for (int i = 0; i < currentNode->size; i++) {       // traverse the currentNode keys 
-                if (currentNode->key[i].key == x) {
-                    cout << "Found\n";
+                if (currentNode->key[i].key == x) {               
                     return currentNode->key[i].locationPtr;
                 }
-            }
-            cout << "Not found\n";
+            }            
             return row;
         }
     };
