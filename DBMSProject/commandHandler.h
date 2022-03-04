@@ -295,6 +295,10 @@ public:
 				BPTree newPrimaryKeyIndex;
 				newPrimaryKeyIndex.Name = t.table_name;
 
+				std::vector<std::string> nodropcols = Parser::get_select_columns(cmd);
+				nodropcols.push_back(fkey);
+
+
 				for (Row r : t.newrows)
 				{
 					/*Row* rpoint = &r;*/
@@ -313,6 +317,64 @@ public:
 							}
 
 						}
+						else
+						{
+							//check to see if we need to delete this column entry
+							bool should_drop;
+							for (std::string s : nodropcols)
+							{
+								if (c.GetName() == s)
+								{
+									should_drop = false;
+								}
+								else
+								{
+									should_drop = true;
+								}
+							}
+							if (should_drop == true)
+							{
+								c.SetName("markedthisentryforlaterdeletion");
+							}
+						}
+					//}
+					//for (Column<string> c : r.strColumn)
+					//{
+					//	bool should_drop;
+					//	for (std::string s : nodropcols)
+					//	{
+					//		if (c.GetName() == s)
+					//		{
+					//			should_drop = false;
+					//		}
+					//		else
+					//		{
+					//			should_drop = true;
+					//		}
+					//	}
+					//	if (should_drop == true)
+					//	{
+					//		c.SetName("markedthisentryforlaterdeletion");
+					//	}
+					//}
+					//for (Column<char *> c : r.charColumn)
+					//{
+					//	bool should_drop;
+					//	for (std::string s : nodropcols)
+					//	{
+					//		if (c.GetName() == s)
+					//		{
+					//			should_drop = false;
+					//		}
+					//		else
+					//		{
+					//			should_drop = true;
+					//		}
+					//	}
+					//	if (should_drop == true)
+					//	{
+					//		c.SetName("markedthisentryforlaterdeletion");
+					//	}
 					}
 
 				}
@@ -320,6 +382,7 @@ public:
 				t.primaryKeyTree = newPrimaryKeyIndex;
 
 				cout << "Joined: " << src_table <<" with " << dest_table << " as " << t.table_name << endl;
+
 			}
 			else {
 				// use if there is no join
