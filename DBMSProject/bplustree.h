@@ -69,29 +69,30 @@ class BPTree {
         }
         else {                                                          // NOTE: should create a virtualNode instead of virtual arrays
             Node* newInternal = new Node;                               // create a newNode
-            PrimaryKey virtualNode[MAX + 1];                                   // create a virtualNode key array
+            PrimaryKey virtualNode[MAX + 1];                            // create a virtualNode key array
             Node* virtualPtr[MAX + 2];                                  // 
             for (int i = 0; i < MAX; i++) {                             // copy parentNode-keys to virtualNode key array
                 virtualNode[i] = parentNode->key[i];
             }
+            
             for (int i = 0; i < MAX + 1; i++) {                         // copy paretnNode-ptrs to virtualNode ptr array
                 virtualPtr[i] = parentNode->ptr[i];
             }
             int i = 0, j;
-            while (x.key > virtualNode[i].key && i < MAX)                       // Find which index to add the input value in the virtualNode
+            while (x.key > virtualNode[i].key && i < MAX)               // Find which index to add the input value in the virtualNode
                 i++;
-            for (int j = MAX + 1; j > i; j--) {                         // move keys based on input value index i
+            for (int j = MAX; j > i; j--) {                             // move keys based on input value index i
                 virtualNode[j] = virtualNode[j - 1];                    // move previous virtualtNode-key index to the right
             }
             virtualNode[i] = x;                                         // set the input value in virtualNode array based on the index i
-            for (int j = MAX + 2; j > i + 1; j--) {                     // 
+            for (int j = MAX + 1; j > i + 1; j--) {                     // 
                 virtualPtr[j] = virtualPtr[j - 1];
             }
             virtualPtr[i + 1] = child;
             newInternal->IS_LEAF = false;                               // set newNode IS_LEAF 
             parentNode->size = (MAX + 1) / 2;                           // resize parentNode
             newInternal->size = MAX - (MAX + 1) / 2;                    // set size for newNode
-            for (i = 0, j = parentNode->size; i < newInternal->size; i++, j++) {        // assign keys to newNode from virtualNode || POSSIBLE BUG, should be j = parentNode->size, not j = parentNode->size + 1
+            for (i = 0, j = parentNode->size + 1; i < newInternal->size; i++, j++) {        // assign keys to newNode from virtualNode || POSSIBLE BUG, should be j = parentNode->size, not j = parentNode->size + 1
                 newInternal->key[i] = virtualNode[j];
             }
             for (i = 0, j = parentNode->size + 1; i < newInternal->size + 1; i++, j++) {

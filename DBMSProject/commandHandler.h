@@ -283,7 +283,7 @@ public:
 		try {
 			BPTree tree;
 			// check for join
-						
+			
 			// use if there is a join
 			if (Utils::contains(cmd, "join")) {
 				std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
