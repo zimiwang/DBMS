@@ -396,6 +396,11 @@ public:
 				cout << "Joined: " << src_table <<" with " << dest_table << " as " << t.table_name << endl;
 
 			}
+			else if (Utils::contains(cmd, "between")) {
+				string tbl_name = Parser::get_table_name(cmd, "from", "where");
+				tree = db->get_tree(tbl_name);
+		
+			}
 			else {
 				// use if there is no join
 				std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
@@ -430,12 +435,26 @@ public:
 					// search based on pk
 					if (tree.IsPrimaryKey(column)) {
 						// search table
-						Row row = tree.search(stoi(pk));						
-						if (!row.isEmpty()) {
-							row.PrintRow(cols, row.GetLargestColumnSize());
+						if (Utils::contains(cmd, "between")) {
+							// get range values
+							string value1 = Utils::get_string_between_two_strings(cmd, "between", "and");
+							string value2 = Utils::get_string_between_two_strings(cmd, "and", ";");
+							// use range between PK
+							vector<Row> rows = tree.searchMultiple(stoi(value1), stoi(value2));
+							rows[0].PrintFullTable(rows, cols);
+							// or use secondary index
+							
+							// else use all columns 
+
 						}
 						else {
-							cout << "Could not find row" << endl;
+							Row row = tree.search(stoi(pk));						
+							if (!row.isEmpty()) {
+								row.PrintRow(cols, row.GetLargestColumnSize());
+							}
+							else {
+								cout << "Could not find row" << endl;
+							}
 						}
 
 					}
