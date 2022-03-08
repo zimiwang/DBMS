@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="bplustree.h" />
     <ClInclude Include="database.h" />
+    <ClInclude Include="dictionary.h" />
     <ClInclude Include="filehelper.h" />
     <ClInclude Include="bminustree.h" />
     <ClInclude Include="parser.h" />

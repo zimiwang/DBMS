@@ -419,7 +419,9 @@ public:
 				std::string conditional = Parser::get_conditional(cmd);				
 
 				std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
-				
+				cmd = Utils::remove_char(cmd, ';');
+				Dictionary clauses = Parser::get_where_clause(cmd);
+
 				// decide to print whole table or search table
 				if (where_clause.empty()) {										
 
@@ -429,8 +431,7 @@ public:
 				}
 				else {			
 					// decide to use search based on pk, sk, or full search
-					string column = where_clause[0];
-					string pk = where_clause[1];				
+					string column = clauses.GetValuesByKey("where")[0];					
 
 					// search based on pk
 					if (tree.IsPrimaryKey(column)) {
@@ -448,6 +449,7 @@ public:
 
 						}
 						else {
+							string pk = clauses.GetValuesByKey("where")[2];
 							Row row = tree.search(stoi(pk));						
 							if (!row.isEmpty()) {
 								row.PrintRow(cols, row.GetLargestColumnSize());

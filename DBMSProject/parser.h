@@ -6,10 +6,21 @@
 //#include <bits/stdc++.h>		// comment this out because no uses it and it is recommeded that you don'MinDegree use it.
 #include "utils.h"
 #include <iomanip>
+#include "dictionary.h"
 using namespace std;
 
 class Parser {
+	vector<string> KEYWORDS;
+
+
 public:
+	Parser() {
+		KEYWORDS.push_back("between");
+		KEYWORDS.push_back("and");
+		KEYWORDS.push_back("where");
+	}
+	Dictionary static get_where_clause(string cmd);
+	vector<string> static findKeyWords(vector<string>, string cmd);
 	vector<string> static split_text(string input);
 	vector<string> static get_select_columns(string cmd);
 	static string* split_str(std::string str, char delim);
@@ -238,6 +249,42 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 	}
 
 	return ret;
+}
+
+/// <summary>
+/// Creates a dictionary of keywords used in a where clause. 
+/// It finds keywords and adds the following words to a vector until it hits a new keyword.
+/// When it hits a new keyword then it does the process all over again.
+/// It saves this in a dictionary
+/// </summary>
+/// <param name="cmd">the command to parse</param>
+/// <returns>A dictionary with key value pairs of keywords and their following words</returns>
+Dictionary Parser::get_where_clause(string cmd) {
+	// check what keywords are in the string
+	Parser parser;	
+	vector<string> wordsFound = Parser::findKeyWords(parser.KEYWORDS, cmd);
+
+	Dictionary dic;
+	bool keyWordFound = false;
+	string keyword = "";
+
+	vector<string> subs = Utils::split(cmd);
+	for (string sub : subs) {
+		// if keyword found then add it to dictionary
+		if (Utils::contains(parser.KEYWORDS, sub)) {
+			keyWordFound = true;
+			keyword = sub;
+			dic.AddNewKey(sub);
+		}
+		else if (keyWordFound) {
+			// if keyword found add current keyword value to dictionary
+			dic.AddKeyValuePair(keyword, sub);
+		}
+	}
+
+
+
+	return dic;
 }
 
 /// Author: Andrew
@@ -521,3 +568,24 @@ std::vector<std::string> split_text(std::string input, std::string delimeter)
 	return results;
 }
 
+
+/// <summary>
+	/// Finds keywords in a string and returns the keywords found
+	/// </summary>
+	/// <param name="keyWords">The keywords to use</param>
+	/// <param name="cmd">The string to look at</param>
+	/// <returns>Vector of keywords found</returns>
+vector<string> Parser::findKeyWords(vector<string> keyWords, string cmd) {	
+	vector<string> wordsFound;
+
+	// check to see if keywords are in the cmd string
+	for (string key : keyWords) {
+		if (Utils::contains(cmd, key)) {
+			// add found word to vector
+			wordsFound.push_back(key);
+		}
+	}
+
+	return wordsFound;
+
+}

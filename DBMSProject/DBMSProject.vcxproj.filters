@@ -38,6 +38,9 @@
     <ClInclude Include="row.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="dictionary.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
