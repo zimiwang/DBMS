@@ -348,45 +348,7 @@ public:
 							{
 								c.SetName("markedthisentryforlaterdeletion");
 							}
-						}
-					//}
-					//for (Column<string> c : r.strColumn)
-					//{
-					//	bool should_drop;
-					//	for (std::string s : nodropcols)
-					//	{
-					//		if (c.GetName() == s)
-					//		{
-					//			should_drop = false;
-					//		}
-					//		else
-					//		{
-					//			should_drop = true;
-					//		}
-					//	}
-					//	if (should_drop == true)
-					//	{
-					//		c.SetName("markedthisentryforlaterdeletion");
-					//	}
-					//}
-					//for (Column<char *> c : r.charColumn)
-					//{
-					//	bool should_drop;
-					//	for (std::string s : nodropcols)
-					//	{
-					//		if (c.GetName() == s)
-					//		{
-					//			should_drop = false;
-					//		}
-					//		else
-					//		{
-					//			should_drop = true;
-					//		}
-					//	}
-					//	if (should_drop == true)
-					//	{
-					//		c.SetName("markedthisentryforlaterdeletion");
-					//	}
+						}					
 					}
 
 				}
