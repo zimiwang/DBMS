@@ -145,9 +145,11 @@ Use where clause to select a row.
     select */[Column Name] from [Table Name] where [Column Name] = [Existing Value];
     
 Use where clause to join two tables.
+
     select */[Column Name] from [Table1,Table2] where [Table1].[Column]=[Table2].[Column]
     
 Use join clause to join two tables.
+
     select */[Column Name] from [Table1] join [Table2] on [Column1]=[Column2]
 
 Note: If you type a nonexistent column, the table will give a wrong feedback.  
