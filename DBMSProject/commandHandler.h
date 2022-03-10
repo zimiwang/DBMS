@@ -785,6 +785,8 @@ public:
 		std::cout << "DROP TABLE [NAME] 	- Creates a table in the current database." << std::endl;
 		std::cout << "DROP DATABASE [NAME]		- Check if the database exists and drop it." << std::endl;
 		std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl;
+		std::cout << "JOIN		- Used to select from a joined table." << std::endl;
+		std::cout << "WHERE		- Used to select from a table joined on a specified column." << std::endl;
 		std::cout << "UPDATE TABLE 		- Updates the single column and meta or multiple columns and meta for the given table." << std::endl;
 		std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl;
 		std::cout << "INSERT INTO 		- Inserts the data into the table. (In Testing))" << std::endl;
