@@ -399,13 +399,8 @@ public:
 					if (tree.IsPrimaryKey(column)) {
 						// search table
 						if (Utils::contains(cmd, "between")) {
-							// get range values
-							string value1 = Utils::get_string_between_two_strings(cmd, "between", "and");
-							string value2 = Utils::get_string_between_two_strings(cmd, "and", ";");
-							// use range between PK
-							vector<Row> rows = tree.searchMultiple(stoi(value1), stoi(value2));
-							rows[0].PrintFullTable(rows, cols);
-							// or use secondary index
+							SearchOnJoin(tree, cols);
+													
 							
 							// else use all columns 
 
@@ -424,11 +419,53 @@ public:
 					}
 					// search based on sk
 					else if (tree.IsSecondaryKey(column)) {
-
+						if (Utils::contains(cmd, "between")) {
+							SearchOnJoin(tree, cols);
+						}
 					}
 					// full searh
 					else {
+						vector<Row> rows = tree.getFullTable();
+						// get the column type and name
+						string colName = clauses.GetValuesByKey("where")[0];						
+						int type = rows[0].GetColumnType(colName);
 
+						// the value to use to get the row
+						string valueToCompare = clauses.GetValuesByKey("where")[2];
+						vector<Row> rowsFound;
+						bool shouldPrint = true;
+						for (Row row : rows) {
+							if (type == -1) {
+								shouldPrint = false;							
+							}
+							else if (type == 0) {
+								Column<string> col = row.GetStringColumnByName(colName);
+								// check if column value matches
+								if (col.GetValue() == valueToCompare) {
+									// print row
+									rowsFound.push_back(row);
+								}
+							}
+							else if (type == 1) {
+								Column<int> col = row.GetIntColumnByName(colName);
+								if (to_string(col.GetValue()) == valueToCompare) {
+									rowsFound.push_back(row);
+								}
+							}
+							else if (type == 2) {
+								Column<char*> col = row.GetCharColumnByName(colName);
+								if (string(col.GetValue()) == valueToCompare) {
+									rowsFound.push_back(row);
+								}
+							}
+						}
+						// print all of the rows found with the given conditions
+						if (shouldPrint) {
+							rowsFound[0].PrintFullTable(rowsFound, cols);
+						}
+						else {
+							cout << "Could not find the row" << endl;
+						}
 					}
 					
 				}
@@ -446,6 +483,15 @@ public:
 		return 1;
 	}
 
+
+	void SearchOnJoin(BPTree tree, vector<string> cols) {
+		// get range values
+		string value1 = Utils::get_string_between_two_strings(cmd, "between", "and");
+		string value2 = Utils::get_string_between_two_strings(cmd, "and", ";");
+		// use range between PK
+		vector<Row> rows = tree.searchMultiple(stoi(value1), stoi(value2));
+		rows[0].PrintFullTable(rows, cols);
+	}
 
 
 	/// <summary>

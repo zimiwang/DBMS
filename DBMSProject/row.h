@@ -263,6 +263,112 @@ public:
 		return empty;
 	}
 
+
+	/// <summary>
+	/// Gets the column of type char* by its name
+	/// </summary>
+	/// <param name="name">The name of the column</param>
+	/// <returns></returns>
+	Column<char*> GetCharColumnByName(string name) {
+		// check to see if columns is not empty
+		if (charColumn.empty()) {
+			cout << "The Column<char> is empty for given row." << endl;
+		}
+		else {
+			for (Column<char*> col : charColumn) {
+				if (col.GetName() == name) {
+					return col;
+				}
+			}
+			cout << "Could not find the column '" << name << "'." << endl;
+		}
+	}
+
+	/// <summary>
+	/// Gets the column of type int by its name
+	/// </summary>
+	/// <param name="name">The name of the column</param>
+	/// <returns></returns>
+	Column<int> GetIntColumnByName(string name) {
+		// check to see if columns is not empty
+		if (intColumn.empty()) {
+			cout << "The Column<int> is empty for given row." << endl;
+		}
+		else {
+			for (Column<int> col : intColumn) {
+				if (col.GetName() == name) {
+					return col;
+				}
+			}
+			cout << "Could not find the column '" << name << "'." << endl;
+		}
+	}
+
+	/// <summary>
+	/// Gets the column of type string by its name
+	/// </summary>
+	/// <param name="name">The name of the column</param>
+	/// <returns>The column with the specified name</returns>
+	Column<string> GetStringColumnByName(string name) {
+		// check to see if columns is not empty
+		if (strColumn.empty()) {
+			cout << "The Column<string> is empty for given row." << endl;
+		}
+		else {
+			for (Column<string> col : strColumn) {
+				if (col.GetName() == name) {
+					return col;
+				}
+			}
+			cout << "Could not find the column '" << name << "'." << endl;
+		}
+	}
+
+	/// <summary>
+	/// Returns the type of a column
+	/// 0 - Means string
+	/// 1 - Means int
+	/// 2 - Means char
+	/// </summary>
+	/// <param name="">The name of the column</param>
+	/// <returns></returns>
+	int GetColumnType(string name) {
+		int type = -1;
+		bool Continue = true;
+		// Go through the rows columns 
+		for (Column<int> i : intColumn) {
+			// Got through the incoming columns
+			if (i.GetName() == name) {
+				type = 1;
+				Continue = false;
+				break;
+			}
+		}
+
+		if (Continue) {
+			// The same as above
+			for (Column<string> i : strColumn) {
+				if (i.GetName() == name) {
+					type = 0;
+					Continue = false;
+					break;
+				}
+			}
+		}
+
+		if (Continue) {
+			// The same as above
+			for (Column<char*> i : charColumn) {
+				if (i.GetName() == name) {
+					type = 2;
+					break;
+				}
+			}
+		}
+
+		return type;
+	}
+
 	/// <summary>
 	/// Gets the largest value out of all the columns
 	/// </summary>
