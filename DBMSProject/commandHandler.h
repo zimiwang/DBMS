@@ -6,6 +6,8 @@
 #pragma once
 #include "database.h"
 #include <string>
+#include <sstream>
+#include <iostream>
 
 using namespace std;
 
@@ -283,7 +285,7 @@ public:
 		try {
 			BPTree tree;
 			// check for join
-			
+			bool skipmainprint = false;
 			// use if there is a join
 			if (Utils::contains(cmd, "join")) {
 				std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
@@ -310,7 +312,6 @@ public:
 				std::vector<std::string> nodropcols = Parser::get_select_columns(cmd);
 				nodropcols.push_back(fkey);
 
-
 				for (Row r : t.newrows)
 				{
 					/*Row* rpoint = &r;*/
@@ -329,26 +330,6 @@ public:
 							}
 
 						}
-						else
-						{
-							//check to see if we need to delete this column entry
-							bool should_drop;
-							for (std::string s : nodropcols)
-							{
-								if (c.GetName() == s)
-								{
-									should_drop = false;
-								}
-								else
-								{
-									should_drop = true;
-								}
-							}
-							if (should_drop == true)
-							{
-								c.SetName("markedthisentryforlaterdeletion");
-							}
-						}					
 					}
 
 				}
@@ -357,6 +338,77 @@ public:
 
 				cout << "Joined: " << src_table <<" with " << dest_table << " as " << t.table_name << endl;
 
+			}
+			else if (Utils::contains(cmd, "where"))
+			{
+				//check to see if this is a multitable operation
+				string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
+				if (Utils::contains(cmd, ","))
+				{
+					std::vector<string> tables = Utils::split(tbl_name, ",");
+					string table1 = tables[0];
+					string table2 = tables[1];
+
+					string fkey = Utils::get_string_between_two_strings(cmd, "where ", ";");
+					std::vector<std::string> splitkeys;
+
+					char* token = strtok(const_cast<char*>(fkey.c_str()), "=");
+					while (token != nullptr)
+					{
+						splitkeys.push_back(std::string(token));
+						token = strtok(nullptr, "=");
+					}
+					string localkey = splitkeys[0];
+					string foreignkey = splitkeys[1];
+
+					std::vector<string> tab1namecol = Utils::split(localkey, ".");
+					std::vector<string> tab2namecol = Utils::split(foreignkey, ".");
+
+					if (tab1namecol[0] == table1 && tab2namecol[0] == table2)  //todo - look into error handling for this
+					{
+						Table t = db->join_table(table1, table2, tab1namecol[1], tab2namecol[1]);
+						// index the new table
+						BPTree newPrimaryKeyIndex;
+						newPrimaryKeyIndex.Name = t.table_name;
+
+						std::vector<std::string> nodropcols = Parser::get_select_columns(cmd);
+						nodropcols.push_back(fkey);
+
+
+						for (Row r : t.newrows)
+						{
+							/*Row* rpoint = &r;*/
+							r.InUse();
+							for (Column<int> c : r.intColumn)
+							{
+								//check to see if the colname is the primary key
+								if (c.GetName() == t.primaryKeyName)
+								{
+									//index based on the value here
+									newPrimaryKeyIndex.insert(c.GetValue(), r);
+
+									// set primary key
+									if (!newPrimaryKeyIndex.HasPrimaryKey()) {
+										newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
+									}
+
+								}
+							}
+
+						}
+						tree = newPrimaryKeyIndex;
+						t.primaryKeyTree = newPrimaryKeyIndex;
+
+						cout << "Joined: " << table1 << " with " << table2 << " as " << t.table_name << endl;
+						std::vector<std::string> cols = Parser::get_select_columns(cmd);
+						cols = Utils::trimColumns(cols);
+						vector<Row> rows = tree.getFullTable();
+						rows[0].PrintFullTable(rows, cols);
+						skipmainprint = true;
+					}
+
+				}
+				//else carry on
 			}
 			else if (Utils::contains(cmd, "between")) {
 				string tbl_name = Parser::get_table_name(cmd, "from", "where");
@@ -384,16 +436,18 @@ public:
 				cmd = Utils::remove_char(cmd, ';');
 				Dictionary clauses = Parser::get_where_clause(cmd);
 
-				// decide to print whole table or search table
-				if (where_clause.empty()) {										
+				if (skipmainprint == false)
+				{
+					// decide to print whole table or search table
+					if (where_clause.empty()) {
 
-					// print whole table
-					vector<Row> rows = tree.getFullTable();
-					rows[0].PrintFullTable(rows, cols);
-				}
-				else {			
-					// decide to use search based on pk, sk, or full search
-					string column = clauses.GetValuesByKey("where")[0];					
+						// print whole table
+						vector<Row> rows = tree.getFullTable();
+						rows[0].PrintFullTable(rows, cols);
+					}
+					else {
+						// decide to use search based on pk, sk, or full search
+						string column = clauses.GetValuesByKey("where")[0];
 
 					// search based on pk
 					if (tree.IsPrimaryKey(column)) {
@@ -404,17 +458,17 @@ public:
 							
 							// else use all columns 
 
-						}
-						else {
-							string pk = clauses.GetValuesByKey("where")[2];
-							Row row = tree.search(stoi(pk));						
-							if (!row.isEmpty()) {
-								row.PrintRow(cols, row.GetLargestColumnSize());
 							}
 							else {
-								cout << "Could not find row" << endl;
+								string pk = clauses.GetValuesByKey("where")[2];
+								Row row = tree.search(stoi(pk));
+								if (!row.isEmpty()) {
+									row.PrintRow(cols, row.GetLargestColumnSize());
+								}
+								else {
+									cout << "Could not find row" << endl;
+								}
 							}
-						}
 
 					}
 					// search based on sk
@@ -775,6 +829,8 @@ public:
 		std::cout << "DROP TABLE [NAME] 	- Creates a table in the current database." << std::endl;
 		std::cout << "DROP DATABASE [NAME]		- Check if the database exists and drop it." << std::endl;
 		std::cout << "SELECT [] FROM [] 	- Selects the specified columns from the table." << std::endl;
+		std::cout << "JOIN		- Used to select from a joined table." << std::endl;
+		std::cout << "WHERE		- Used to select from a table joined on a specified column." << std::endl;
 		std::cout << "UPDATE TABLE 		- Updates the single column and meta or multiple columns and meta for the given table." << std::endl;
 		std::cout << "DELETE FROM 		- Deletes the sepcified data from the table." << std::endl;
 		std::cout << "INSERT INTO 		- Inserts the data into the table. (In Testing))" << std::endl;
