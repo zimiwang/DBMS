@@ -291,7 +291,7 @@ public:
 				std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
 				std::string dest_table = Utils::get_string_between_two_strings(cmd, "join ", " on");
 				//std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
-				
+
 				string fkey = Parser::get_foreign_key(cmd);
 				std::vector<std::string> splitkeys;
 
@@ -333,10 +333,10 @@ public:
 					}
 
 				}
-				tree = newPrimaryKeyIndex;				
+				tree = newPrimaryKeyIndex;
 				t.primaryKeyTree = newPrimaryKeyIndex;
 
-				cout << "Joined: " << src_table <<" with " << dest_table << " as " << t.table_name << endl;
+				cout << "Joined: " << src_table << " with " << dest_table << " as " << t.table_name << endl;
 
 			}
 			else if (Utils::contains(cmd, "where"))
@@ -413,7 +413,7 @@ public:
 			else if (Utils::contains(cmd, "between")) {
 				string tbl_name = Parser::get_table_name(cmd, "from", "where");
 				tree = db->get_tree(tbl_name);
-		
+
 			}
 			else {
 				// use if there is no join
@@ -425,12 +425,12 @@ public:
 			}
 
 
-			if (tree.Name.length() > 0)				
-			{				
+			if (tree.Name.length() > 0)
+			{
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
 				cols = Utils::trimColumns(cols);
 
-				std::string conditional = Parser::get_conditional(cmd);				
+				std::string conditional = Parser::get_conditional(cmd);
 
 				std::vector<std::string> where_clause = Parser::get_where_clause(cmd, conditional);
 				cmd = Utils::remove_char(cmd, ';');
@@ -449,15 +449,11 @@ public:
 						// decide to use search based on pk, sk, or full search
 						string column = clauses.GetValuesByKey("where")[0];
 
-					// search based on pk
-					if (tree.IsPrimaryKey(column)) {
-						// search table
-						if (Utils::contains(cmd, "between")) {
-							SearchOnJoin(tree, cols);
-													
-							
-							// else use all columns 
-
+						// search based on pk
+						if (tree.IsPrimaryKey(column)) {
+							// search table
+							if (Utils::contains(cmd, "between")) {
+								SearchOnRange(tree, cols);
 							}
 							else {
 								string pk = clauses.GetValuesByKey("where")[2];
@@ -470,75 +466,89 @@ public:
 								}
 							}
 
-					}
-					// search based on sk
-					else if (tree.IsSecondaryKey(column)) {
-						if (Utils::contains(cmd, "between")) {
-							SearchOnJoin(tree, cols);
 						}
-					}
-					// full searh
-					else {
-						vector<Row> rows = tree.getFullTable();
-						// get the column type and name
-						string colName = clauses.GetValuesByKey("where")[0];						
-						int type = rows[0].GetColumnType(colName);
-
-						// the value to use to get the row
-						string valueToCompare = clauses.GetValuesByKey("where")[2];
-						vector<Row> rowsFound;
-						bool shouldPrint = true;
-						for (Row row : rows) {
-							if (type == -1) {
-								shouldPrint = false;							
-							}
-							else if (type == 0) {
-								Column<string> col = row.GetStringColumnByName(colName);
-								// check if column value matches
-								if (col.GetValue() == valueToCompare) {
-									// print row
-									rowsFound.push_back(row);
-								}
-							}
-							else if (type == 1) {
-								Column<int> col = row.GetIntColumnByName(colName);
-								if (to_string(col.GetValue()) == valueToCompare) {
-									rowsFound.push_back(row);
-								}
-							}
-							else if (type == 2) {
-								Column<char*> col = row.GetCharColumnByName(colName);
-								if (string(col.GetValue()) == valueToCompare) {
-									rowsFound.push_back(row);
-								}
+						// search based on sk
+						else if (tree.IsSecondaryKey(column)) {
+							if (Utils::contains(cmd, "between")) {
+								SearchOnRange(tree, cols);
 							}
 						}
-						// print all of the rows found with the given conditions
-						if (shouldPrint) {
-							rowsFound[0].PrintFullTable(rowsFound, cols);
-						}
+						// full searh
 						else {
-							cout << "Could not find the row" << endl;
+							FullSearch(tree, clauses, cols);
 						}
+
 					}
-					
 				}
-				
-			}
-			else
-			{
-				std::cout << "Table does not exist." << std::endl;
+				else
+				{
+					std::cout << "Table does not exist." << std::endl;
+				}
 			}
 		}
-		catch (const std::exception&)
+		catch (const std::exception& e)
 		{
 			cout << "An error occured while trying to select a table" << endl;
 		}
 		return 1;
 	}
 
+	/// <summary>
+	/// Searches through all the tables instead of using a tree
+	/// </summary>
+	/// <param name="tree">The primary tree table to get all the rows</param>
+	/// <param name="clauses"></param>
+	/// <param name="cols"></param>
+	void FullSearch(BPTree tree, Dictionary clauses, vector<string> cols) {
+		vector<Row> rows = tree.getFullTable();
+		// get the column type and name
+		string colName = clauses.GetValuesByKey("where")[0];
+		int type = rows[0].GetColumnType(colName);
 
-	void SearchOnJoin(BPTree tree, vector<string> cols) {
+		// the value to use to get the row
+		string valueToCompare = clauses.GetValuesByKey("where")[2];
+		vector<Row> rowsFound;
+		bool shouldPrint = true;
+		for (Row row : rows) {
+			if (type == -1) {
+				shouldPrint = false;
+			}
+			else if (type == 0) {
+				Column<string> col = row.GetStringColumnByName(colName);
+				// check if column value matches
+				if (col.GetValue() == valueToCompare) {
+					// print row
+					rowsFound.push_back(row);
+				}
+			}
+			else if (type == 1) {
+				Column<int> col = row.GetIntColumnByName(colName);
+				if (to_string(col.GetValue()) == valueToCompare) {
+					rowsFound.push_back(row);
+				}
+			}
+			else if (type == 2) {
+				Column<char*> col = row.GetCharColumnByName(colName);
+				if (string(col.GetValue()) == valueToCompare) {
+					rowsFound.push_back(row);
+				}
+			}
+		}
+		// print all of the rows found with the given conditions
+		if (shouldPrint) {
+			rowsFound[0].PrintFullTable(rowsFound, cols);
+		}
+		else {
+			cout << "Could not find the row" << endl;
+		}
+	}
+
+	/// <summary>
+	/// Searches through a range of values
+	/// </summary>
+	/// <param name="tree"></param>
+	/// <param name="cols"></param>
+	void SearchOnRange(BPTree tree, vector<string> cols) {
 		// get range values
 		string value1 = Utils::get_string_between_two_strings(cmd, "between", "and");
 		string value2 = Utils::get_string_between_two_strings(cmd, "and", ";");
