@@ -409,21 +409,21 @@ public:
 
 				}
 				//else carry on
-			}
-			else if (Utils::contains(cmd, "between")) {
-				string tbl_name = Parser::get_table_name(cmd, "from", "where");
-				tree = db->get_tree(tbl_name);
 
-			}
-			else {
-				// use if there is no join
-				std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
-				cout << "Selecting from Table: " << tbl_name << endl;
+				else if (Utils::contains(cmd, "between")) {
+					string tbl_name = Parser::get_table_name(cmd, "from", "where");
+					tree = db->get_tree(tbl_name);
 
-				tbl_name = Utils::remove_char(tbl_name, ';');
-				tree = db->get_tree(tbl_name);
-			}
+				}
+				else {
+					// use if there is no join
+					std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
+					cout << "Selecting from Table: " << tbl_name << endl;
 
+					tbl_name = Utils::remove_char(tbl_name, ';');
+					tree = db->get_tree(tbl_name);
+				}
+			}
 
 			if (tree.Name.length() > 0)
 			{
