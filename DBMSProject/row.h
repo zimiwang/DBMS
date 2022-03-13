@@ -103,7 +103,7 @@ private:
 		}
 
 		// The same as above
-		for (Column<char*> i : charColumn) {
+		for (Column<char> i : charColumn) {
 			columns.push_back(i.GetName());
 		}
 
@@ -165,7 +165,7 @@ private:
 		}
 
 		// The same as above
-		for (Column<char*> i : charColumn) {
+		for (Column<char> i : charColumn) {
 			for (string col : columns) {
 				if (col == "*" || col == i.GetName()) {
 					totalColumnsFound++;
@@ -173,7 +173,10 @@ private:
 						PrintColumnName(i.GetName(), maxSize);
 					}
 					else {
-						PrintColumnValue(to_string(*i.GetValue()), maxSize);
+						string value;
+						char val = i.GetValue();
+						value = val;
+						PrintColumnValue(value, maxSize);
 					}
 				}
 			}
@@ -249,7 +252,7 @@ private:
 public:		
 	vector<Column<string>> strColumn;
 	vector<Column<int>> intColumn;
-	vector<Column<char*>> charColumn;		
+	vector<Column<char>> charColumn;		
 	
 	Row() {	
 		empty = true;	
@@ -269,13 +272,13 @@ public:
 	/// </summary>
 	/// <param name="name">The name of the column</param>
 	/// <returns></returns>
-	Column<char*> GetCharColumnByName(string name) {
+	Column<char> GetCharColumnByName(string name) {
 		// check to see if columns is not empty
 		if (charColumn.empty()) {
 			cout << "The Column<char> is empty for given row." << endl;
 		}
 		else {
-			for (Column<char*> col : charColumn) {
+			for (Column<char> col : charColumn) {
 				if (col.GetName() == name) {
 					return col;
 				}
@@ -358,7 +361,7 @@ public:
 
 		if (Continue) {
 			// The same as above
-			for (Column<char*> i : charColumn) {
+			for (Column<char> i : charColumn) {
 				if (i.GetName() == name) {
 					type = 2;
 					break;
@@ -392,7 +395,7 @@ public:
 			}
 		}
 		// char
-		for (Column<char*> i : charColumn) {
+		for (Column<char> i : charColumn) {
 			// convert to string and then check size
 			int temp = i.GetName().length();
 			if (temp > size) {
@@ -440,7 +443,7 @@ public:
 				total++;
 			}
 
-			for (Column<char*> i : charColumn) {
+			for (Column<char> i : charColumn) {
 				total++;
 			}
 		}

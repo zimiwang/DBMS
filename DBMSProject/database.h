@@ -15,6 +15,9 @@
 #include <cstring>
 #include<iostream>
 #include<string>
+
+using namespace std;
+
 class Database
 {
 private:
@@ -459,7 +462,7 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 									{
 										combinedRow.strColumn.push_back(loc);
 									}
-									for (Column<char*> loc : destrow.charColumn)
+									for (Column<char> loc : destrow.charColumn)
 									{
 										combinedRow.charColumn.push_back(loc);
 									}
@@ -695,11 +698,10 @@ void Database::insert_into(std::string statement, std::string table_name)
 	}
 
 	int cnt = 0;
-
+	
 	for (vector<string> row : values)
 	{
 		vector<string> temp;
-
 		for (int j = 0; j < order.size(); j++)
 		{
 			if (order[j] == -1)
@@ -842,11 +844,10 @@ void Database::updateRows()
 				}
 				else if (col.second == "char")
 				{
-					char* char_arr;
+					char char_arr;
 					string str_obj(rw[rowfind]);
-					char_arr = &str_obj[0];
-					cout << char_arr;
-					Column<char*> newcol = Column<char*>();
+					char_arr = str_obj[0];					
+					Column<char> newcol = Column<char>();
 					newcol.AddValue(char_arr);
 					newcol.SetName(col.first);
 					nrow.charColumn.push_back(newcol);

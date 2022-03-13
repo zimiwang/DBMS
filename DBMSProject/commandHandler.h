@@ -372,16 +372,16 @@ public:
 				string tbl_name = Parser::get_table_name(cmd, "from", "where");
 				tree = db->get_tree(tbl_name);
 
-			}
-			else {
-				// use if there is no join
-				std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
-				cout << "Selecting from Table: " << tbl_name << endl;
+				}
+				else {
+					// use if there is no join
+					std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
+					cout << "Selecting from Table: " << tbl_name << endl;
 
-				tbl_name = Utils::remove_char(tbl_name, ';');
-				tree = db->get_tree(tbl_name);
+					tbl_name = Utils::remove_char(tbl_name, ';');
+					tree = db->get_tree(tbl_name);
+				}
 			}
-
 
 			if (tree.Name.length() > 0)
 			{
@@ -486,8 +486,10 @@ public:
 				}
 			}
 			else if (type == 2) {
-				Column<char*> col = row.GetCharColumnByName(colName);
-				if (string(col.GetValue()) == valueToCompare) {
+				Column<char> col = row.GetCharColumnByName(colName);
+				string value;
+				value = col.GetValue();
+				if (value == valueToCompare) {
 					rowsFound.push_back(row);
 				}
 			}
