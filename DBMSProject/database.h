@@ -15,6 +15,9 @@
 #include <cstring>
 #include<iostream>
 #include<string>
+
+using namespace std;
+
 class Database
 {
 private:
@@ -695,11 +698,10 @@ void Database::insert_into(std::string statement, std::string table_name)
 	}
 
 	int cnt = 0;
-
+	
 	for (vector<string> row : values)
 	{
 		vector<string> temp;
-
 		for (int j = 0; j < order.size(); j++)
 		{
 			if (order[j] == -1)
