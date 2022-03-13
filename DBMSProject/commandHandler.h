@@ -528,8 +528,10 @@ public:
 				}
 			}
 			else if (type == 2) {
-				Column<char*> col = row.GetCharColumnByName(colName);
-				if (string(col.GetValue()) == valueToCompare) {
+				Column<char> col = row.GetCharColumnByName(colName);
+				string value;
+				value = col.GetValue();
+				if (value == valueToCompare) {
 					rowsFound.push_back(row);
 				}
 			}
