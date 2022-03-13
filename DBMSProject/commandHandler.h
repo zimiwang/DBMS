@@ -288,29 +288,13 @@ public:
 			bool skipmainprint = false;
 			// use if there is a join
 			if (Utils::contains(cmd, "join")) {
-				std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
-				std::string dest_table = Utils::get_string_between_two_strings(cmd, "join ", " on");
-				//std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
+				std::vector<string> joinparser = Parser::get_join_info(cmd);
 
-				string fkey = Parser::get_foreign_key(cmd);
-				std::vector<std::string> splitkeys;
+				Table t = db->join_table(joinparser[0], joinparser[1], joinparser[2], joinparser[3]);
 
-				char* token = strtok(const_cast<char*>(fkey.c_str()), "=");
-				while (token != nullptr)
-				{
-					splitkeys.push_back(std::string(token));
-					token = strtok(nullptr, "=");
-				}
-				string localkey = splitkeys[0];
-				string foreignkey = splitkeys[1];
-
-				Table t = db->join_table(src_table, dest_table, localkey, foreignkey);
 				// index the new table
 				BPTree newPrimaryKeyIndex;
 				newPrimaryKeyIndex.Name = t.table_name;
-
-				std::vector<std::string> nodropcols = Parser::get_select_columns(cmd);
-				nodropcols.push_back(fkey);
 
 				for (Row r : t.newrows)
 				{
@@ -336,7 +320,7 @@ public:
 				tree = newPrimaryKeyIndex;
 				t.primaryKeyTree = newPrimaryKeyIndex;
 
-				cout << "Joined: " << src_table << " with " << dest_table << " as " << t.table_name << endl;
+				cout << "Joined: " << joinparser[0] << " with " << joinparser[1] << " as " << t.table_name << endl;
 
 			}
 			else if (Utils::contains(cmd, "where"))
@@ -345,70 +329,44 @@ public:
 				string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
 				if (Utils::contains(cmd, ","))
 				{
-					std::vector<string> tables = Utils::split(tbl_name, ",");
-					string table1 = tables[0];
-					string table2 = tables[1];
+					std::vector<string> joinparser = Parser::get_join_where_info(cmd);
 
-					string fkey = Utils::get_string_between_two_strings(cmd, "where ", ";");
-					std::vector<std::string> splitkeys;
+					Table t = db->join_table(joinparser[0], joinparser[1], joinparser[2], joinparser[3]);
+					// index the new table
+					BPTree newPrimaryKeyIndex;
+					newPrimaryKeyIndex.Name = t.table_name;
 
-					char* token = strtok(const_cast<char*>(fkey.c_str()), "=");
-					while (token != nullptr)
+					for (Row r : t.newrows)
 					{
-						splitkeys.push_back(std::string(token));
-						token = strtok(nullptr, "=");
-					}
-					string localkey = splitkeys[0];
-					string foreignkey = splitkeys[1];
-
-					std::vector<string> tab1namecol = Utils::split(localkey, ".");
-					std::vector<string> tab2namecol = Utils::split(foreignkey, ".");
-
-					if (tab1namecol[0] == table1 && tab2namecol[0] == table2)  //todo - look into error handling for this
-					{
-						Table t = db->join_table(table1, table2, tab1namecol[1], tab2namecol[1]);
-						// index the new table
-						BPTree newPrimaryKeyIndex;
-						newPrimaryKeyIndex.Name = t.table_name;
-
-						std::vector<std::string> nodropcols = Parser::get_select_columns(cmd);
-						nodropcols.push_back(fkey);
-
-
-						for (Row r : t.newrows)
+						/*Row* rpoint = &r;*/
+						r.InUse();
+						for (Column<int> c : r.intColumn)
 						{
-							/*Row* rpoint = &r;*/
-							r.InUse();
-							for (Column<int> c : r.intColumn)
+							//check to see if the colname is the primary key
+							if (c.GetName() == t.primaryKeyName)
 							{
-								//check to see if the colname is the primary key
-								if (c.GetName() == t.primaryKeyName)
-								{
-									//index based on the value here
-									newPrimaryKeyIndex.insert(c.GetValue(), r);
+								//index based on the value here
+								newPrimaryKeyIndex.insert(c.GetValue(), r);
 
-									// set primary key
-									if (!newPrimaryKeyIndex.HasPrimaryKey()) {
-										newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
-									}
-
+								// set primary key
+								if (!newPrimaryKeyIndex.HasPrimaryKey()) {
+									newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
 								}
+
 							}
+						}
 
 						}
 						tree = newPrimaryKeyIndex;
 						t.primaryKeyTree = newPrimaryKeyIndex;
 
-						cout << "Joined: " << table1 << " with " << table2 << " as " << t.table_name << endl;
+						cout << "Joined: " << joinparser[0] << " with " << joinparser[1] << " as " << t.table_name << endl;
 						std::vector<std::string> cols = Parser::get_select_columns(cmd);
 						cols = Utils::trimColumns(cols);
 						vector<Row> rows = tree.getFullTable();
 						rows[0].PrintFullTable(rows, cols);
 						skipmainprint = true;
 					}
-
-				}
-				//else carry on
 			}
 			else if (Utils::contains(cmd, "between")) {
 				string tbl_name = Parser::get_table_name(cmd, "from", "where");

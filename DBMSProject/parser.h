@@ -36,6 +36,8 @@ public:
 	string static get_table_name(string cmd);
 	string static get_foreign_key(string cmd);
 	vector<vector<string>> static get_update_clauses(string cmd);
+	vector<string> static get_join_info(string cmd);
+	vector<string> static get_join_where_info(string cmd);
 };
 
 /// Converts a string to lower
@@ -151,6 +153,66 @@ vector<vector<string>> Parser::get_update_clauses(string cmd) {
 	}
 
 	return ret;
+}
+
+inline vector<string> Parser::get_join_info(string cmd)
+{
+	vector<string> ret;
+	std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
+	std::string dest_table = Utils::get_string_between_two_strings(cmd, "join ", " on");
+	//std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
+
+	string fkey = Parser::get_foreign_key(cmd);
+	std::vector<std::string> splitkeys;
+
+	char* token = strtok(const_cast<char*>(fkey.c_str()), "=");
+	while (token != nullptr)
+	{
+		splitkeys.push_back(std::string(token));
+		token = strtok(nullptr, "=");
+	}
+	string localkey = splitkeys[0];
+	string foreignkey = splitkeys[1];
+
+	ret.push_back(src_table);
+	ret.push_back(dest_table);
+	ret.push_back(localkey);
+	ret.push_back(foreignkey);
+
+	return ret;
+
+}
+
+inline vector<string> Parser::get_join_where_info(string cmd)
+{
+	string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
+	vector<string> ret;
+	std::vector<string> tables = Utils::split(tbl_name, ",");
+	string table1 = tables[0];
+	string table2 = tables[1];
+
+	string fkey = Utils::get_string_between_two_strings(cmd, "where ", ";");
+	std::vector<std::string> splitkeys;
+
+	char* token = strtok(const_cast<char*>(fkey.c_str()), "=");
+	while (token != nullptr)
+	{
+		splitkeys.push_back(std::string(token));
+		token = strtok(nullptr, "=");
+	}
+	string localkey = splitkeys[0];
+	string foreignkey = splitkeys[1];
+
+	std::vector<string> tab1namecol = Utils::split(localkey, ".");
+	std::vector<string> tab2namecol = Utils::split(foreignkey, ".");
+
+	ret.push_back(tab1namecol[0]);
+	ret.push_back(tab2namecol[0]);
+	ret.push_back(tab1namecol[1]);
+	ret.push_back(tab2namecol[1]);
+
+	return ret;
+
 }
 
 string Parser::get_foreign_key(string cmd) {
