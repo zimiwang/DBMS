@@ -22,6 +22,7 @@ public:
 	/// <returns></returns>
 	int userVerification(std::string username, std::string password) {
 
+		// Load the users.txt file
 		std::ifstream read("../users.txt");
 
 		if (read)
@@ -30,6 +31,7 @@ public:
 
 			std::string u, p;
 
+			// Print after login successfully
 			while (read >> u >> p)
 			{
 				if (u == username && p == password) {
@@ -116,6 +118,7 @@ public:
 
 		if (read)
 		{
+			// Find if there is a username with the same name
 			while (std::getline(read, line)) {
 
 				std::size_t found = line.find(username + " ");
@@ -140,6 +143,7 @@ public:
 		}
 		read.close();
 
+		//  Write the new username and password to the .txt file
 		std::ofstream userFile;
 		userFile.open("../users.txt", std::ios::app);
 
@@ -173,6 +177,7 @@ public:
 		std::cout << "Please enter password: ";
 		password = passwordStar();
 
+		// Default administrator account username and password
 		if (username == "admit" && password == "isu4488")
 		{
 			int back = 0;
@@ -242,6 +247,7 @@ public:
 
 		if (read)
 		{
+			// Find if there is a user with the same username as the entered username, and save only other users except the entered username
 			while (std::getline(read, line)) {
 
 				std::istringstream is(line);
@@ -260,6 +266,7 @@ public:
 
 		read.close();
 
+		// Delete user if user exists
 		if (isExist)
 		{
 			std::ofstream os("../users.txt");
@@ -303,6 +310,7 @@ public:
 
 		if (read)
 		{
+			// Find if the entered username exists and save the new password
 			while (std::getline(read, line))
 			{
 				std::istringstream is(line);
@@ -329,6 +337,7 @@ public:
 			}
 		}
 
+		// If the user exists, save the new password to the .txt file
 		if (isExist)
 		{
 			read.close();
@@ -366,6 +375,7 @@ public:
 
 		while ((ch = _getch()) != 13)
 		{
+			// Delete the key, it will back the input by one space
 			if (ch == 8)
 			{
 				if (!password.empty())
@@ -377,6 +387,7 @@ public:
 				}
 			}
 
+			// Click the TAB key, the entered password will be displayed, and if you click it again, the asterisk will be displayed again
 			else if (ch == 9) {
 
 				if (!password.empty())
@@ -411,6 +422,7 @@ public:
 				}
 			}
 
+			// If click SHIFT, CAPS, CTRL and ALT, then continue
 			else if (ch == 16 || ch == 17 || ch == 18 || ch == 20) {
 				continue;
 			}
