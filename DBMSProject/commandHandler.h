@@ -287,7 +287,8 @@ public:
 			// check for join
 			bool skipmainprint = false;
 			// use if there is a join
-			if (Utils::contains(cmd, "join")) {
+			if (Utils::contains(cmd, "join"))
+			{
 				std::vector<string> joinparser = Parser::get_join_info(cmd);
 
 				Table t = db->join_table(joinparser[0], joinparser[1], joinparser[2], joinparser[3]);
@@ -326,8 +327,7 @@ public:
 			else if (Utils::contains(cmd, "where"))
 			{
 				//check to see if this is a multitable operation
-				string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
-				if (Utils::contains(cmd, ","))
+				if (Utils::contains(Utils::get_string_between_two_strings(cmd, "from ", " where"), ","))
 				{
 					std::vector<string> joinparser = Parser::get_join_where_info(cmd);
 
@@ -356,33 +356,31 @@ public:
 							}
 						}
 
-						}
-						tree = newPrimaryKeyIndex;
-						t.primaryKeyTree = newPrimaryKeyIndex;
-
-						cout << "Joined: " << joinparser[0] << " with " << joinparser[1] << " as " << t.table_name << endl;
-						std::vector<std::string> cols = Parser::get_select_columns(cmd);
-						cols = Utils::trimColumns(cols);
-						vector<Row> rows = tree.getFullTable();
-						rows[0].PrintFullTable(rows, cols);
-						skipmainprint = true;
 					}
+					tree = newPrimaryKeyIndex;
+					t.primaryKeyTree = newPrimaryKeyIndex;
+
+					cout << "Joined: " << joinparser[0] << " with " << joinparser[1] << " as " << t.table_name << endl;
+					std::vector<std::string> cols = Parser::get_select_columns(cmd);
+					cols = Utils::trimColumns(cols);
+					vector<Row> rows = tree.getFullTable();
+					rows[0].PrintFullTable(rows, cols);
+					skipmainprint = true;
+				}
 			}
 			else if (Utils::contains(cmd, "between")) {
 				string tbl_name = Parser::get_table_name(cmd, "from", "where");
 				tree = db->get_tree(tbl_name);
 
-				}
-				else {
-					// use if there is no join
-					std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
-					cout << "Selecting from Table: " << tbl_name << endl;
-
-					tbl_name = Utils::remove_char(tbl_name, ';');
-					tree = db->get_tree(tbl_name);
-				}
 			}
+			else {
+				// use if there is no join
+				std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
+				cout << "Selecting from Table: " << tbl_name << endl;
 
+				tbl_name = Utils::remove_char(tbl_name, ';');
+				tree = db->get_tree(tbl_name);
+			}
 			if (tree.Name.length() > 0)
 			{
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
@@ -437,6 +435,7 @@ public:
 						}
 
 					}
+
 				}
 				else
 				{
