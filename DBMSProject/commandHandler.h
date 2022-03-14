@@ -269,7 +269,41 @@ public:
 		return 1;
 	}
 
+	/// <summary>
+	/// Indexes the table passed in to it, returns the B+ tree associated with the table.
+	/// </summary>
+	/// <param name="t">The table you want to index.</param>
+	/// <returns>B+ Tree for the table.</returns>
+	BPTree index_join(Table t)
+	{
+		// index the new table
+		BPTree newPrimaryKeyIndex;
+		newPrimaryKeyIndex.Name = t.table_name;
 
+		for (Row r : t.newrows)
+		{
+			/*Row* rpoint = &r;*/
+			r.InUse();
+			for (Column<int> c : r.intColumn)
+			{
+				//check to see if the colname is the primary key
+				if (c.GetName() == t.primaryKeyName)
+				{
+					//index based on the value here
+					newPrimaryKeyIndex.insert(c.GetValue(), r);
+
+					// set primary key
+					if (!newPrimaryKeyIndex.HasPrimaryKey()) {
+						newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
+					}
+
+				}
+			}
+
+		}
+		t.primaryKeyTree = newPrimaryKeyIndex;
+		return newPrimaryKeyIndex;
+	}
 
 	/// <summary>
 	/// command handler: handler for when "select" is in the command
@@ -292,34 +326,7 @@ public:
 				std::vector<string> joinparser = Parser::get_join_info(cmd);
 
 				Table t = db->join_table(joinparser[0], joinparser[1], joinparser[2], joinparser[3]);
-
-				// index the new table
-				BPTree newPrimaryKeyIndex;
-				newPrimaryKeyIndex.Name = t.table_name;
-
-				for (Row r : t.newrows)
-				{
-					/*Row* rpoint = &r;*/
-					r.InUse();
-					for (Column<int> c : r.intColumn)
-					{
-						//check to see if the colname is the primary key
-						if (c.GetName() == t.primaryKeyName)
-						{
-							//index based on the value here
-							newPrimaryKeyIndex.insert(c.GetValue(), r);
-
-							// set primary key
-							if (!newPrimaryKeyIndex.HasPrimaryKey()) {
-								newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
-							}
-
-						}
-					}
-
-				}
-				tree = newPrimaryKeyIndex;
-				t.primaryKeyTree = newPrimaryKeyIndex;
+				tree = index_join(t);
 
 				cout << "Joined: " << joinparser[0] << " with " << joinparser[1] << " as " << t.table_name << endl;
 
@@ -333,32 +340,7 @@ public:
 
 					Table t = db->join_table(joinparser[0], joinparser[1], joinparser[2], joinparser[3]);
 					// index the new table
-					BPTree newPrimaryKeyIndex;
-					newPrimaryKeyIndex.Name = t.table_name;
-
-					for (Row r : t.newrows)
-					{
-						/*Row* rpoint = &r;*/
-						r.InUse();
-						for (Column<int> c : r.intColumn)
-						{
-							//check to see if the colname is the primary key
-							if (c.GetName() == t.primaryKeyName)
-							{
-								//index based on the value here
-								newPrimaryKeyIndex.insert(c.GetValue(), r);
-
-								// set primary key
-								if (!newPrimaryKeyIndex.HasPrimaryKey()) {
-									newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
-								}
-
-							}
-						}
-
-					}
-					tree = newPrimaryKeyIndex;
-					t.primaryKeyTree = newPrimaryKeyIndex;
+					tree = index_join(t);
 
 					cout << "Joined: " << joinparser[0] << " with " << joinparser[1] << " as " << t.table_name << endl;
 					std::vector<std::string> cols = Parser::get_select_columns(cmd);

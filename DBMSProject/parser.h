@@ -155,6 +155,11 @@ vector<vector<string>> Parser::get_update_clauses(string cmd) {
 	return ret;
 }
 
+/// <summary>
+/// Parses command for necessary info to perform a join on operation
+/// </summary>
+/// <param name="cmd">of form "select * from table1 join table2 on table1col=table2col"</param>
+/// <returns>string vector of form [table1, table2, table1col, table2col]</returns>
 inline vector<string> Parser::get_join_info(string cmd)
 {
 	vector<string> ret;
@@ -183,6 +188,11 @@ inline vector<string> Parser::get_join_info(string cmd)
 
 }
 
+/// <summary>
+/// Parses command for necessary info to perform a join using the where clause
+/// </summary>
+/// <param name="cmd">of form "select * from table1,table2 where table1.table1col=table2.table2col"</param>
+/// <returns>string vector of form [table1, table2, table1col, table2col]</returns>
 inline vector<string> Parser::get_join_where_info(string cmd)
 {
 	string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
