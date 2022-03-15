@@ -109,7 +109,7 @@ int main() {
 int main(int argc, char** argv)
 {
 	// The user login interface has been commented out; if you want to use it, delete the comments
-	//login_interface();
+	login_interface();
 
 	setup_intro();
 
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
 
 		// if there are no inputs, then use the stdin for user control
 		if ( argc == 1 )
-		{
+		{			
 			std::getline(std::cin, cmd);
 		}
 		// if there are inputs, use the argc[] string array for inputs
@@ -318,10 +318,11 @@ void login_interface() {
 		std::cout << "Please enter a number for your choice. \n";
 
 		std::cin >> option;
+	/*	std::getline(std::cin, op);
+		int option = stoi(op);*/
 
 		switch (option)
 		{
-
 		case 1:
 			isRun = log.userLogin();
 			break;
