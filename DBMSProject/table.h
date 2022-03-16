@@ -38,7 +38,7 @@ public:
 	std::vector<Row> newrows;
 
 	BPTree primaryKeyTree;
-
+	bool wasCreated = true;
 	/// Counter for row ID
 	int ID_count = 0;
 
@@ -108,6 +108,7 @@ public:
 			{
 				std::cout << "Invalid format " << std::endl;
 				isCreate = false;
+				wasCreated = false;
 				break;
 			}
 		}
@@ -116,7 +117,7 @@ public:
 			if (hasID == false) //We have no ID column defined by the user, manually add one
 			{
 				columns.insert(std::pair<std::string, std::string>(("ID_" + name), "int"));
-			}
+			}		
 		}
 
 	}

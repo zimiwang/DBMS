@@ -534,9 +534,13 @@ public:
 		table_name = Parser::get_table_name(cmd, "table", "(");
 		vector<string> cols = Parser::get_create_columns(cmd);
 		Table* tbl = new Table(table_name, cols);
-
-		// add the table
-		db->AddTable(*tbl);
+		if (tbl->wasCreated) {
+			// add the table
+			db->AddTable(*tbl);
+		}
+		else {
+			cout << "Did not create Table" << endl;
+		}
 		return 1;
 	}
 
