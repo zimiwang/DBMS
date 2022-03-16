@@ -53,7 +53,7 @@ public:
 
 					system("cls");
 					std::cin.clear();
-
+					std::cin.ignore(10000, '\n');
 					accountFound = 1;
 					break;
 				}
