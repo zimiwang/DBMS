@@ -318,10 +318,26 @@ public:
 		// Parses the select command
 		try {
 			BPTree tree;
+			
 			// check for join
 			bool skipmainprint = false;
+			
+			// check for sum() function
+			if (Utils::contains(cmd, "sum("))
+			{
+				string columnName = Parser::getSumFunctionColumnName(cmd);
+				string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
+				bool hasAS = false;
+
+				// run handler function
+				float sum = db->sumRows(sourceTable, columnName);
+
+				cout << "(commandHandler.h) sum = " << sum << "\n";
+
+			}
+						
 			// use if there is a join
-			if (Utils::contains(cmd, "join"))
+			else if (Utils::contains(cmd, "join"))
 			{
 				std::vector<string> joinparser = Parser::get_join_info(cmd);
 
@@ -427,7 +443,7 @@ public:
 		}
 		catch (const std::exception& e)
 		{
-			cout << "An error occured while trying to select a table" << endl;
+			cout << "An error occured while trying to select a table" << e.what() << endl;
 		}
 		return 1;
 	}

@@ -26,7 +26,7 @@ public:
 	static string* split_str(std::string str, char delim);
 	vector<string> static get_create_columns(string cmd);
 	vector<string> static get_where_clause(string cmd, string op);
-	vector<string> split_text(string input, string delimeter);
+	vector<string> static split_text(string input, string delimeter);
 	vector<string> static get_insert_columns(string cmd, string table_name);
 	vector<vector<string> > static get_insert_rows(string cmd, string table_name);
 	std::string static to_lower(std::string s);
@@ -38,6 +38,9 @@ public:
 	vector<vector<string>> static get_update_clauses(string cmd);
 	vector<string> static get_join_info(string cmd);
 	vector<string> static get_join_where_info(string cmd);
+	std::string static getSumFunctionColumnName(std::string cmd);
+	std::string static getSumFunctionSourceTableName(std::string cmd);
+
 };
 
 /// Converts a string to lower
@@ -583,6 +586,7 @@ std::string Parser::get_table_name(string cmd) {
 
 }
 
+
 /// <summary>
 /// table name retriever
 /// </summary>
@@ -660,4 +664,69 @@ vector<string> Parser::findKeyWords(vector<string> keyWords, string cmd) {
 
 	return wordsFound;
 
+}
+
+
+
+/// <summary>
+/// parser for the sum() command to get the column name that is in the call sum(<column name>)
+/// </summary>
+/// <param name="cmd">string command that is to be analyzed</param>
+/// <returns>just the column name</returns>
+std::string Parser::getSumFunctionColumnName(std::string cmd)
+{
+	std::string columnName;
+
+	// perform regex to find when sum(.*) is found
+	regex str_expr("(.*)sum\\((.*)\\)(.*)");
+	smatch sm;
+	regex_match(cmd, sm, str_expr);
+	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
+	
+	/*
+	cout << "String:range, size:" << sm.size() << " matches\n";
+	for (unsigned i = 0; i < sm.size(); ++i) {
+		cout << i << " : [" << sm[i] << "] \n";
+	}
+	cout << "sm.size()-1 = " << sm.size() - 2 << "\n";
+	*/
+
+	// return the column name
+	columnName = sm[2];
+
+	//cout << "column name \t:" << columnName << "\n";
+
+	return columnName;
+}
+
+
+
+/// <summary>
+/// get the source table name that the function should call from
+/// </summary>
+/// <param name="cmd"></param>
+/// <returns></returns>
+std::string Parser::getSumFunctionSourceTableName(std::string cmd)
+{
+	std::string tableName;
+
+	// perform regex to find when sum(.*) is found
+	regex str_expr("(.*)sum\\((.*)\\) from (.*)( .*)*;");
+	smatch sm;
+	regex_match(cmd, sm, str_expr);
+	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
+
+	/*
+	cout << "String:range, size:" << sm.size() << " matches\n";
+	for (unsigned i = 0; i < sm.size(); ++i) {
+		cout << i << " : [" << sm[i] << "] \n";
+	}
+	*/
+
+	// return the column name
+	tableName = sm[3];
+
+	//cout << "table name \t:" << tableName << "\n";
+
+	return tableName;
 }
