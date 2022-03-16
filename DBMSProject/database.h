@@ -11,7 +11,7 @@
 #include "table.h"
 #include "bplustree.h"
 #include <stdbool.h>
-#include"row.h"
+#include "row.h"
 #include <cstring>
 #include<iostream>
 #include<string>
@@ -64,6 +64,7 @@ public:
 	void sortKeys();
 	void updateRows();
 	void updatePrimaryTrees();
+	float sumRows(std::string table, std::string column);
 
 	
 	/// <summary>
@@ -412,6 +413,37 @@ Table Database::get_table(std::string name)
 
 	return ret;
 }
+
+
+
+/// <summary>
+/// return the sum of the column
+/// </summary>
+/// <param name="table">table name to use</param>
+/// <param name="column">name of which column to add</param>
+/// <returns>float of the sum</returns>
+float Database::sumRows(std::string fromTable, std::string column)
+{
+	float sum = 0;
+
+	//get the table information (table, column, rows)
+	Table table = this->get_table(fromTable);
+	int columnIndex = table.get_column_index(column);
+	std::vector<std::vector<std::string>> rows = table.rows;
+
+	// iterate through the rows
+	for (int i = 0; i < rows.size(); i++)
+	{
+		std::string value = rows[i][columnIndex];
+		//cout << "row:" << i << "\t" << value << "\n";
+		sum += stoi(value);
+	}
+
+	return sum;
+}
+
+
+
 /// <summary>
 /// Joins two tables based on a foreign key
 /// </summary>
