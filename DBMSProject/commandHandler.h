@@ -376,8 +376,13 @@ public:
 
 				if (skipmainprint == false)
 				{
+					//check for minmax
+					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max"))
+					{
+						maxminHelper(cmd, tree);
+					}
 					// decide to print whole table or search table
-					if (where_clause.empty()) {
+					else if (where_clause.empty()) {
 
 						// print whole table
 						vector<Row> rows = tree.getFullTable();
@@ -415,9 +420,8 @@ public:
 						else {
 							FullSearch(tree, clauses, cols);
 						}
-
+						
 					}
-
 				}
 				else
 				{
@@ -762,6 +766,56 @@ public:
 
 		
 		return 1;
+	}
+
+	void maxminHelper(string cmd, BPTree tree)
+	{
+		vector<Row> tablerows = tree.getFullTable();
+		if (Utils::contains(cmd, "min"))
+		{
+			Row minrow;
+			Column<int> mincol = Column<int>();
+			mincol.AddValue(1000000000);
+			string colformin = Utils::get_string_between_two_strings(cmd, "min(", ")");
+			for (Row r : tablerows)
+			{
+				Column<int> c = r.GetIntColumnByName(colformin);
+				if (c.GetValue() < mincol.GetValue())
+				{
+					mincol = c;
+					minrow = r;
+				}
+
+			}
+			vector<string> cnames;
+			cnames.push_back(colformin);
+			minrow.PrintRow(cnames);
+		}
+		else if (Utils::contains(cmd, "max"))
+		{
+			string colformax = Utils::get_string_between_two_strings(cmd, "max(", ")");
+			Row maxrow;
+			Column<int> maxcol = Column<int>();
+			maxcol.AddValue(-1000000000);
+			string colformin = Utils::get_string_between_two_strings(cmd, "max(", ")");
+			for (Row r : tablerows)
+			{
+				Column<int> c = r.GetIntColumnByName(colformax);
+				if (c.GetValue() > maxcol.GetValue())
+				{
+					maxcol = c;
+					maxrow = r;
+				}
+
+			}
+			vector<string> cnames;
+			cnames.push_back(colformax);
+			maxrow.PrintRow(cnames);
+		}
+		else
+		{
+			//how did you get here?
+		}
 	}
 
 	/// Author: Andrew Nunez
