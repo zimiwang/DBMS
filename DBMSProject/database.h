@@ -434,7 +434,7 @@ float Database::sumRows(std::string fromTable, std::string column)
 	// iterate through the rows
 	for (int i = 0; i < rows.size(); i++)
 	{
-		std::string value = rows[i][columnIndex];
+		std::string value = std::string(rows[i][columnIndex]);
 		//cout << "row:" << i << "\t" << value << "\n";
 		sum += stoi(value);
 	}

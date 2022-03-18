@@ -324,17 +324,8 @@ public:
 			
 			// check for sum() function
 			if (Utils::contains(cmd, "sum("))
-			{
-				string columnName = Parser::getSumFunctionColumnName(cmd);
-				string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
-				bool hasAS = false;
+				sumHandler(cmd, db);
 
-				// run handler function
-				float sum = db->sumRows(sourceTable, columnName);
-
-				cout << "(commandHandler.h) sum = " << sum << "\n";
-
-			}
 						
 			// use if there is a join
 			else if (Utils::contains(cmd, "join"))
@@ -803,7 +794,7 @@ public:
 		}
 		else if (Utils::contains(cmd, "sum"))
 		{
-
+			sumHandler(cmd, db);
 		}
 		else if (Utils::contains(cmd, "avg"))
 		{
@@ -915,6 +906,41 @@ public:
 		std::cout << "ALTER TABLE		- Used to modify table, I.E. DROP COLUMN {name}." << std::endl;
 	}
 
+
+
+	/// <summary>
+	/// handle when there is a sum() function call
+	/// </summary>
+	/// <param name="cmd"></param>
+	/// <param name="db"></param>
+	/// <returns></returns>
+	int sumHandler(std::string cmd, Database* db)
+	{
+		int sum = 0;
+		// check for sum() function
+		if (Utils::contains(cmd, "sum("))
+		{
+			string columnName = Parser::getSumFunctionColumnName(cmd);
+			string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
+			bool hasAS = false;
+
+			// run handler function
+			float sum = db->sumRows(sourceTable, columnName);
+
+			Row nr;
+			Column<int> c;
+			c.SetName(columnName);
+			c.AddValue((int)sum);
+			nr.intColumn.push_back(c);
+			vector<string> cols;
+			cols.push_back(columnName);
+			nr.PrintRow(cols);
+			//cout << "(commandHandler.h) sum = " << sum << "\n";
+
+		}
+
+		return sum;
+	}
 
 
 };
