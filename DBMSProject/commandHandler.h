@@ -343,7 +343,10 @@ public:
 
 				Table t = db->join_table(joinparser[0], joinparser[1], joinparser[2], joinparser[3]);
 				tree = index_join(t);
-
+				if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "sum") || Utils::contains(cmd, "count"))
+				{
+					return columnoperations(cmd, tree);
+				}
 				cout << "Joined: " << joinparser[0] << " with " << joinparser[1] << " as " << t.table_name << endl;
 
 			}
@@ -360,6 +363,10 @@ public:
 
 					cout << "Joined: " << joinparser[0] << " with " << joinparser[1] << " as " << t.table_name << endl;
 					std::vector<std::string> cols = Parser::get_select_columns(cmd);
+					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum"))
+					{
+						return columnoperations(cmd, tree);
+					}
 					cols = Utils::trimColumns(cols);
 					vector<Row> rows = tree.getFullTable();
 					rows[0].PrintFullTable(rows, cols);
@@ -393,9 +400,9 @@ public:
 				if (skipmainprint == false)
 				{
 					//check for minmax
-					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max"))
+					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum"))
 					{
-						maxminHelper(cmd, tree);
+						return columnoperations(cmd, tree);
 					}
 					// decide to print whole table or search table
 					else if (where_clause.empty()) {
@@ -788,7 +795,27 @@ public:
 		return 1;
 	}
 
-	void maxminHelper(string cmd, BPTree tree)
+	int columnoperations(string cmd, BPTree tree)
+	{
+		if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max"))
+		{
+			return maxminHelper(cmd, tree);
+		}
+		else if (Utils::contains(cmd, "sum"))
+		{
+
+		}
+		else if (Utils::contains(cmd, "avg"))
+		{
+
+		}
+		else if (Utils::contains(cmd, "count"))
+		{
+
+		}
+	}
+
+	int maxminHelper(string cmd, BPTree tree)
 	{
 		vector<Row> tablerows = tree.getFullTable();
 		if (Utils::contains(cmd, "min"))
@@ -797,6 +824,7 @@ public:
 			Column<int> mincol = Column<int>();
 			mincol.AddValue(1000000000);
 			string colformin = Utils::get_string_between_two_strings(cmd, "min(", ")");
+			vector<string> othercols = Parser::get_select_columns(cmd);
 			for (Row r : tablerows)
 			{
 				Column<int> c = r.GetIntColumnByName(colformin);
@@ -807,9 +835,18 @@ public:
 				}
 
 			}
-			vector<string> cnames;
-			cnames.push_back(colformin);
-			minrow.PrintRow(cnames);
+			vector<string> printcols;
+
+			for (string c : othercols)
+			{
+				if (!Utils::contains(c, "min"))
+				{
+					printcols.push_back(c);
+				}
+			}
+			printcols.push_back(colformin);
+			minrow.PrintRow(printcols);
+			return 1;
 		}
 		else if (Utils::contains(cmd, "max"))
 		{
@@ -817,6 +854,7 @@ public:
 			Row maxrow;
 			Column<int> maxcol = Column<int>();
 			maxcol.AddValue(-1000000000);
+			vector<string> othercols = Parser::get_select_columns(cmd);
 			string colformin = Utils::get_string_between_two_strings(cmd, "max(", ")");
 			for (Row r : tablerows)
 			{
@@ -828,13 +866,23 @@ public:
 				}
 
 			}
-			vector<string> cnames;
-			cnames.push_back(colformax);
-			maxrow.PrintRow(cnames);
+			vector<string> printcols;
+
+			for (string c : othercols)
+			{
+				if (!Utils::contains(c, "max"))
+				{
+					printcols.push_back(c);
+				}
+			}
+			printcols.push_back(colformax);
+			maxrow.PrintRow(printcols);
+			return 1;
 		}
 		else
 		{
 			//how did you get here?
+			return 0;
 		}
 	}
 
