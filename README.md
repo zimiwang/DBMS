@@ -208,6 +208,11 @@ Add a key to the specified table. The key type has primary, secondary, and forei
 
     alter table [Table name] add [Key Type] key [Key Name];  
 
+**19. Sum rows**
+Sum the rows of a specific column of a table.
+
+    select * sum([column name]) from [table name];
+
 **Please Note**
 1. All commands should end with a semicolon. Without it, the system will not be able to detect the entered command.  
 2. Most commands are not case-sensitive. Table, value, and database names are case-sensitive.  
