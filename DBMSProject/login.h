@@ -69,9 +69,10 @@ public:
 	/// Print the user's login interface
 	/// </summary>
 	/// <returns></returns>
-	int userLogin() {
+	std::pair<int, std::string> userLogin() {
 
 		system("cls");
+		std::pair<int, std::string> ret;
 
 		std::cout << "\n------------- Student Login -------------" << std::endl;
 
@@ -92,7 +93,10 @@ public:
 			std::cin.get();
 		}
 
-		return res;
+		ret.first = res;
+		ret.second = username;
+
+		return ret;
 	}
 	
 	/// <summary>

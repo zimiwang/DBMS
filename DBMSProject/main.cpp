@@ -109,7 +109,7 @@ int main() {
 int main(int argc, char** argv)
 {
 	// The user login interface has been commented out; if you want to use it, delete the comments
-	//login_interface();
+	login_interface();
 
 	setup_intro();
 
@@ -302,9 +302,12 @@ void setup_intro()
 /// Provide a login interface
 /// </summary>
 void login_interface() {
+
+	std::pair<int, std::string> ret;
+	std::string username;
+	int isRun = 0;
 	login log;
 
-	int isRun = 0;
 	while (1)
 	{
 		system("cls");
@@ -324,7 +327,7 @@ void login_interface() {
 		switch (option)
 		{
 		case 1:
-			isRun = log.userLogin();
+			ret = log.userLogin();
 			break;
 		case 2:
 			log.addminstratorLogin();
@@ -334,6 +337,9 @@ void login_interface() {
 		default:
 			std::cout << "\nInvalid choice. Please enter a number again ";
 		}
+
+		isRun = ret.first;
+		username = ret.second;
 
 		if (isRun == 1)
 		{
