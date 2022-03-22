@@ -434,9 +434,16 @@ float Database::sumRows(std::string fromTable, std::string column)
 	// iterate through the rows
 	for (int i = 0; i < rows.size(); i++)
 	{
-		std::string value = std::string(rows[i][columnIndex]);
-		//cout << "row:" << i << "\t" << value << "\n";
-		sum += stoi(value);
+		try {
+			std::string value = std::string(rows[i][columnIndex]);
+			//cout << "row:" << i << "\t" << value << "\n";
+			sum += stoi(value);
+		}
+		// this catch should run if the row is not a string that can be converted into an int (! 0-9)
+		catch(const std::exception& e)
+		{
+			sum += 0; 
+		}
 	}
 
 	return sum;
