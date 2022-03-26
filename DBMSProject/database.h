@@ -15,7 +15,7 @@
 #include <cstring>
 #include<iostream>
 #include<string>
-
+#include "bminustree.h"
 using namespace std;
 
 class Database
