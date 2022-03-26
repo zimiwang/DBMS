@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-
+#include "bminustree.h"
 using namespace std;
 
 class CommandHandler
@@ -317,8 +317,7 @@ public:
 		
 		// Parses the select command
 		try {
-			BPTree tree;
-			
+			BPTree tree;			
 			// check for join
 			bool skipmainprint = false;
 			
@@ -429,6 +428,13 @@ public:
 							if (Utils::contains(cmd, "between")) {
 								SearchOnRange(tree, cols);
 							}
+							else {
+								string sk = clauses.GetValuesByKey("where")[2];
+								// get tree 
+								
+							}
+
+
 						}
 						// full searh
 						else {

@@ -15,6 +15,7 @@
 #include <cstring>
 #include<iostream>
 #include<string>
+#include "bminustree.h"
 
 using namespace std;
 
@@ -35,7 +36,9 @@ public:
 	/// </summary>
 	std::vector<Table> tables;
 	std::vector<Table> join_tables;
-
+	std::vector<BTree<string>> secondaryStringTrees;
+	std::vector<BTree<int>> secondaryIntTrees;
+	std::vector<BTree<char>> secondaryCharTrees;
 	std::vector<BPTree> primary_key_trees;
 
 	const string PRIMARY_KEY = "ID";
