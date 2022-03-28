@@ -453,6 +453,7 @@ float Database::sumRows(std::string fromTable, std::string column)
 
 
 
+
 /// <summary>
 /// Joins two tables based on a foreign key
 /// </summary>
