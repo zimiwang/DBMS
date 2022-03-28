@@ -388,7 +388,7 @@ public:
 				if (skipmainprint == false)
 				{
 					//check for minmax
-					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum"))
+					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum") || Utils::contains(cmd, "MIN") || Utils::contains(cmd, "MAX") || Utils::contains(cmd, "AVG") || Utils::contains(cmd, "COUNT") || Utils::contains(cmd, "SUM"))
 					{
 						return columnoperations(cmd, tree);
 					}
@@ -792,19 +792,19 @@ public:
 
 	int columnoperations(string cmd, BPTree tree)
 	{
-		if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max"))
+		if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "MIN") || Utils::contains(cmd, "MAX"))
 		{
 			return maxminHelper(cmd, tree);
 		}
-		else if (Utils::contains(cmd, "sum"))
+		else if (Utils::contains(cmd, "sum") || Utils::contains(cmd, "SUM"))
 		{
 			return sumHandler(cmd, db);
 		}
-		else if (Utils::contains(cmd, "count"))
+		else if (Utils::contains(cmd, "count") || Utils::contains(cmd, "COUNT"))
 		{
 			return countHandler(cmd, tree);
 		}
-		else if (Utils::contains(cmd, "avg"))
+		else if (Utils::contains(cmd, "avg") || Utils::contains(cmd, "AVG") )
 		{
 			return avgHandler(cmd, db);
 			
@@ -954,8 +954,6 @@ public:
 	/// <returns></returns>
 	int sumHandler(std::string cmd, Database* db)
 	{
-		// check for sum() function
-		
 		string columnName = Parser::getSumFunctionColumnName(cmd);
 		string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
 		bool hasAS = false;
@@ -973,7 +971,6 @@ public:
 		nr.PrintRow(cols);
 		//cout << "(commandHandler.h) sum = " << sum << "\n";
 
-	
 		return 1;
 	}
 
@@ -987,29 +984,22 @@ public:
 	/// <returns></returns>
 	int avgHandler(std::string cmd, Database* db)
 	{
-		int sum = 0;
-		// check for sum() function
-		if (true)
-		{
+		string columnName = Parser::getSumFunctionColumnName(cmd);
+		string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
+		bool hasAS = false;
 
-			string columnName = Parser::getSumFunctionColumnName(cmd);
-			string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
-			bool hasAS = false;
-
-			// run handler function
-			float sum = db->sumRows(sourceTable, columnName); 
-			int avg = floor(sum / 2);
-			Row nr;
-			Column<int> c;
-			c.SetName(columnName);
-			c.AddValue((int)avg);
-			nr.intColumn.push_back(c);
-			vector<string> cols;
-			cols.push_back(columnName);
-			nr.PrintRow(cols);
-			//cout << "(commandHandler.h) sum = " << sum << "\n";
-
-		}
+		// run handler function
+		float sum = db->sumRows(sourceTable, columnName); 
+		int avg = floor(sum / 2);
+		Row nr;
+		Column<int> c;
+		c.SetName(columnName);
+		c.AddValue((int)avg);
+		nr.intColumn.push_back(c);
+		vector<string> cols;
+		cols.push_back(columnName);
+		nr.PrintRow(cols);
+		//cout << "(commandHandler.h) sum = " << sum << "\n";
 
 		return 1;
 	}
