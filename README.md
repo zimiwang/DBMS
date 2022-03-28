@@ -6,7 +6,7 @@
   - [Tests](#tests)
   - [Installation](#installation)
   - [Instructions](#instructions)
-  - [Login Interface](#Login Interface)
+  - [Login](#login)
   - [Authors](#authors)
   - [License](#license)
   - [Acknowledgments](#acknowledgments)
@@ -220,7 +220,7 @@ Sum the rows of a specific column of a table.
 3. Some commands are space-sensitive, so please strictly follow the instructions when entering the command line.
 4. When entering an existing database name, table name, and column name, check the existence of these names multiple times. In some command lines if the wrong input will cause the program to crash and terminate.  
 
-## Login Interface  
+## Login  
 
 Our Database Management Systems have a login screen. The DBMS can only be used by logging in. Here are the functions of the login interface of this project. All accounts' usernames and passwords are stored in the users.txt file. The file type chooses to use .txt because it can better manage and view existing accounts.  
 
