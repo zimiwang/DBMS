@@ -39,6 +39,7 @@ public:
 	vector<string> static get_join_info(string cmd);
 	vector<string> static get_join_where_info(string cmd);
 	std::string static getSumFunctionColumnName(std::string cmd);
+	std::string static getCountFunctionColumnName(std::string cmd);
 	std::string static getSumFunctionSourceTableName(std::string cmd);
 
 };
@@ -699,7 +700,26 @@ std::string Parser::getSumFunctionColumnName(std::string cmd)
 	return columnName;
 }
 
+/// <summary>
+/// parser for the count() command to get the column name that is in the call count(<column name>)
+/// </summary>
+/// <param name="cmd"></param>
+/// <returns></returns>
+std::string Parser::getCountFunctionColumnName(std::string cmd)
+{
+	std::string columnName;
 
+	// perform regex to find when count(.*) is found
+	regex str_expr("(.*)count\\((.*)\\)(.*)");
+	smatch sm;
+	regex_match(cmd, sm, str_expr);
+	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
+
+	// return the column name
+	columnName = sm[2];
+
+	return columnName;
+}
 
 /// <summary>
 /// get the source table name that the function should call from

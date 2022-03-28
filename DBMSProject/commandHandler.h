@@ -324,7 +324,6 @@ public:
 			// check for sum() function
 			if (Utils::contains(cmd, "sum("))
 				sumHandler(cmd, db);
-
 						
 			// use if there is a join
 			else if (Utils::contains(cmd, "join"))
@@ -802,17 +801,17 @@ public:
 		{
 			sumHandler(cmd, db);
 		}
-		else if (Utils::contains(cmd, "avg"))
-		{
-
-		}
 		else if (Utils::contains(cmd, "count"))
 		{
-
+			return countHandler(cmd, tree);
+		}
+		else if (Utils::contains(cmd, "avg"))
+		{
+			
 		}
 	}
 
-	int maxminHelper(string cmd, BPTree tree)
+	int maxminHelper(std::string cmd, BPTree tree)
 	{
 		vector<Row> tablerows = tree.getFullTable();
 		if (Utils::contains(cmd, "min"))
@@ -881,6 +880,39 @@ public:
 			//how did you get here?
 			return 0;
 		}
+	}
+
+	/// <summary>
+	/// handle when there is a count() function call
+	/// </summary>
+	/// <param name="cmd"></param>
+	/// <param name="tree"></param>
+	/// <returns></returns>
+	int countHandler(string cmd, BPTree tree) {
+
+		int count = 0;
+
+		vector<Row> tablerows = tree.getFullTable();
+
+		if (Utils::contains(cmd, "count("))
+		{
+			string columnName = Parser::getCountFunctionColumnName(cmd);
+
+			count = tablerows.size();
+
+			Row countrow;
+			Column<int> countcol;
+			countcol.SetName(columnName);
+			countcol.AddValue(count);
+			countrow.intColumn.push_back(countcol);
+
+			vector<string> cols;
+			cols.push_back(columnName);
+			countrow.PrintRow(cols);
+
+		}
+	
+		return 1;
 	}
 
 	/// Author: Andrew Nunez
