@@ -322,16 +322,10 @@ public:
 			bool skipmainprint = false;
 			
 			// check for sum() function
-			if (Utils::contains(cmd, "sum("))
-				sumHandler(cmd, db);
-
-			// check for sum() function
-			else if (Utils::contains(cmd, "avg("))
-				avgHandler(cmd, db);
-
+			
 						
 			// use if there is a join
-			else if (Utils::contains(cmd, "join"))
+			if (Utils::contains(cmd, "join"))
 			{
 				std::vector<string> joinparser = Parser::get_join_info(cmd);
 
@@ -804,7 +798,7 @@ public:
 		}
 		else if (Utils::contains(cmd, "sum"))
 		{
-			sumHandler(cmd, db);
+			return sumHandler(cmd, db);
 		}
 		else if (Utils::contains(cmd, "count"))
 		{
@@ -812,6 +806,7 @@ public:
 		}
 		else if (Utils::contains(cmd, "avg"))
 		{
+			return avgHandler(cmd, db);
 			
 		}
 	}
@@ -959,30 +954,27 @@ public:
 	/// <returns></returns>
 	int sumHandler(std::string cmd, Database* db)
 	{
-		int sum = 0;
 		// check for sum() function
-		if (Utils::contains(cmd, "sum("))
-		{
-			string columnName = Parser::getSumFunctionColumnName(cmd);
-			string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
-			bool hasAS = false;
+		
+		string columnName = Parser::getSumFunctionColumnName(cmd);
+		string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
+		bool hasAS = false;
 
-			// run handler function
-			float sum = db->sumRows(sourceTable, columnName);
+		// run handler function
+		int sum = db->sumRows(sourceTable, columnName);
 
-			Row nr;
-			Column<int> c;
-			c.SetName(columnName);
-			c.AddValue((int)sum);
-			nr.intColumn.push_back(c);
-			vector<string> cols;
-			cols.push_back(columnName);
-			nr.PrintRow(cols);
-			//cout << "(commandHandler.h) sum = " << sum << "\n";
+		Row nr;
+		Column<int> c;
+		c.SetName(columnName);
+		c.AddValue((int)sum);
+		nr.intColumn.push_back(c);
+		vector<string> cols;
+		cols.push_back(columnName);
+		nr.PrintRow(cols);
+		//cout << "(commandHandler.h) sum = " << sum << "\n";
 
-		}
-
-		return sum;
+	
+		return 1;
 	}
 
 
@@ -997,9 +989,8 @@ public:
 	{
 		int sum = 0;
 		// check for sum() function
-		if (Utils::contains(cmd, "avg("))
+		if (true)
 		{
-			cout << "average:\n";
 
 			string columnName = Parser::getSumFunctionColumnName(cmd);
 			string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
@@ -1007,12 +998,11 @@ public:
 
 			// run handler function
 			float sum = db->sumRows(sourceTable, columnName); 
-			sum = sum / 2;
-
+			int avg = floor(sum / 2);
 			Row nr;
 			Column<int> c;
 			c.SetName(columnName);
-			c.AddValue((int)sum);
+			c.AddValue((int)avg);
 			nr.intColumn.push_back(c);
 			vector<string> cols;
 			cols.push_back(columnName);
@@ -1021,7 +1011,7 @@ public:
 
 		}
 
-		return sum;
+		return 1;
 	}
 
 
