@@ -147,11 +147,36 @@ Use where clause to select a row.
     
 Use where clause to join two tables.
 
-    select */[Column Name] from [Table1,Table2] where [Table1].[Column]=[Table2].[Column]
+    select */[Column Name] from [Table1,Table2] where [Table1].[Column]=[Table2].[Column];
     
 Use join clause to join two tables.
 
-    select */[Column Name] from [Table1] join [Table2] on [Column1]=[Column2]
+    select */[Column Name] from [Table1] join [Table2] on [Column1]=[Column2];  
+
+The SUM() function returns the total sum of a numeric column.  
+
+    select * sum([column name]) from [table name]; OR  
+    select sum([column name]) from [table name];  
+
+The MIN() function returns the smallest value of the selected column.  
+
+    select * min([column name]) from [table name]; OR
+    select min([column name]) from [table name];  
+
+The MAX() function returns the largest value of the selected column.  
+
+    select * max([column name]) from [table name]; OR
+    select max([column name]) from [table name];
+
+The COUNT() function returns the number of rows that matches a specified criterion.  
+
+    select * count([column name]) from [table name]; OR
+    select count([column name]) from [table name];
+
+The AVG() function returns the average value of a numeric column.  
+
+    select * avg([column name]) from [table name]; OR
+    select avg([column name]) from [table name];
 
 Note: If you type a nonexistent column, the table will give a wrong feedback.  
 
@@ -208,11 +233,6 @@ Drop an existing column in a table.
 Add a key to the specified table. The key type has primary, secondary, and foreign.
 
     alter table [Table name] add [Key Type] key [Key Name];  
-
-**19. Sum rows**
-Sum the rows of a specific column of a table.
-
-    select * sum([column name]) from [table name];
 
 **Please Note**
 1. All commands should end with a semicolon. Without it, the system will not be able to detect the entered command.  

@@ -894,25 +894,21 @@ public:
 
 		vector<Row> tablerows = tree.getFullTable();
 
-		if (Utils::contains(cmd, "count("))
-		{
-			string columnName = Parser::getCountFunctionColumnName(cmd);
+		string columnName = Parser::getCountFunctionColumnName(cmd);
 
-			count = tablerows.size();
+		count = tablerows.size();
 
-			Row countrow;
-			Column<int> countcol;
-			countcol.SetName(columnName);
-			countcol.AddValue(count);
-			countrow.intColumn.push_back(countcol);
+		Row countrow;
+		Column<int> countcol;
+		countcol.SetName(columnName);
+		countcol.AddValue(count);
+		countrow.intColumn.push_back(countcol);
 
-			vector<string> cols;
-			cols.push_back(columnName);
-			countrow.PrintRow(cols);
-
-		}
+		vector<string> cols;
+		cols.push_back(columnName);
+		countrow.PrintRow(cols);
 	
-		return 1;
+		return count;
 	}
 
 	/// Author: Andrew Nunez
