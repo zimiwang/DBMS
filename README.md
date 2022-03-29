@@ -6,6 +6,7 @@
   - [Tests](#tests)
   - [Installation](#installation)
   - [Instructions](#instructions)
+  - [Login](#login)
   - [Authors](#authors)
   - [License](#license)
   - [Acknowledgments](#acknowledgments)
@@ -218,6 +219,72 @@ Sum the rows of a specific column of a table.
 2. Most commands are not case-sensitive. Table, value, and database names are case-sensitive.  
 3. Some commands are space-sensitive, so please strictly follow the instructions when entering the command line.
 4. When entering an existing database name, table name, and column name, check the existence of these names multiple times. In some command lines if the wrong input will cause the program to crash and terminate.  
+
+## Login  
+
+Our Database Management Systems have a login screen. The DBMS can only be used by logging in. Here are the functions of the login interface of this project. All accounts' usernames and passwords are stored in the users.txt file. The file type chooses to use .txt because it can better manage and view existing accounts.  
+
+1. User Login
+2. Administrator Login
+    1. Register a new user
+    2. Delete a user
+    3. Change password
+
+**1. User Login**  
+This function can log in to a registered account, which is saved in the users.txt file. When entering the password, the password will be replaced by (*). If the user is unsure if the wrong password has been entered, the entered password can be displayed by hitting the "TAB" key on the keyboard during password entry. Hit the "TAB" key again to display the password as asterisks again.  
+
+Once the user logs in successfully, the interface will show  
+
+    LOGIN SUCCESS! Welcome to use RDBMS
+    Loading...
+
+After a few more seconds of waiting, it can be loaded into the DBMS.  
+
+If the user inputs a wrong username or password, it will show
+
+    Incorrect username or password, please press any keys for back
+
+**2. Administrator Login**  
+There is an Administrator in this login interface, and the administrator has the ability to perform other operations on all users only when the Administrator account is logged in. This is the username and password of the Administrator account.  
+        
+    Username: admit  
+    Password: isu4488
+
+
+
+**3. Register a new user**  
+This operation can register a new account for use. All registered accounts will be saved in the users.txt file.  
+
+If the user inputs an existing username, it will show  
+    
+    This user has already registered. Please try another username  
+
+Otherwise, it will show  
+
+    User Registered Successfully  
+
+**4. Delete a user**  
+This operation deletes an existing account from the user.txt file. This operation only requires the user to provide a username to perform the delete operation.  
+
+Once an account is deleted, then it will show  
+
+    [Username] has been deleted successfully!
+
+Otherwise, it will show  
+
+    [Username] does not exist, please try again!
+
+**5. Change password**  
+This operation can modify the password of an existing account. After entering the correct username, you can enter a new password.  
+
+Once the username is incorrect, then it will show  
+
+    [Username] does not exist, please try again!
+
+**Please Note**  
+Since all accounts are stored in the users.txt file, please avoid adding or deleting accounts directly in users.txt. Because this may disrupt the format in users.txt and make it impossible to register an account normally.  
+
+If you want to operate directly in the users.txt file, after deleting or adding an account, keep a new line after the bottom account. In this way, when a new account is registered again, the username and password will not be saved after the existing account.  
 
 ## Authors
 

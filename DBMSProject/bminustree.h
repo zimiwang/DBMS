@@ -1,14 +1,11 @@
-// template from https://www.programiz.com/dsa/b-tree
+#pragma once
 
+// Searching a key on a B-tree in C++
 
 #include <iostream>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 #include "row.h"
-#include <list>
-
 using namespace std;
+
 
 template <typename T> struct Key {
     T key;
@@ -16,55 +13,54 @@ template <typename T> struct Key {
 };
 
 
-template <class T> class TreeNode {
+template <typename T> class TreeNode {
     Key<T>* keys;
-    int MAX;
+    int MAX = 3;
     TreeNode** C;
-
     int size;
     bool leaf;
 
 public:
-    TreeNode(int t1, bool leaf1) {
-        MAX = t1;
+    TreeNode(bool leaf1) {        
         leaf = leaf1;
 
-        keys = new Key[2 * MAX - 1];
-        C = new TreeNode * [2 * MAX];
+        keys = new Key<T>[2 * MAX - 1];
+        C = new TreeNode<T> * [2 * MAX];
 
         size = 0;
     }
 
-    void insertNonFull(T k) {
+    void insertNonFull(T k, Row row) {
         int i = size - 1;
 
         if (leaf == true) {
-            while (i >= 0 && keys[i]->t1 > k) {
+            while (i >= 0 && keys[i].key > k) {
                 keys[i + 1] = keys[i];
                 i--;
             }
 
-            keys[i + 1] = k;
+            keys[i + 1].key = k;
+            keys[i + 1].row = row;
             size = size + 1;
         }
         else {
-            while (i >= 0 && keys[i] > k)
+            while (i >= 0 && keys[i].key > k)
                 i--;
 
             if (C[i + 1]->size == 2 * MAX - 1) {
                 splitChild(i + 1, C[i + 1]);
 
-                if (keys[i + 1] < k)
+                if (keys[i + 1].key < k)
                     i++;
             }
-            C[i + 1]->insertNonFull(k);
+            C[i + 1]->insertNonFull(k, row);
         }
     }
 
-
-    void splitChild(int i, TreeNode* y) {
+    void splitChild(int i, TreeNode<T>* y) {
         TreeNode* z = new TreeNode(y->t, y->leaf);
         z->size = MAX - 1;
+        
 
         for (int j = 0; j < MAX - 1; j++)
             z->keys[j] = y->keys[j + MAX];
@@ -87,6 +83,7 @@ public:
         size = size + 1;
     }
 
+    
     void traverse() {
         int i;
         for (i = 0; i < size; i++) {
@@ -101,33 +98,29 @@ public:
 
     Row search(T k) {
         int i = 0;
-        while (i < size && k > keys[i]->key)
+        while (i < size && k > keys[i].key)
             i++;
 
-        if (keys[i]->key == k)
-            return this;
+        if (keys[i].key == k)
+            return keys[i].row;
 
         if (leaf == true)
             return NULL;
 
         return C[i]->search(k);
     }
-
+    template <typename T>
     friend class BTree;
 };
 
 
-
-template <class T> class BTree {
-    TreeNode* root;
-    T t;
+template <typename T> class BTree {
+    TreeNode<T>* root;
+    int MAX = 3;
 
 public:
-    BTree();
-
-    BTree(T temp) {
-        root = NULL;
-        int MAX = temp;
+    BTree() {
+        root = NULL;        
     }
 
     void traverse() {
@@ -139,31 +132,31 @@ public:
         return (root == NULL) ? NULL : root->search(k);
     }
 
+    template <typename T>
     void insert(T k, Row row) {
         if (root == NULL) {
-            // create new tree node
-            root = new TreeNode(MAX, true);
-            root->keys[0].key = k;              // create new key
+            root = new TreeNode<T>(true);
+            root->keys[0].key = k;
             root->keys[0].row = row;
             root->size = 1;
         }
         else {
             if (root->size == 2 * MAX - 1) {
-                TreeNode* s = new TreeNode(t, false);
+                TreeNode* s = new TreeNode<T>(false);
 
                 s->C[0] = root;
 
                 s->splitChild(0, root);
 
                 int i = 0;
-                if (s->keys[0] < k)
+                if (s->keys[0].key < k)
                     i++;
-                s->C[i]->insertNonFull(k);
+                s->C[i]->insertNonFull(k, row);
 
                 root = s;
             }
             else
-                root->insertNonFull(k);
+                root->insertNonFull(k, row);
         }
     }
 };

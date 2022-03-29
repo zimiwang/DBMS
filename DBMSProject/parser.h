@@ -39,6 +39,7 @@ public:
 	vector<string> static get_join_info(string cmd);
 	vector<string> static get_join_where_info(string cmd);
 	std::string static getSumFunctionColumnName(std::string cmd);
+	std::string static getCountFunctionColumnName(std::string cmd);
 	std::string static getSumFunctionSourceTableName(std::string cmd);
 
 };
@@ -669,7 +670,7 @@ vector<string> Parser::findKeyWords(vector<string> keyWords, string cmd) {
 
 
 /// <summary>
-/// parser for the sum() command to get the column name that is in the call sum(<column name>)
+/// parser for the sum() command to get the column name that is in the call sum(<column name>) or avg(<column name>)
 /// </summary>
 /// <param name="cmd">string command that is to be analyzed</param>
 /// <returns>just the column name</returns>
@@ -678,7 +679,7 @@ std::string Parser::getSumFunctionColumnName(std::string cmd)
 	std::string columnName;
 
 	// perform regex to find when sum(.*) is found
-	regex str_expr("(.*)sum\\((.*)\\)(.*)");
+	regex str_expr("(.*)(sum||SUM||avg||AVG)\\((.*)\\)(.*)");
 	smatch sm;
 	regex_match(cmd, sm, str_expr);
 	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
@@ -692,17 +693,39 @@ std::string Parser::getSumFunctionColumnName(std::string cmd)
 	*/
 
 	// return the column name
-	columnName = sm[2];
+	columnName = sm[sm.size()-2];
 
 	//cout << "column name \t:" << columnName << "\n";
 
 	return columnName;
 }
 
+/// <summary>
+/// parser for the count() command to get the column name that is in the call count(<column name>)
+/// </summary>
+/// <param name="cmd"></param>
+/// <returns></returns>
+std::string Parser::getCountFunctionColumnName(std::string cmd)
+{
+	std::string columnName;
+
+	// perform regex to find when count(.*) is found
+	regex str_expr("(.*)count\\((.*)\\)(.*)");
+	smatch sm;
+	regex_match(cmd, sm, str_expr);
+	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
+
+	// return the column name
+	columnName = sm[2];
+
+	return columnName;
+}
+
+
 
 
 /// <summary>
-/// get the source table name that the function should call from
+/// get the source table name that the function should call from for avg() and sum()
 /// </summary>
 /// <param name="cmd"></param>
 /// <returns></returns>
@@ -710,23 +733,28 @@ std::string Parser::getSumFunctionSourceTableName(std::string cmd)
 {
 	std::string tableName;
 
+	//cout << "cmd:" << cmd << "\n";
+
 	// perform regex to find when sum(.*) is found
-	regex str_expr("(.*)sum\\((.*)\\) from (.*)( .*)*;");
+	regex str_expr("(.*)(sum||SUM||avg||AVG)\((.*)\) (from||FROM) (.*)( .*)*");
 	smatch sm;
 	regex_match(cmd, sm, str_expr);
 	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
 
 	/*
-	cout << "String:range, size:" << sm.size() << " matches\n";
+	cout << "String:range, size:" << sm.size() << "\t matches\n";
 	for (unsigned i = 0; i < sm.size(); ++i) {
 		cout << i << " : [" << sm[i] << "] \n";
 	}
 	*/
+	
 
 	// return the column name
-	tableName = sm[3];
+	tableName = sm[sm.size()-2];
 
 	//cout << "table name \t:" << tableName << "\n";
 
 	return tableName;
 }
+
+

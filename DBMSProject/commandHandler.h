@@ -322,12 +322,10 @@ public:
 			bool skipmainprint = false;
 			
 			// check for sum() function
-			if (Utils::contains(cmd, "sum("))
-				sumHandler(cmd, db);
-
+			
 						
 			// use if there is a join
-			else if (Utils::contains(cmd, "join"))
+			if (Utils::contains(cmd, "join"))
 			{
 				std::vector<string> joinparser = Parser::get_join_info(cmd);
 
@@ -390,7 +388,7 @@ public:
 				if (skipmainprint == false)
 				{
 					//check for minmax
-					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum"))
+					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum") || Utils::contains(cmd, "MIN") || Utils::contains(cmd, "MAX") || Utils::contains(cmd, "AVG") || Utils::contains(cmd, "COUNT") || Utils::contains(cmd, "SUM"))
 					{
 						return columnoperations(cmd, tree);
 					}
@@ -794,25 +792,26 @@ public:
 
 	int columnoperations(string cmd, BPTree tree)
 	{
-		if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max"))
+		if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "MIN") || Utils::contains(cmd, "MAX"))
 		{
 			return maxminHelper(cmd, tree);
 		}
-		else if (Utils::contains(cmd, "sum"))
+		else if (Utils::contains(cmd, "sum") || Utils::contains(cmd, "SUM"))
 		{
-			sumHandler(cmd, db);
+			return sumHandler(cmd, db);
 		}
-		else if (Utils::contains(cmd, "avg"))
+		else if (Utils::contains(cmd, "count") || Utils::contains(cmd, "COUNT"))
 		{
-
+			return countHandler(cmd, tree);
 		}
-		else if (Utils::contains(cmd, "count"))
+		else if (Utils::contains(cmd, "avg") || Utils::contains(cmd, "AVG") )
 		{
-
+			return avgHandler(cmd, db);
+			
 		}
 	}
 
-	int maxminHelper(string cmd, BPTree tree)
+	int maxminHelper(std::string cmd, BPTree tree)
 	{
 		vector<Row> tablerows = tree.getFullTable();
 		if (Utils::contains(cmd, "min"))
@@ -883,6 +882,39 @@ public:
 		}
 	}
 
+	/// <summary>
+	/// handle when there is a count() function call
+	/// </summary>
+	/// <param name="cmd"></param>
+	/// <param name="tree"></param>
+	/// <returns></returns>
+	int countHandler(string cmd, BPTree tree) {
+
+		int count = 0;
+
+		vector<Row> tablerows = tree.getFullTable();
+
+		if (Utils::contains(cmd, "count("))
+		{
+			string columnName = Parser::getCountFunctionColumnName(cmd);
+
+			count = tablerows.size();
+
+			Row countrow;
+			Column<int> countcol;
+			countcol.SetName(columnName);
+			countcol.AddValue(count);
+			countrow.intColumn.push_back(countcol);
+
+			vector<string> cols;
+			cols.push_back(columnName);
+			countrow.PrintRow(cols);
+
+		}
+	
+		return 1;
+	}
+
 	/// Author: Andrew Nunez
 
 	/// <summary>
@@ -922,30 +954,54 @@ public:
 	/// <returns></returns>
 	int sumHandler(std::string cmd, Database* db)
 	{
-		int sum = 0;
-		// check for sum() function
-		if (Utils::contains(cmd, "sum("))
-		{
-			string columnName = Parser::getSumFunctionColumnName(cmd);
-			string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
-			bool hasAS = false;
+		string columnName = Parser::getSumFunctionColumnName(cmd);
+		string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
+		bool hasAS = false;
 
-			// run handler function
-			float sum = db->sumRows(sourceTable, columnName);
+		// run handler function
+		int sum = db->sumRows(sourceTable, columnName);
 
-			Row nr;
-			Column<int> c;
-			c.SetName(columnName);
-			c.AddValue((int)sum);
-			nr.intColumn.push_back(c);
-			vector<string> cols;
-			cols.push_back(columnName);
-			nr.PrintRow(cols);
-			//cout << "(commandHandler.h) sum = " << sum << "\n";
+		Row nr;
+		Column<int> c;
+		c.SetName(columnName);
+		c.AddValue((int)sum);
+		nr.intColumn.push_back(c);
+		vector<string> cols;
+		cols.push_back(columnName);
+		nr.PrintRow(cols);
+		//cout << "(commandHandler.h) sum = " << sum << "\n";
 
-		}
+		return 1;
+	}
 
-		return sum;
+
+
+	/// <summary>
+	/// handle when there is a avg() function call
+	/// </summary>
+	/// <param name="cmd"></param>
+	/// <param name="db"></param>
+	/// <returns></returns>
+	int avgHandler(std::string cmd, Database* db)
+	{
+		string columnName = Parser::getSumFunctionColumnName(cmd);
+		string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
+		bool hasAS = false;
+
+		// run handler function
+		float sum = db->sumRows(sourceTable, columnName); 
+		int avg = floor(sum / 2);
+		Row nr;
+		Column<int> c;
+		c.SetName(columnName);
+		c.AddValue((int)avg);
+		nr.intColumn.push_back(c);
+		vector<string> cols;
+		cols.push_back(columnName);
+		nr.PrintRow(cols);
+		//cout << "(commandHandler.h) sum = " << sum << "\n";
+
+		return 1;
 	}
 
 

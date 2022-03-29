@@ -16,7 +16,6 @@
 #include<iostream>
 #include<string>
 #include "bminustree.h"
-
 using namespace std;
 
 class Database
@@ -428,6 +427,7 @@ Table Database::get_table(std::string name)
 float Database::sumRows(std::string fromTable, std::string column)
 {
 	float sum = 0;
+	//cout << "runing sumROws\n" << "from table: \""<<fromTable<<"\"\t column: \"" << column << "\"\n";
 
 	//get the table information (table, column, rows)
 	Table table = this->get_table(fromTable);
@@ -439,7 +439,6 @@ float Database::sumRows(std::string fromTable, std::string column)
 	{
 		try {
 			std::string value = std::string(rows[i][columnIndex]);
-			//cout << "row:" << i << "\t" << value << "\n";
 			sum += stoi(value);
 		}
 		// this catch should run if the row is not a string that can be converted into an int (! 0-9)
@@ -451,6 +450,7 @@ float Database::sumRows(std::string fromTable, std::string column)
 
 	return sum;
 }
+
 
 
 
