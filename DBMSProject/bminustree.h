@@ -67,11 +67,11 @@ public:
         z->size = MAX - 1;
 
         for (int j = 0; j < MAX - 1; j++)
-            z->keys[j] = y->keys[j + t];
+            z->keys[j] = y->keys[j + MAX];
 
         if (y->leaf == false) {
-            for (int j = 0; j < t; j++)
-                z->C[j] = y->C[j + t];
+            for (int j = 0; j < MAX; j++)
+                z->C[j] = y->C[j + MAX];
         }
 
         y->size = MAX - 1;

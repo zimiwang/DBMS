@@ -266,6 +266,15 @@ public:
 		return empty;
 	}
 
+	bool hasSecondaryKeyChar(vector<string> secondaryKeys) {
+		for (string key : secondaryKeys) {
+			Column<char> col = GetCharColumnByName(key);
+			/*if (GetCharColumnByName(key) != NULL) {
+
+			}*/
+		}
+	}
+
 
 	/// <summary>
 	/// Gets the column of type char* by its name
@@ -283,7 +292,7 @@ public:
 					return col;
 				}
 			}
-			cout << "Could not find the column '" << name << "'." << endl;
+			cout << "Could not find the column '" << name << "'." << endl;			
 		}
 	}
 

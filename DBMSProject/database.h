@@ -918,7 +918,11 @@ inline void Database::updatePrimaryTrees()
 	primary_key_trees.clear();
 	for (Table tbl : tables)
 	{
-		BPTree newPrimaryKeyIndex;
+		BPTree newPrimaryKeyIndex;	
+		BTree<int> secondaryIntKeyTree;
+		BTree<char> secondaryCharKeyTree;
+		BTree<string> secondaryStringKeyTree;
+
 		newPrimaryKeyIndex.Name = tbl.table_name;
 
 		for (Row r : tbl.newrows)
@@ -937,9 +941,21 @@ inline void Database::updatePrimaryTrees()
 					if (!newPrimaryKeyIndex.HasPrimaryKey()) {
 						newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
 					}
-
+				}
+				// check to see if the colname is a secondary key
+				else if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
+					// add value to secondary tree
+					secondaryIntKeyTree.insert(c.GetValue(), r);
 				}
 			}
+
+			// check for other secondary keys
+			if (r.hasSecondaryKeyChar(tbl.secondaryKeys)) {
+				/*secondaryCharKeyTree.insert(c.GetValue(), r);*/
+			}
+		/*	else if (r.hasSecondaryKeyString(tbl.secondaryKeys)) {
+
+			}*/
 
 		}
 		tbl.primaryKeyTree = newPrimaryKeyIndex;
