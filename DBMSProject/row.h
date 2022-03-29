@@ -221,6 +221,28 @@ private:
 		cout << " | ";
 	}
 
+	/// <summary>
+	/// Checks to see if the given column type has a secondary key
+	/// </summary>
+	/// <param name="secondaryKeys">The secondary keys to search for</param>
+	/// <param name="columnType">The type of column</param>
+	/// <returns>Returns true if the given column type is a secondary key</returns>
+	bool hasSecondaryKey(vector<string> secondaryKeys, int columnType) {
+		secondaryKeys.push_back("name");
+		for (string key : secondaryKeys) {
+			if (columnType == 1) {
+				if (!GetCharColumnByName(key, false).IsEmpty()) {
+					return true;
+				}
+			}
+			else if (columnType == 2) {
+				if (!GetStringColumnByName(key, false).IsEmpty()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	/// <summary>
 	/// Prints the names of columns as headers
@@ -267,41 +289,47 @@ public:
 	vector<Column<int>> intColumn;
 	vector<Column<char>> charColumn;		
 	
+	/// <summary>
+	/// Creates an empty row
+	/// </summary>
 	Row() {	
 		empty = true;	
 	}
 
+	/// <summary>
+	/// Sets the row as being used so the row is not empty
+	/// </summary>
 	void InUse() {
 		empty = false;
 	}
 
+	/// <summary>
+	/// Checks to see if the row is empty
+	/// </summary>
+	/// <returns>Returns true if the row is empty</returns>
 	bool isEmpty() {
 		return empty;
 	}
 
+	/// <summary>
+	/// Checks to see if one of the char columns is a secondary key
+	/// </summary>
+	/// <param name="secondaryKeys">The secondary keys to search for</param>
+	/// <returns>Returns true if at least one column is a secondary key</returns>
 	bool hasSecondaryKeyChar(vector<string> secondaryKeys) {
 		return hasSecondaryKey(secondaryKeys, 1);
 	}
 
+	/// <summary>
+	/// Checks to see if one of the string columns is a secondary key
+	/// </summary>
+	/// <param name="secondaryKeys">The secondary keys to search for</param>
+	/// <returns>Returns true if at least one column is a secondary key</returns>
 	bool hasSecondaryKeyString(vector<string> secondaryKeys) {
 		return hasSecondaryKey(secondaryKeys, 2);
 	}
 
-	bool hasSecondaryKey(vector<string> secondaryKeys, int columnType) {
-		for (string key : secondaryKeys) {
-			if (columnType == 1) {
-				if (!GetCharColumnByName(key).IsEmpty()) {
-					return true;
-				}
-			}
-			else if (columnType == 2) {
-				if (!GetStringColumnByName(key).IsEmpty()) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+	
 
 
 	/// <summary>
@@ -309,11 +337,13 @@ public:
 	/// </summary>
 	/// <param name="name">The name of the column</param>
 	/// <returns></returns>
-	Column<char> GetCharColumnByName(string name) {
+	Column<char> GetCharColumnByName(string name, bool printError = true) {
 		Column<char> emptyColumn(true);
 		// check to see if columns is not empty
 		if (charColumn.empty()) {
-			cout << "The Column<char> is empty for given row." << endl;
+			if (printError) {
+				cout << "The Column<char> is empty for given row." << endl;
+			}
 			return emptyColumn;
 		}
 		else {
@@ -322,8 +352,10 @@ public:
 					return col;
 				}
 			}
+			if (printError) {
+				cout << "Could not find the column '" << name << "'." << endl;			
+			}
 			return emptyColumn;
-			cout << "Could not find the column '" << name << "'." << endl;			
 		}
 	}
 
@@ -332,10 +364,13 @@ public:
 	/// </summary>
 	/// <param name="name">The name of the column</param>
 	/// <returns></returns>
-	Column<int> GetIntColumnByName(string name) {
+	Column<int> GetIntColumnByName(string name, bool printError = true) {
+		Column<int> emptyColumn(true);
 		// check to see if columns is not empty
 		if (intColumn.empty()) {
-			cout << "The Column<int> is empty for given row." << endl;
+			if (printError)
+				cout << "The Column<int> is empty for given row." << endl;
+			return emptyColumn;
 		}
 		else {
 			for (Column<int> col : intColumn) {
@@ -343,7 +378,8 @@ public:
 					return col;
 				}
 			}
-			cout << "Could not find the column '" << name << "'." << endl;
+			if (printError) cout << "Could not find the column '" << name << "'." << endl;
+			return emptyColumn;
 		}
 	}
 
@@ -352,10 +388,12 @@ public:
 	/// </summary>
 	/// <param name="name">The name of the column</param>
 	/// <returns>The column with the specified name</returns>
-	Column<string> GetStringColumnByName(string name) {
+	Column<string> GetStringColumnByName(string name, bool printError = true) {
+		Column<string> emptyColumn(true);
 		// check to see if columns is not empty
 		if (strColumn.empty()) {
-			cout << "The Column<string> is empty for given row." << endl;
+			if (printError) cout << "The Column<string> is empty for given row." << endl;
+			return emptyColumn;
 		}
 		else {
 			for (Column<string> col : strColumn) {
@@ -363,7 +401,8 @@ public:
 					return col;
 				}
 			}
-			cout << "Could not find the column '" << name << "'." << endl;
+			if (printError) cout << "Could not find the column '" << name << "'." << endl;
+			return emptyColumn;
 		}
 	}
 

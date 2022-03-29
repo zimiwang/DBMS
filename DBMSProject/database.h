@@ -930,7 +930,8 @@ inline void Database::updatePrimaryTrees()
 			/*Row* rpoint = &r;*/
 			r.InUse();
 			for (Column<int> c : r.intColumn)
-			{
+			{				
+
 				//check to see if the colname is the primary key
 				if (c.GetName() == tbl.primaryKeyName)
 				{
@@ -940,12 +941,14 @@ inline void Database::updatePrimaryTrees()
 					// set primary key
 					if (!newPrimaryKeyIndex.HasPrimaryKey()) {
 						newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
+						//newPrimaryKeyIndex.AddSecondaryKey("name");
 					}
-				}
+				}			
 				// check to see if the colname is a secondary key
 				else if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
 					// add value to secondary tree
 					secondaryIntKeyTree.insert(c.GetValue(), r);
+					secondaryIntKeyTree.SetKeyName(c.GetName());
 				}
 			}
 
@@ -957,21 +960,26 @@ inline void Database::updatePrimaryTrees()
 					if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
 						// add value to secondary tree
 						secondaryCharKeyTree.insert(c.GetValue(), r);
+						secondaryCharKeyTree.SetKeyName(c.GetName());
 					}
 				}
 			}
 			if (r.hasSecondaryKeyString(tbl.secondaryKeys)) {
 				for (Column<string> c : r.strColumn)
 				{
+					/*secondaryStringKeyTree.insert(c.GetValue(), r);
+					secondaryStringKeyTree.SetKeyName(c.GetName());*/
 					// check to see if the colname is a secondary key
 					if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
 						// add value to secondary tree
 						secondaryStringKeyTree.insert(c.GetValue(), r);
+						secondaryStringKeyTree.SetKeyName(c.GetName());
 					}
 				}
 			}
 
 		}
+		// add the secondarytrees to the arrays if they are not empty
 		if (!secondaryIntKeyTree.IsEmpty()) {
 			secondaryIntTrees.push_back(secondaryIntKeyTree);
 		}
@@ -981,6 +989,7 @@ inline void Database::updatePrimaryTrees()
 		if (!secondaryStringKeyTree.IsEmpty()) {
 			secondaryStringTrees.push_back(secondaryStringKeyTree);
 		}
+
 		tbl.primaryKeyTree = newPrimaryKeyIndex;
 		primary_key_trees.push_back(newPrimaryKeyIndex);
 

@@ -360,20 +360,20 @@ public:
 					rows[0].PrintFullTable(rows, cols);
 					skipmainprint = true;
 				}
-			}
-			else if (Utils::contains(cmd, "between")) {
-				string tbl_name = Parser::get_table_name(cmd, "from", "where");
-				tree = db->get_tree(tbl_name);
+				else if (Utils::contains(cmd, "between")) {
+					string tbl_name = Parser::get_table_name(cmd, "from", "where");
+					tree = db->get_tree(tbl_name);
 
-			}
-			else {
-				// use if there is no join
-				std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
-				cout << "Selecting from Table: " << tbl_name << endl;
+				}
+				else {
+					// use if there is no join
+					std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
+					cout << "Selecting from Table: " << tbl_name << endl;
 
-				tbl_name = Utils::remove_char(tbl_name, ';');
-				tree = db->get_tree(tbl_name);
-			}
+					tbl_name = Utils::remove_char(tbl_name, ';');
+					tree = db->get_tree(tbl_name);
+				}
+			}			
 			if (tree.Name.length() > 0)
 			{
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
@@ -427,12 +427,10 @@ public:
 								SearchOnRange(tree, cols);
 							}
 							else {
+								string colName = clauses.GetValuesByKey("where")[0];
 								string sk = clauses.GetValuesByKey("where")[2];
-								// get tree 
-								
+								SearchBTree(cols, colName, sk, db);								
 							}
-
-
 						}
 						// full searh
 						else {
@@ -453,6 +451,69 @@ public:
 		}
 		return 1;
 	}
+
+	/// <summary>
+	/// Searches through the secondary trees to find the row
+	/// </summary>
+	/// <param name="cols">The column names to print</param>
+	/// <param name="colName">The secondary key name</param>
+	/// <param name="sk">The secondary key value</param>
+	/// <param name="db">The database pointer</param>
+	void SearchBTree(vector<string> cols, string colName, string sk, Database* db) {
+		// check which BTree type to use
+		bool continueOn = true;		
+		for (BTree<char> tree : db->secondaryCharTrees) {
+			if (tree.GetKeyName() == colName) {
+				// search the tree and print the results
+				SearchBTreeKey(cols, tree, sk[0]);
+				// stop searching and break
+				continueOn = false;
+				break;
+			}
+		}
+		// if the BTree was not found continue searching
+		if (continueOn) {
+			for (BTree<string> tree : db->secondaryStringTrees) {
+				if (tree.GetKeyName() == colName) {
+					SearchBTreeKey(cols, tree, sk);
+					// stop searching and break
+					continueOn = false;
+					break;
+				}
+			}
+		}
+		// if the BTree was not found continue searching
+		if (continueOn) {
+			for (BTree<int> tree : db->secondaryIntTrees) {
+				if (tree.GetKeyName() == colName) {
+					SearchBTreeKey(cols, tree, stoi(sk));					
+					break;
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Searches through the given BTree and prints the row
+	/// </summary>
+	/// <param name="cols">The column names to print</param>
+	/// <param name="tree">The BTree to search</param>
+	/// <param name="sk">The secondary key value</param>	
+	template <typename T>
+	void SearchBTreeKey(vector<string> cols, BTree<T> tree, T sk) {		
+
+		Row row = tree.search(sk);
+		if (!row.isEmpty()) {
+			row.PrintRow(cols, row.GetLargestColumnSize());
+		}
+		else {
+			cout << "Could not find row" << endl;
+		}
+
+	}
+
+	
+
 
 	/// <summary>
 	/// Searches through all the tables instead of using a tree

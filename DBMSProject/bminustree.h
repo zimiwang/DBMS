@@ -104,8 +104,11 @@ public:
         if (keys[i].key == k)
             return keys[i].row;
 
-        if (leaf == true)
-            return NULL;
+        if (leaf == true) {
+            Row row;
+            return row;
+        }
+            
 
         return C[i]->search(k);
     }
@@ -118,7 +121,16 @@ template <typename T> class BTree {
     TreeNode<T>* root;
     int MAX = 3;
     bool empty;
+    string keyName;
 public:
+
+    void SetKeyName(string name) {
+        keyName = name;
+    }
+
+    string GetKeyName() {
+        return keyName;
+    }
 
     bool IsEmpty() {
         return empty;
@@ -135,7 +147,15 @@ public:
     }
 
     Row search(T k) {
-        return (root == NULL) ? NULL : root->search(k);
+        if (root == NULL) {
+            // create empty row
+            Row row;
+            return row;
+        }
+        else {
+            return root->search(k);
+        }
+        
     }
 
     template <typename T>
