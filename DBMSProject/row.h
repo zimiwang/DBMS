@@ -14,7 +14,13 @@ using namespace std;
 template <typename T> class Column {
 	string name;	// The name of the column || Have not decided if we will use this
 	T value;
+	bool empty = false;
 public:	
+	Column<T>(){}
+
+	Column<T>(bool emp) {
+		empty = emp;
+	}
 	/// <summary>
 	/// Adds a value
 	/// </summary>
@@ -50,6 +56,13 @@ public:
 	/// <returns>The name of the column</returns>	
 	string GetName() {
 		return name;
+	}
+	/// <summary>
+	/// Returns if the column is empty
+	/// </summary>
+	/// <returns></returns>
+	bool IsEmpty() {
+		return empty;
 	}
 };
 
@@ -267,12 +280,27 @@ public:
 	}
 
 	bool hasSecondaryKeyChar(vector<string> secondaryKeys) {
-		for (string key : secondaryKeys) {
-			Column<char> col = GetCharColumnByName(key);
-			/*if (GetCharColumnByName(key) != NULL) {
+		return hasSecondaryKey(secondaryKeys, 1);
+	}
 
-			}*/
+	bool hasSecondaryKeyString(vector<string> secondaryKeys) {
+		return hasSecondaryKey(secondaryKeys, 2);
+	}
+
+	bool hasSecondaryKey(vector<string> secondaryKeys, int columnType) {
+		for (string key : secondaryKeys) {
+			if (columnType == 1) {
+				if (!GetCharColumnByName(key).IsEmpty()) {
+					return true;
+				}
+			}
+			else if (columnType == 2) {
+				if (!GetStringColumnByName(key).IsEmpty()) {
+					return true;
+				}
+			}
 		}
+		return false;
 	}
 
 
@@ -282,9 +310,11 @@ public:
 	/// <param name="name">The name of the column</param>
 	/// <returns></returns>
 	Column<char> GetCharColumnByName(string name) {
+		Column<char> emptyColumn(true);
 		// check to see if columns is not empty
 		if (charColumn.empty()) {
 			cout << "The Column<char> is empty for given row." << endl;
+			return emptyColumn;
 		}
 		else {
 			for (Column<char> col : charColumn) {
@@ -292,6 +322,7 @@ public:
 					return col;
 				}
 			}
+			return emptyColumn;
 			cout << "Could not find the column '" << name << "'." << endl;			
 		}
 	}

@@ -58,7 +58,7 @@ public:
     }
 
     void splitChild(int i, TreeNode<T>* y) {
-        TreeNode* z = new TreeNode(y->t, y->leaf);
+        TreeNode* z = new TreeNode(y->leaf);
         z->size = MAX - 1;
         
 
@@ -117,10 +117,16 @@ public:
 template <typename T> class BTree {
     TreeNode<T>* root;
     int MAX = 3;
-
+    bool empty;
 public:
+
+    bool IsEmpty() {
+        return empty;
+    }
+
     BTree() {
         root = NULL;        
+        empty = true;
     }
 
     void traverse() {
@@ -139,10 +145,11 @@ public:
             root->keys[0].key = k;
             root->keys[0].row = row;
             root->size = 1;
+            empty = false;
         }
         else {
             if (root->size == 2 * MAX - 1) {
-                TreeNode* s = new TreeNode<T>(false);
+                TreeNode<T>* s = new TreeNode<T>(false);
 
                 s->C[0] = root;
 

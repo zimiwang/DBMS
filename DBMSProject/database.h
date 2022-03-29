@@ -951,12 +951,35 @@ inline void Database::updatePrimaryTrees()
 
 			// check for other secondary keys
 			if (r.hasSecondaryKeyChar(tbl.secondaryKeys)) {
-				/*secondaryCharKeyTree.insert(c.GetValue(), r);*/
+				for (Column<char> c : r.charColumn)
+				{				
+					// check to see if the colname is a secondary key
+					if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
+						// add value to secondary tree
+						secondaryCharKeyTree.insert(c.GetValue(), r);
+					}
+				}
 			}
-		/*	else if (r.hasSecondaryKeyString(tbl.secondaryKeys)) {
+			if (r.hasSecondaryKeyString(tbl.secondaryKeys)) {
+				for (Column<string> c : r.strColumn)
+				{
+					// check to see if the colname is a secondary key
+					if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
+						// add value to secondary tree
+						secondaryStringKeyTree.insert(c.GetValue(), r);
+					}
+				}
+			}
 
-			}*/
-
+		}
+		if (!secondaryIntKeyTree.IsEmpty()) {
+			secondaryIntTrees.push_back(secondaryIntKeyTree);
+		}
+		if (!secondaryCharKeyTree.IsEmpty()) {
+			secondaryCharTrees.push_back(secondaryCharKeyTree);
+		}
+		if (!secondaryStringKeyTree.IsEmpty()) {
+			secondaryStringTrees.push_back(secondaryStringKeyTree);
 		}
 		tbl.primaryKeyTree = newPrimaryKeyIndex;
 		primary_key_trees.push_back(newPrimaryKeyIndex);
