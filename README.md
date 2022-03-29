@@ -153,6 +153,14 @@ Use join clause to join two tables.
 
     select */[Column Name] from [Table1] join [Table2] on [Column1]=[Column2];  
 
+Use group by clause to organize entries by like column value.  
+
+    select * from [Table] where {clause} {group by [Column Name]};  
+
+Use Order by clause to arrange entries in descending numerical or alphabetical order.  
+
+    select * from [Table] where {clause} {order by [Column Name]};   
+
 The SUM() function returns the total sum of a numeric column.  
 
     select * sum([column name]) from [table name]; OR  
