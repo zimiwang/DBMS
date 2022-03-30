@@ -53,9 +53,9 @@ public:
 /// <returns>S but lowercase.</returns>
 std::string Parser::to_lower(std::string s)
 {
-	std::string keywords[18] = {"open", "database", "create", "db", "info",
+	std::string keywords[20] = {"open", "database", "create", "db", "info",
 		"table" , "drop" , "select" , "from" , "update", "delete", "insert",
-		"into", "rename", "column", "where", "on", "join"};
+		"into", "rename", "column", "where", "on", "join", "group", "order"};
 	//first save a copy of the input
 	std::string input_copy = s;
 
