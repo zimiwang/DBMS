@@ -20,8 +20,8 @@ public:
 	std::string table_name;
 	std::string cmd;
 	std::string statement;
-
-	
+	//std::string current_username = getUsername();
+	std::string current_username = "joe";
 
 	/// <summary>
 	/// command handker: exit the dbms--this is fairly self-explanatary
@@ -70,7 +70,7 @@ public:
 	/// <param name="db">string name of the current database</param>
 	/// <param name="cmd">command string</param>
 	/// <returns>1 on completion</returns>
-	int createDatabase(string new_current_db_name, Database *new_db, string new_cmd )
+	int createDatabase(string new_current_db_name, Database* new_db, string new_cmd)
 	{
 		current_db_name = new_current_db_name;
 		db = new_db;
@@ -79,7 +79,9 @@ public:
 		current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		db = new Database();
 		db->database_name = current_db_name;
+		// addOwner(current_db_name);
 		db->Save();
+
 		return 1;
 	}
 
@@ -849,6 +851,42 @@ public:
 
 		
 		return 1;
+	}
+
+	/// <summary>
+/// When create a database, save the database to the users.txt
+/// </summary>
+	void addOwner(std::string db_name) {
+
+		std::string line, temp;
+		std::string db = db_name;
+		std::string data = "";
+		std::ifstream read("../users.txt");
+
+		//std::string username = getUsername();
+		std::string username = current_username;
+
+		if (read) {
+
+			while (std::getline(read, line)) {
+
+				std::istringstream is(line);
+				is >> temp;
+				if (temp == username) {
+
+					data += (line + " " + db + "\n");
+					
+				}
+				else {
+					data += (line + "\n");
+				}
+			}
+		}
+		read.close();
+
+		std::ofstream os("../users.txt");
+		os << data;
+		os.close();
 	}
 
 	int columnoperations(string cmd, BPTree tree)

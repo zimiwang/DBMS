@@ -30,6 +30,7 @@ std::string table_name;
 std::string db_name;
 std::string cmd = "";
 std::string statement;
+std::string current_username;
 
 Database* read_sql_file(string path);
 Database* db = NULL;
@@ -304,7 +305,7 @@ void setup_intro()
 void login_interface() {
 
 	std::pair<int, std::string> ret;
-	std::string username;
+	//std::string username;
 	int isRun = 0;
 	login log;
 
@@ -321,8 +322,8 @@ void login_interface() {
 		std::cout << "Please enter a number for your choice. \n";
 
 		std::cin >> option;
-	/*	std::getline(std::cin, op);
-		int option = stoi(op);*/
+		/*	std::getline(std::cin, op);
+			int option = stoi(op);*/
 
 		switch (option)
 		{
@@ -339,7 +340,7 @@ void login_interface() {
 		}
 
 		isRun = ret.first;
-		username = ret.second;
+		current_username = ret.second;
 
 		if (isRun == 1)
 		{
