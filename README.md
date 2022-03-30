@@ -52,7 +52,8 @@ The database management system is capable of performing the following operations
 16. Rename Column
 17. Drop Column  
 18. Add Key  
-
+19. Return Sum of Column
+20. Return Average of Column
 
 **Get help**  
 Get a list of all command lines and their functionality.
@@ -241,6 +242,17 @@ Drop an existing column in a table.
 Add a key to the specified table. The key type has primary, secondary, and foreign.
 
     alter table [Table name] add [Key Type] key [Key Name];  
+
+**19. Return Sum of Column**
+Return the sum of rows from a specified column of a specified table.
+
+   select sum([Column Name]) from [Table Name]
+
+**20. Return Average of Column**
+Return the average of the rows from a specified column of a specified table.
+
+   select avg([Column Name]) from [Table Name]
+
 
 **Please Note**
 1. All commands should end with a semicolon. Without it, the system will not be able to detect the entered command.  
