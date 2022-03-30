@@ -736,7 +736,7 @@ std::string Parser::getSumFunctionSourceTableName(std::string cmd)
 	//cout << "cmd:" << cmd << "\n";
 
 	// perform regex to find when sum(.*) is found
-	regex str_expr("(.*)(sum||SUM||avg||AVG)\((.*)\) (from||FROM) (.*)( .*)*");
+	regex str_expr("(.*)(sum||SUM||avg||AVG)\\((.*)\\) (from||FROM) (.*)( .*)*");
 	smatch sm;
 	regex_match(cmd, sm, str_expr);
 	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
