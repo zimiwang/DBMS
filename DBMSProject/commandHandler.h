@@ -20,8 +20,8 @@ public:
 	std::string table_name;
 	std::string cmd;
 	std::string statement;
-
-	
+	//std::string current_username = getUsername();
+	std::string current_username = "joe";
 
 	/// <summary>
 	/// command handker: exit the dbms--this is fairly self-explanatary
@@ -70,7 +70,7 @@ public:
 	/// <param name="db">string name of the current database</param>
 	/// <param name="cmd">command string</param>
 	/// <returns>1 on completion</returns>
-	int createDatabase(string new_current_db_name, Database *new_db, string new_cmd )
+	int createDatabase(string new_current_db_name, Database* new_db, string new_cmd)
 	{
 		current_db_name = new_current_db_name;
 		db = new_db;
@@ -79,7 +79,9 @@ public:
 		current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		db = new Database();
 		db->database_name = current_db_name;
+		// addOwner(current_db_name);
 		db->Save();
+
 		return 1;
 	}
 
@@ -331,7 +333,7 @@ public:
 
 				Table t = db->join_table(joinparser[0], joinparser[1], joinparser[2], joinparser[3]);
 				tree = index_join(t);
-				if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "sum") || Utils::contains(cmd, "count"))
+				if (Utils::contains(cmd, "order by") || Utils::contains(cmd, "group by") ||Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "sum") || Utils::contains(cmd, "count"))
 				{
 					return columnoperations(cmd, tree);
 				}
@@ -351,7 +353,7 @@ public:
 
 					cout << "Joined: " << joinparser[0] << " with " << joinparser[1] << " as " << t.table_name << endl;
 					std::vector<std::string> cols = Parser::get_select_columns(cmd);
-					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum"))
+					if (Utils::contains(cmd, "order by") || Utils::contains(cmd, "group by") || Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum"))
 					{
 						return columnoperations(cmd, tree);
 					}
@@ -365,15 +367,15 @@ public:
 					tree = db->get_tree(tbl_name);
 
 				}
-				else {
-					// use if there is no join
-					std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
-					cout << "Selecting from Table: " << tbl_name << endl;
+			}
+			else {
+				// use if there is no join
+				std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
+				cout << "Selecting from Table: " << tbl_name << endl;
 
-					tbl_name = Utils::remove_char(tbl_name, ';');
-					tree = db->get_tree(tbl_name);
-				}
-			}			
+				tbl_name = Utils::remove_char(tbl_name, ';');
+				tree = db->get_tree(tbl_name);
+			}				
 			if (tree.Name.length() > 0)
 			{
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
@@ -388,7 +390,7 @@ public:
 				if (skipmainprint == false)
 				{
 					//check for minmax
-					if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum") || Utils::contains(cmd, "MIN") || Utils::contains(cmd, "MAX") || Utils::contains(cmd, "AVG") || Utils::contains(cmd, "COUNT") || Utils::contains(cmd, "SUM"))
+					if (Utils::contains(cmd, "order by") ||Utils::contains(cmd, "group by") ||Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "avg") || Utils::contains(cmd, "count") || Utils::contains(cmd, "sum") || Utils::contains(cmd, "MIN") || Utils::contains(cmd, "MAX") || Utils::contains(cmd, "AVG") || Utils::contains(cmd, "COUNT") || Utils::contains(cmd, "SUM"))
 					{
 						return columnoperations(cmd, tree);
 					}
@@ -853,6 +855,42 @@ public:
 		return 1;
 	}
 
+	/// <summary>
+/// When create a database, save the database to the users.txt
+/// </summary>
+	void addOwner(std::string db_name) {
+
+		std::string line, temp;
+		std::string db = db_name;
+		std::string data = "";
+		std::ifstream read("../users.txt");
+
+		//std::string username = getUsername();
+		std::string username = current_username;
+
+		if (read) {
+
+			while (std::getline(read, line)) {
+
+				std::istringstream is(line);
+				is >> temp;
+				if (temp == username) {
+
+					data += (line + " " + db + "\n");
+					
+				}
+				else {
+					data += (line + "\n");
+				}
+			}
+		}
+		read.close();
+
+		std::ofstream os("../users.txt");
+		os << data;
+		os.close();
+	}
+
 	int columnoperations(string cmd, BPTree tree)
 	{
 		if (Utils::contains(cmd, "min") || Utils::contains(cmd, "max") || Utils::contains(cmd, "MIN") || Utils::contains(cmd, "MAX"))
@@ -872,8 +910,237 @@ public:
 			return avgHandler(cmd, db);
 			
 		}
+		else if (Utils::contains(cmd, "group"))
+		{
+			return grouphandler(cmd, tree);
+
+		}
+		else if (Utils::contains(cmd, "order"))
+		{
+			return orderhandler(cmd, tree);
+
+		}
 	}
 
+	/// <summary>
+	/// Handler for group by command
+	/// </summary>
+	/// <param name="cmd">command</param>
+	/// <param name="tree">tree we're operating on</param>
+	/// <returns>1 on success, 0 on failure</returns>
+	int grouphandler(std::string cmd, BPTree tree)
+	{
+		vector<Row> tablerows = tree.getFullTable();
+		vector<Row> groupedrows;
+		string groupcolname = Utils::get_string_between_two_strings(cmd, "by ", ";");
+		vector<vector<Row>> groups;
+		std::vector<std::string> cols = Parser::get_select_columns(cmd);
+		cols = Utils::trimColumns(cols);
+		int type;
+		for (Row r : tablerows)
+		{
+			type = r.GetColumnType(groupcolname);
+		}
+
+		if (type == 0)
+		{
+			//string
+			vector<string> groups;
+			for (Row r : tablerows)
+			{
+				Column<string> s = r.GetStringColumnByName(groupcolname);
+				string val = s.GetValue();
+				if (std::find(groups.begin(), groups.end(), val) == groups.end())
+				{
+					groups.push_back(val);
+				}
+			}
+
+			for (string n : groups)
+			{
+				for (Row r : tablerows)
+				{
+					if (n == r.GetStringColumnByName(groupcolname).GetValue())
+					{
+						groupedrows.push_back(r);
+					}
+				}
+			}
+
+			groupedrows[0].PrintFullTable(groupedrows, cols);
+			return 1;
+		}
+		else if (type == 1)
+		{
+			//int
+			vector<int> groups;
+			for (Row r : tablerows)
+			{
+				Column<int> s = r.GetIntColumnByName(groupcolname);
+				int val = s.GetValue();
+				if (std::find(groups.begin(), groups.end(), val) == groups.end())
+				{
+					groups.push_back(val);
+				}
+			}
+
+			for (int n : groups)
+			{
+				for (Row r : tablerows)
+				{
+					if (n == r.GetIntColumnByName(groupcolname).GetValue())
+					{
+						groupedrows.push_back(r);
+					}
+				}
+			}
+			groupedrows[0].PrintFullTable(groupedrows, cols);
+			return 1;
+		}
+		else if (type == 2)
+		{
+			//char
+			vector<char> groups;
+			for (Row r : tablerows)
+			{
+				Column<char> s = r.GetCharColumnByName(groupcolname);
+				char val = s.GetValue();
+				if (std::find(groups.begin(), groups.end(), val) == groups.end())
+				{
+					groups.push_back(val);
+				}
+			}
+
+			for (char n : groups)
+			{
+				for (Row r : tablerows)
+				{
+					if (n == r.GetCharColumnByName(groupcolname).GetValue())
+					{
+						groupedrows.push_back(r);
+					}
+				}
+			}
+
+			groupedrows[0].PrintFullTable(groupedrows, cols);
+			return 1;
+		}
+		else return 0;
+
+	}
+
+	/// <summary>
+	/// Handler for order by command
+	/// </summary>
+	/// <param name="cmd">command</param>
+	/// <param name="tree">tree we're operating on</param>
+	/// <returns>1 on success, 0 on failure</returns>
+	int orderhandler(std::string cmd, BPTree tree)
+	{
+		vector<Row> tablerows = tree.getFullTable();
+		vector<Row> groupedrows;
+		string groupcolname = Utils::get_string_between_two_strings(cmd, "by ", ";");
+		vector<vector<Row>> groups;
+		std::vector<std::string> cols = Parser::get_select_columns(cmd);
+		cols = Utils::trimColumns(cols);
+		int type;
+		for (Row r : tablerows)
+		{
+			type = r.GetColumnType(groupcolname);
+		}
+
+		if (type == 0)
+		{
+			//string
+			vector<string> groups;
+			for (Row r : tablerows)
+			{
+				Column<string> s = r.GetStringColumnByName(groupcolname);
+				string val = s.GetValue();
+				if (std::find(groups.begin(), groups.end(), val) == groups.end())
+				{
+					groups.push_back(val);
+				}
+			}
+			sort(groups.begin(), groups.end());
+			for (string n : groups)
+			{
+				for (Row r : tablerows)
+				{
+					if (n == r.GetStringColumnByName(groupcolname).GetValue())
+					{
+						groupedrows.push_back(r);
+					}
+				}
+			}
+			
+			groupedrows[0].PrintFullTable(groupedrows, cols);
+			return 1;
+		}
+		else if (type == 1)
+		{
+			//int
+			vector<int> groups;
+			for (Row r : tablerows)
+			{
+				Column<int> s = r.GetIntColumnByName(groupcolname);
+				int val = s.GetValue();
+				if (std::find(groups.begin(), groups.end(), val) == groups.end())
+				{
+					groups.push_back(val);
+				}
+			}
+			sort(groups.begin(), groups.end());
+
+			for (int n : groups)
+			{
+				for (Row r : tablerows)
+				{
+					if (n == r.GetIntColumnByName(groupcolname).GetValue())
+					{
+						groupedrows.push_back(r);
+					}
+				}
+			}
+			groupedrows[0].PrintFullTable(groupedrows, cols);
+			return 1;
+		}
+		else if (type == 2)
+		{
+			//char
+			vector<char> groups;
+			for (Row r : tablerows)
+			{
+				Column<char> s = r.GetCharColumnByName(groupcolname);
+				char val = s.GetValue();
+				if (std::find(groups.begin(), groups.end(), val) == groups.end())
+				{
+					groups.push_back(val);
+				}
+			}
+			sort(groups.begin(), groups.end());
+			for (char n : groups)
+			{
+				for (Row r : tablerows)
+				{
+					if (n == r.GetCharColumnByName(groupcolname).GetValue())
+					{
+						groupedrows.push_back(r);
+					}
+				}
+			}
+			groupedrows[0].PrintFullTable(groupedrows, cols);
+			return 1;
+		}
+		else return 0;
+	}
+
+	/// <summary>
+	/// Handler for min / max clauses
+	/// </summary>
+	/// <param name="cmd">command</param>
+	/// <param name="tree">tree we're operating on</param>
+	/// <returns>1 on success, 0 on failure</returns>
 	int maxminHelper(std::string cmd, BPTree tree)
 	{
 		vector<Row> tablerows = tree.getFullTable();
