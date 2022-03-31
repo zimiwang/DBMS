@@ -502,12 +502,14 @@ public:
 	template <typename T>
 	void SearchBTreeKey(vector<string> cols, BTree<T> tree, T sk) {		
 
-		Row row = tree.search(sk);
-		if (!row.isEmpty()) {
-			row.PrintRow(cols, row.GetLargestColumnSize());
-		}
-		else {
-			cout << "Could not find row" << endl;
+		vector<Row> rows = tree.search(sk);
+		for (Row row : rows) {
+			if (!row.isEmpty()) {
+				row.PrintRow(cols, row.GetLargestColumnSize());
+			}
+			else {
+				cout << "Could not find row" << endl;
+			}
 		}
 
 	}

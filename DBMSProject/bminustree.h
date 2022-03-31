@@ -6,11 +6,18 @@
 #include "row.h"
 using namespace std;
 
+template <typename T> struct DuplicateKey {
+    T key;
+    vector<Row> rows;
+};
 
 template <typename T> struct Key {
     T key;
+    bool duplicate = false;
+    DuplicateKey<T> dpks;
     Row row;
 };
+
 
 
 template <typename T> class TreeNode {
@@ -20,7 +27,21 @@ template <typename T> class TreeNode {
     int size;
     bool leaf;
 
+    vector<Row> CreateRowVector(Key<T> key) {
+        vector<Row> rows;
+        rows.push_back(key.row);
+        return rows;
+    }
+
 public:
+
+    vector<Row> CreateRowVector(Row row) {
+        vector<Row> rows;        
+        rows.push_back(row);
+        return rows;
+    }
+
+
     TreeNode(bool leaf1) {        
         leaf = leaf1;
 
@@ -32,16 +53,32 @@ public:
 
     void insertNonFull(T k, Row row) {
         int i = size - 1;
-
+        bool Continue = true;
         if (leaf == true) {
             while (i >= 0 && keys[i].key > k) {
+                if (i >= 0 && keys[i].key > k) {
+                    Continue = true;
+                }
+                else if (i >= 0 && keys[i].key == k) {
+                    if (keys[i].duplicate) {                        
+                        keys[i].dpks.rows.push_back(row);
+                    }
+                    else {
+                        keys[i].duplicate = true;                        
+                        keys[i].dpks.key = k;
+                        keys[i].dpks.rows.push_back(row);
+                    }
+                    Continue = false;
+                }
+                else Continue = false;
                 keys[i + 1] = keys[i];
                 i--;
             }
-
-            keys[i + 1].key = k;
-            keys[i + 1].row = row;
-            size = size + 1;
+            if (!keys[i].duplicate) {
+                keys[i + 1].key = k;
+                keys[i + 1].row = row;
+                size = size + 1;
+            }
         }
         else {
             while (i >= 0 && keys[i].key > k)
@@ -96,17 +133,23 @@ public:
             C[i]->traverse();
     }
 
-    Row search(T k) {
+    vector<Row> search(T k) {
         int i = 0;
         while (i < size && k > keys[i].key)
             i++;
 
-        if (keys[i].key == k)
-            return keys[i].row;
+        if (keys[i].key == k) {
+            if (keys[i].duplicate) {
+                return keys[i].dpks.rows;
+            }
+            else {
+                return CreateRowVector(keys[i]);
+            }            
+        }
 
         if (leaf == true) {
             Row row;
-            return row;
+            return CreateRowVector(row);
         }
             
 
@@ -145,12 +188,11 @@ public:
         if (root != NULL)
             root->traverse();
     }
-
-    Row search(T k) {
+    vector<Row> search(T k) {
         if (root == NULL) {
             // create empty row
             Row row;
-            return row;
+            return root->CreateRowVector(row);
         }
         else {
             return root->search(k);
