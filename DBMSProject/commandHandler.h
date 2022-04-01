@@ -22,8 +22,7 @@ public:
 	std::string table_name;
 	std::string cmd;
 	std::string statement;
-	//std::string current_username = getUsername();
-	std::string current_username = "joe";
+	std::string current_username = "";
 
 	/// <summary>
 	/// command handker: exit the dbms--this is fairly self-explanatary
@@ -81,8 +80,11 @@ public:
 		current_db_name = cmd.substr(cmd.find_last_of(' ') + 1, cmd.find_last_of(';') - cmd.find_last_of(' ') - 1);
 		db = new Database();
 		db->database_name = current_db_name;
-		// addOwner(current_db_name);
 		db->Save();
+
+		if (current_username.empty() == 0) {
+			addOwner(current_db_name);
+		}
 
 		return 1;
 	}
@@ -101,7 +103,6 @@ public:
 		current_db_name = new_current_db_name;
 		db = new_db;
 		cmd = new_cmd;
-		//current_db_name = statement.substr(statement.find_last_of(' ') + 1, statement.find_last_of(';') - statement.find_last_of(' ') - 1);
 
 		current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
 		db = new Database(current_db_name);
