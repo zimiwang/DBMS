@@ -9,6 +9,8 @@
 #include <sstream>
 #include <iostream>
 #include "bminustree.h"
+#include <string>
+#include <cstring>
 using namespace std;
 
 class CommandHandler
@@ -367,6 +369,13 @@ public:
 					tree = db->get_tree(tbl_name);
 
 				}
+				else {
+					// use if there is no join
+					std::string tbl_name = Parser::get_table_name(cmd, "from", " where");
+					cout << "Selecting from Table: " << tbl_name << endl;
+
+					tree = db->get_tree(tbl_name);
+				}
 			}
 			else {
 				// use if there is no join
@@ -404,15 +413,16 @@ public:
 					else {
 						// decide to use search based on pk, sk, or full search
 						string column = clauses.GetValuesByKey("where")[0];
-
+						std::vector<string> coln = Utils::split(column, conditional);
 						// search based on pk
-						if (tree.IsPrimaryKey(column)) {
+						if (tree.IsPrimaryKey(coln[0])) {
 							// search table
 							if (Utils::contains(cmd, "between")) {
 								SearchOnRange(tree, cols);
 							}
 							else {
-								string pk = clauses.GetValuesByKey("where")[2];
+								//string pk = clauses.GetValuesByKey("where")[2];
+								string pk = coln[1];
 								Row row = tree.search(stoi(pk));
 								if (!row.isEmpty()) {
 									row.PrintRow(cols, row.GetLargestColumnSize());
@@ -424,7 +434,7 @@ public:
 
 						}
 						// search based on sk
-						else if (tree.IsSecondaryKey(column)) {
+						else if (tree.IsSecondaryKey(coln[0])) {
 							if (Utils::contains(cmd, "between")) {
 								SearchOnRange(tree, cols);
 							}
@@ -436,7 +446,7 @@ public:
 						}
 						// full searh
 						else {
-							FullSearch(tree, clauses, cols);
+							FullSearch(tree, clauses, cols, conditional);
 						}
 						
 					}
@@ -525,14 +535,19 @@ public:
 	/// <param name="tree">The primary tree table to get all the rows</param>
 	/// <param name="clauses"></param>
 	/// <param name="cols"></param>
-	void FullSearch(BPTree tree, Dictionary clauses, vector<string> cols) {
+	void FullSearch(BPTree tree, Dictionary clauses, vector<string> cols, string conditional) {
 		vector<Row> rows = tree.getFullTable();
 		// get the column type and name
 		string colName = clauses.GetValuesByKey("where")[0];
-		int type = rows[0].GetColumnType(colName);
+		// modified - jw 3/31
+		std::vector<string> coln = Utils::split(colName, conditional);
+		string cname = coln[0];
+		string cval = coln[1];
+		int type = rows[0].GetColumnType(cname);
 
 		// the value to use to get the row
-		string valueToCompare = clauses.GetValuesByKey("where")[2];
+		// string valueToCompare = clauses.GetValuesByKey("where")[2];
+		string valueToCompare = cval;
 		vector<Row> rowsFound;
 		bool shouldPrint = true;
 		for (Row row : rows) {
@@ -540,27 +555,78 @@ public:
 				shouldPrint = false;
 			}
 			else if (type == 0) {
-				Column<string> col = row.GetStringColumnByName(colName);
-				// check if column value matches
-				if (col.GetValue() == valueToCompare) {
-					// print row
-					rowsFound.push_back(row);
+				Column<string> col = row.GetStringColumnByName(cname);
+				// check if column value matches || for strings, can only do == or !=
+				if (conditional == "=")
+				{
+					if (col.GetValue() == valueToCompare) {
+						// print row
+						rowsFound.push_back(row);
+					}
 				}
+				else if (conditional == "!=")
+				{
+					if (col.GetValue() != valueToCompare) {
+						// print row
+						rowsFound.push_back(row);
+					}
+				}				
 			}
 			else if (type == 1) {
-				Column<int> col = row.GetIntColumnByName(colName);
-				if (to_string(col.GetValue()) == valueToCompare) {
-					rowsFound.push_back(row);
+				Column<int> col = row.GetIntColumnByName(cname);
+				if (conditional == "=")
+				{
+					if (col.GetValue() == stoi(valueToCompare)) {
+						// print row
+						rowsFound.push_back(row);
+					}
+				}
+				else if (conditional == "<=")
+				{
+					if (col.GetValue() <= stoi(valueToCompare)) {
+						// print row
+						rowsFound.push_back(row);
+					}
+				}
+				else if (conditional == ">=")
+				{
+					if (col.GetValue() >= stoi(valueToCompare)) {
+						// print row
+						rowsFound.push_back(row);
+					}
+				}
+				else if (conditional == ">")
+				{
+					if (col.GetValue() > stoi(valueToCompare)) {
+						// print row
+						rowsFound.push_back(row);
+					}
+				}
+				else if (conditional == "<")
+				{
+					if (col.GetValue() < stoi(valueToCompare)) {
+						// print row
+						rowsFound.push_back(row);
+					}
+				}
+				else if (conditional == "!=")
+				{
+					if (col.GetValue() != stoi(valueToCompare)) {
+						// print row
+						rowsFound.push_back(row);
+					}
 				}
 			}
 			else if (type == 2) {
-				Column<char> col = row.GetCharColumnByName(colName);
-				string value;
-				value = col.GetValue();
-				if (value == valueToCompare) {
-					rowsFound.push_back(row);
-				}
+				//doesn't work for char arrays quite yet 
+				shouldPrint = false;
 			}
+			
+		
+		}
+		if (rowsFound.size() == 0)
+		{
+			shouldPrint = false;
 		}
 		// print all of the rows found with the given conditions
 		if (shouldPrint) {
