@@ -100,19 +100,64 @@ public:
 	/// <returns>um....</returns>
 	int openDatabase(string new_current_db_name, Database *new_db, string new_cmd)
 	{
-		current_db_name = new_current_db_name;
-		db = new_db;
-		cmd = new_cmd;
+		if (current_username.empty() == 1)
+		{
+			current_db_name = new_current_db_name;
+			db = new_db;
+			cmd = new_cmd;
 
-		current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
-		db = new Database(current_db_name);
+			current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
+			db = new Database(current_db_name);
 
-		if (db->database_name != current_db_name) {
-			current_db_name = "";
+			if (db->database_name != current_db_name) {
+				current_db_name = "";
+			}
+
+			return 1;
 		}
+		else
+		{
+			std::string line, temp;
+			bool isExist = false;
+			std::ifstream read("../users.txt");
 
-		return 1;
+			while (std::getline(read, line)) {
+
+				std::istringstream is(line);
+				is >> temp;
+				std::size_t found = line.find(" " + current_db_name);
+
+				if (temp == current_username) {
+
+					if (found != std::string::npos) {
+						isExist = true;
+					}
+				}
+			}
+			read.close();
+
+			if (isExist)
+			{
+				current_db_name = new_current_db_name;
+				db = new_db;
+				cmd = new_cmd;
+
+				current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
+				db = new Database(current_db_name);
+
+				if (db->database_name != current_db_name) {
+					current_db_name = "";
+				}
+
+				return 1;
+			}
+			else
+			{
+				std::cout << current_username << " does not have the access to this database, please login another account " << std::endl;
+			}
+		}
 	}
+
 
 
 
