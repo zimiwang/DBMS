@@ -8,6 +8,8 @@
 using namespace std;
 
 
+// currently, this class is to test various applications and implementations of serialization 
+
 /// <summary>
 /// A serialization class that contains function(s) for serialization 
 /// </summary>
