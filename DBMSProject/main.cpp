@@ -40,7 +40,7 @@ void color(int s);
 
 void setup_intro();
 
-void login_interface();
+std::string login_interface();
 
 int mainFunct(string cmd);
 
@@ -65,8 +65,8 @@ CommandHandler* cmdHandler = new CommandHandler;
 int exitDBMS() { return cmdHandler->exitDBMS(); }
 int helpMenu() { return cmdHandler->helpMenu(); } /* test incorperated in test.cpp */
 int noSemiColon() { return cmdHandler->noSemiColon(); }
-int openDatabase() { int retVal = cmdHandler->openDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;}/* test incorperated in tests.cpp */
-int createDatabase() { int retVal = cmdHandler->createDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }/* test incorperated in tests.cpp */
+int openDatabase() { int retVal = cmdHandler->openDatabase(current_db_name, db, cmd, current_username); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;}/* test incorperated in tests.cpp */
+int createDatabase() { int retVal = cmdHandler->createDatabase(current_db_name, db, cmd, current_username); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }/* test incorperated in tests.cpp */
 int listDatabases() { int retVal = cmdHandler->listDatabases(); return retVal; }
 int loadSQLfile() { int retVal = cmdHandler->loadSQLfile(db, current_db_name); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }
 int dropDatabase() { int retVal = cmdHandler->dropDatabase(cmd); current_db_name = cmdHandler->current_db_name; return retVal; } /* test incorperated in tests.cpp*/
@@ -110,7 +110,7 @@ int main() {
 int main(int argc, char** argv)
 {
 	// The user login interface has been commented out; if you want to use it, delete the comments
-	//login_interface();
+	std::string current_username = login_interface();
 
 	setup_intro();
 
@@ -302,7 +302,7 @@ void setup_intro()
 /// <summary>
 /// Provide a login interface
 /// </summary>
-void login_interface() {
+std::string login_interface() {
 
 	std::pair<int, std::string> ret;
 	//std::string username;
@@ -346,5 +346,7 @@ void login_interface() {
 		{
 			break;
 		}
+
+		return current_username;
 	}
 }

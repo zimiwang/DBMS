@@ -22,7 +22,7 @@ public:
 	std::string table_name;
 	std::string cmd;
 	std::string statement;
-	std::string current_username = "";
+	//std::string current_username = "joe";
 
 	/// <summary>
 	/// command handker: exit the dbms--this is fairly self-explanatary
@@ -71,7 +71,7 @@ public:
 	/// <param name="db">string name of the current database</param>
 	/// <param name="cmd">command string</param>
 	/// <returns>1 on completion</returns>
-	int createDatabase(string new_current_db_name, Database* new_db, string new_cmd)
+	int createDatabase(string new_current_db_name, Database* new_db, string new_cmd, string current_username)
 	{
 		current_db_name = new_current_db_name;
 		db = new_db;
@@ -83,7 +83,7 @@ public:
 		db->Save();
 
 		if (current_username.empty() == 0) {
-			addOwner(current_db_name);
+			addOwner(current_db_name, current_username);
 		}
 
 		return 1;
@@ -98,7 +98,7 @@ public:
 	/// <param name="db">reference to the current database</param>
 	/// <param name="cmd">the command string</param>
 	/// <returns>um....</returns>
-	int openDatabase(string new_current_db_name, Database *new_db, string new_cmd)
+	int openDatabase(string new_current_db_name, Database *new_db, string new_cmd, string current_username)
 	{
 		current_db_name = new_current_db_name;
 		db = new_db;
@@ -966,7 +966,7 @@ public:
 	/// <summary>
 /// When create a database, save the database to the users.txt
 /// </summary>
-	void addOwner(std::string db_name) {
+	void addOwner(std::string db_name, std::string current_username) {
 
 		std::string line, temp;
 		std::string db = db_name;
