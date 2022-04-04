@@ -100,12 +100,12 @@ public:
 	/// <returns>um....</returns>
 	int openDatabase(string new_current_db_name, Database *new_db, string new_cmd)
 	{
+		current_db_name = new_current_db_name;
+		db = new_db;
+		cmd = new_cmd;
+
 		if (current_username.empty() == 1)
 		{
-			current_db_name = new_current_db_name;
-			db = new_db;
-			cmd = new_cmd;
-
 			current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
 			db = new Database(current_db_name);
 
@@ -138,10 +138,6 @@ public:
 
 			if (isExist)
 			{
-				current_db_name = new_current_db_name;
-				db = new_db;
-				cmd = new_cmd;
-
 				current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
 				db = new Database(current_db_name);
 
