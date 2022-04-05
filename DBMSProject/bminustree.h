@@ -1,6 +1,7 @@
 #pragma once
 
 // Searching a key on a B-tree in C++
+// Modified B-Tree from https://www.programiz.com/dsa/b-tree
 
 #include <iostream>
 #include "row.h"
@@ -55,26 +56,22 @@ public:
         int i = size - 1;
         bool Continue = true;
         if (leaf == true) {
-            while (i >= 0 && keys[i].key > k) {
-                if (i >= 0 && keys[i].key > k) {
-                    Continue = true;
-                }
-                else if (i >= 0 && keys[i].key == k) {
-                    if (keys[i].duplicate) {                        
-                        keys[i].dpks.rows.push_back(row);
-                    }
-                    else {
-                        keys[i].duplicate = true;                        
-                        keys[i].dpks.key = k;
-                        keys[i].dpks.rows.push_back(row);
-                    }
-                    Continue = false;
-                }
-                else Continue = false;
+            while (i >= 0 && keys[i].key > k) {           
                 keys[i + 1] = keys[i];
                 i--;
             }
-            if (!keys[i].duplicate) {
+            if (i >= 0 && keys[i].key == k) {
+                if (keys[i].duplicate) {
+                    keys[i].dpks.rows.push_back(row);
+                }
+                else {
+                    keys[i].duplicate = true;
+                    keys[i].dpks.key = k;
+                    keys[i].dpks.rows.push_back(keys[i].row);
+                    keys[i].dpks.rows.push_back(row);
+                }            
+            }
+            else {
                 keys[i + 1].key = k;
                 keys[i + 1].row = row;
                 size = size + 1;

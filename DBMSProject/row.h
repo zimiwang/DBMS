@@ -538,9 +538,14 @@ public:
 		// get largest column value
 		int maxSize = 0;
 		for (Row row : rows) {
-			int size = row.GetLargestColumnSize();
-			if (size > maxSize) {
-				maxSize = size;
+			if (!row.isEmpty()) {
+				int size = row.GetLargestColumnSize();
+				if (size > maxSize) {
+					maxSize = size;
+				}
+			}
+			else {
+				cout << "Could not find indicated key" << endl;
 			}
 		}
 

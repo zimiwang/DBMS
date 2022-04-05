@@ -345,7 +345,7 @@ void Database::Read(std::string db_name)
 				tbl->keys = keys;
 				tbl->rows = rows;
 				tbl->columns = columns;
-
+				//tbl->spread_keys();
 				this->AddTable(*tbl);
 
 				rows.clear();
@@ -982,15 +982,18 @@ inline void Database::updatePrimaryTrees()
 		// add the secondarytrees to the arrays if they are not empty
 		if (!secondaryIntKeyTree.IsEmpty()) {
 			secondaryIntTrees.push_back(secondaryIntKeyTree);
+			newPrimaryKeyIndex.AddSecondaryKey(secondaryIntKeyTree.GetKeyName());
 		}
 		if (!secondaryCharKeyTree.IsEmpty()) {
 			secondaryCharTrees.push_back(secondaryCharKeyTree);
+			newPrimaryKeyIndex.AddSecondaryKey(secondaryCharKeyTree.GetKeyName());
 		}
 		if (!secondaryStringKeyTree.IsEmpty()) {
 			secondaryStringTrees.push_back(secondaryStringKeyTree);
+			newPrimaryKeyIndex.AddSecondaryKey(secondaryStringKeyTree.GetKeyName());
 		}
 
-		tbl.primaryKeyTree = newPrimaryKeyIndex;
+		tbl.primaryKeyTree = newPrimaryKeyIndex;		
 		primary_key_trees.push_back(newPrimaryKeyIndex);
 
 		SaveTable(tbl);

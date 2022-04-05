@@ -557,14 +557,15 @@ public:
 	void SearchBTreeKey(vector<string> cols, BTree<T> tree, T sk) {		
 
 		vector<Row> rows = tree.search(sk);
-		for (Row row : rows) {
+		rows[0].PrintFullTable(rows, cols);
+		/*for (Row row : rows) {
 			if (!row.isEmpty()) {
 				row.PrintRow(cols, row.GetLargestColumnSize());
 			}
 			else {
 				cout << "Could not find row" << endl;
 			}
-		}
+		}*/
 
 	}
 
