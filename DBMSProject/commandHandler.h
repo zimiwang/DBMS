@@ -22,10 +22,10 @@ public:
 	std::string table_name;
 	std::string cmd;
 	std::string statement;
-	//std::string current_username = "joe";
+	std::string current_username = "";
 
 	/// <summary>
-	/// command handker: exit the dbms--this is fairly self-explanatary
+	/// command handler: exit the dbms--this is fairly self-explanatary
 	/// </summary>
 	/// <returns>1 on execution</returns>
 	int exitDBMS()
@@ -53,6 +53,60 @@ public:
 
 
 	/// <summary>
+	/// Provide a login interface
+	/// </summary>
+	/// <returns></returns>
+	int loginDBMS() 
+	{
+		std::pair<int, std::string> ret;
+		int isRun = 0;
+		login log;
+
+		while (1)
+		{
+			system("cls");
+
+			std::cout << "\n------------- User Login Interface -------------" << std::endl;
+			std::cout << "1. User Login \n";
+			std::cout << "2. Administrator Login\n";
+			std::cout << "0. Exit \n";
+
+			int option;
+			std::cout << "Please enter a number for your choice. \n";
+
+			std::cin >> option;
+			/*	std::getline(std::cin, op);
+				int option = stoi(op);*/
+
+			switch (option)
+			{
+			case 1:
+				ret = log.userLogin();
+				break;
+			case 2:
+				log.addminstratorLogin();
+				break;
+			case 0:
+				exit(0);
+			default:
+				std::cout << "\nInvalid choice. Please enter a number again ";
+			}
+
+			isRun = ret.first;
+			current_username = ret.second;
+
+			if (isRun == 1)
+			{
+				break;
+			}
+
+			return 1;
+		}
+	}
+
+
+
+	/// <summary>
 	/// command handler: when there is no ';' terminating character
 	/// </summary>
 	/// <returns>1 on text prompt execution</returns>
@@ -71,7 +125,7 @@ public:
 	/// <param name="db">string name of the current database</param>
 	/// <param name="cmd">command string</param>
 	/// <returns>1 on completion</returns>
-	int createDatabase(string new_current_db_name, Database* new_db, string new_cmd, string current_username)
+	int createDatabase(string new_current_db_name, Database* new_db, string new_cmd)
 	{
 		current_db_name = new_current_db_name;
 		db = new_db;
@@ -98,7 +152,7 @@ public:
 	/// <param name="db">reference to the current database</param>
 	/// <param name="cmd">the command string</param>
 	/// <returns>um....</returns>
-	int openDatabase(string new_current_db_name, Database *new_db, string new_cmd, string current_username)
+	int openDatabase(string new_current_db_name, Database *new_db, string new_cmd)
 	{
 		current_db_name = new_current_db_name;
 		db = new_db;

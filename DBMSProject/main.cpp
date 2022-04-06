@@ -30,7 +30,6 @@ std::string table_name;
 std::string db_name;
 std::string cmd = "";
 std::string statement;
-std::string current_username;
 
 Database* read_sql_file(string path);
 Database* db = NULL;
@@ -64,9 +63,10 @@ CommandHandler* cmdHandler = new CommandHandler;
 */
 int exitDBMS() { return cmdHandler->exitDBMS(); }
 int helpMenu() { return cmdHandler->helpMenu(); } /* test incorperated in test.cpp */
+int loginHandler() { return cmdHandler->loginDBMS(); }
 int noSemiColon() { return cmdHandler->noSemiColon(); }
-int openDatabase() { int retVal = cmdHandler->openDatabase(current_db_name, db, cmd, current_username); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;}/* test incorperated in tests.cpp */
-int createDatabase() { int retVal = cmdHandler->createDatabase(current_db_name, db, cmd, current_username); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }/* test incorperated in tests.cpp */
+int openDatabase() { int retVal = cmdHandler->openDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;}/* test incorperated in tests.cpp */
+int createDatabase() { int retVal = cmdHandler->createDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }/* test incorperated in tests.cpp */
 int listDatabases() { int retVal = cmdHandler->listDatabases(); return retVal; }
 int loadSQLfile() { int retVal = cmdHandler->loadSQLfile(db, current_db_name); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }
 int dropDatabase() { int retVal = cmdHandler->dropDatabase(cmd); current_db_name = cmdHandler->current_db_name; return retVal; } /* test incorperated in tests.cpp*/
@@ -110,7 +110,7 @@ int main() {
 int main(int argc, char** argv)
 {
 	// The user login interface has been commented out; if you want to use it, delete the comments
-	//std::string current_username = login_interface();
+	//loginHandler();
 
 	setup_intro();
 
@@ -183,8 +183,9 @@ int main(int argc, char** argv)
 			{ "update", &update, },
 			{ "deleteFrom", &deleteFrom, },
 			{ "renameTable", &renameTable, },
-			{ "renameColumn", & renameColumn, },
-			{ "alterHandl", & alterHandler, }
+			{ "renameColumn", &renameColumn, },
+			{ "alterHandl", &alterHandler, },
+			{ "loginHandler", &loginHandler, },
 			
 		};
 
@@ -195,7 +196,7 @@ int main(int argc, char** argv)
 
 		// condition checking. If true, execute the function pointer (located in sqlCommands)
 		if (statement == "")								cout << "";
-		else if (statement == "exit")							(*sqlCommands.find("exit")).second();
+		else if (statement == "exit")						(*sqlCommands.find("exit")).second();
 		else if (statement == "help")						(*sqlCommands.find("help")).second();
 		else if (statement.back() != ';')					(*sqlCommands.find("noSemiColon")).second();
 		else if (statement.find("open database ") == 0)		(*sqlCommands.find("openDatabase")).second();
@@ -216,7 +217,7 @@ int main(int argc, char** argv)
 		else if (statement.find("rename table ") == 0)		(*sqlCommands.find("renameTable")).second();
 		else if (statement.find("rename column ") == 0)		(*sqlCommands.find("renameColumn")).second();
 		else if (statement.find("alter ") == 0)             (*sqlCommands.find("alterHandl")).second();
-
+		else if (statement.find("logout") == 0)             (*sqlCommands.find("loginHandler")).second();
 		
 		else												std::cout << "Invalid Command." << std::endl;
 
@@ -297,56 +298,4 @@ void setup_intro()
 		<< "Success! Here is your shell." << std::endl
 		<< "Type [help] for a list of commands. Type [exit] to quit." << std::endl
 		<< std::endl;
-}
-
-/// <summary>
-/// Provide a login interface
-/// </summary>
-std::string login_interface() {
-
-	std::pair<int, std::string> ret;
-	//std::string username;
-	int isRun = 0;
-	login log;
-
-	while (1)
-	{
-		system("cls");
-
-		std::cout << "\n------------- User Login Interface -------------" << std::endl;
-		std::cout << "1. User Login \n";
-		std::cout << "2. Administrator Login\n";
-		std::cout << "0. Exit \n";
-
-		int option;
-		std::cout << "Please enter a number for your choice. \n";
-
-		std::cin >> option;
-		/*	std::getline(std::cin, op);
-			int option = stoi(op);*/
-
-		switch (option)
-		{
-		case 1:
-			ret = log.userLogin();
-			break;
-		case 2:
-			log.addminstratorLogin();
-			break;
-		case 0:
-			exit(0);
-		default:
-			std::cout << "\nInvalid choice. Please enter a number again ";
-		}
-
-		isRun = ret.first;
-		current_username = ret.second;
-
-		if (isRun == 1)
-		{
-			break;
-		}
-
-		return current_username;
-	}
 }
