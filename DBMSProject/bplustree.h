@@ -660,6 +660,9 @@ public:
     Node* getRoot() {
         return root;
     };
+
+    bool operator==(const BPTree& rhs) const
+    {
+        return rhs.Name == this->Name;
+    }
 };
-
-

@@ -66,6 +66,7 @@ public:
 	void sortKeys();
 	void updateRows();
 	void updatePrimaryTrees();
+	void newPrimaryTreeUpdate();
 	float sumRows(std::string table, std::string column);
 
 	
@@ -162,6 +163,8 @@ void Database::Save()
 	updateRows();
 	sortKeys();
 	updatePrimaryTrees();
+	newPrimaryTreeUpdate();
+
 }
 
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
@@ -797,6 +800,7 @@ void Database::delete_column(std::string column_name, std::string table_name)
 	SaveTable(current_table);
 	updateRows();
 	updatePrimaryTrees();
+	newPrimaryTreeUpdate();
 	
 	
 }
@@ -915,15 +919,15 @@ void Database::updateRows()
 /// </summary>
 inline void Database::updatePrimaryTrees()
 {
-	primary_key_trees.clear();
+	// primary_key_trees.clear();
 	for (Table tbl : tables)
 	{
-		BPTree newPrimaryKeyIndex;	
+		// BPTree newPrimaryKeyIndex;	
 		BTree<int> secondaryIntKeyTree;
 		BTree<char> secondaryCharKeyTree;
 		BTree<string> secondaryStringKeyTree;
 
-		newPrimaryKeyIndex.Name = tbl.table_name;
+		// newPrimaryKeyIndex.Name = tbl.table_name;
 
 		for (Row r : tbl.newrows)
 		{
@@ -932,20 +936,20 @@ inline void Database::updatePrimaryTrees()
 			for (Column<int> c : r.intColumn)
 			{				
 
-				//check to see if the colname is the primary key
-				if (c.GetName() == tbl.primaryKeyName)
-				{
-					//index based on the value here
-					newPrimaryKeyIndex.insert(c.GetValue(), r);
+				////check to see if the colname is the primary key
+				//if (c.GetName() == tbl.primaryKeyName)
+				//{
+				//	//index based on the value here
+				//	newPrimaryKeyIndex.insert(c.GetValue(), r);
 
-					// set primary key
-					if (!newPrimaryKeyIndex.HasPrimaryKey()) {
-						newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
-						//newPrimaryKeyIndex.AddSecondaryKey("name");
-					}
-				}			
+				//	// set primary key
+				//	if (!newPrimaryKeyIndex.HasPrimaryKey()) {
+				//		newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
+				//		//newPrimaryKeyIndex.AddSecondaryKey("name");
+				//	}
+				//}			
 				// check to see if the colname is a secondary key
-				else if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
+				if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
 					// add value to secondary tree
 					secondaryIntKeyTree.insert(c.GetValue(), r);
 					secondaryIntKeyTree.SetKeyName(c.GetName());
@@ -982,20 +986,76 @@ inline void Database::updatePrimaryTrees()
 		// add the secondarytrees to the arrays if they are not empty
 		if (!secondaryIntKeyTree.IsEmpty()) {
 			secondaryIntTrees.push_back(secondaryIntKeyTree);
-			newPrimaryKeyIndex.AddSecondaryKey(secondaryIntKeyTree.GetKeyName());
+			//newPrimaryKeyIndex.AddSecondaryKey(secondaryIntKeyTree.GetKeyName());
 		}
 		if (!secondaryCharKeyTree.IsEmpty()) {
 			secondaryCharTrees.push_back(secondaryCharKeyTree);
-			newPrimaryKeyIndex.AddSecondaryKey(secondaryCharKeyTree.GetKeyName());
+			//newPrimaryKeyIndex.AddSecondaryKey(secondaryCharKeyTree.GetKeyName());
 		}
 		if (!secondaryStringKeyTree.IsEmpty()) {
 			secondaryStringTrees.push_back(secondaryStringKeyTree);
-			newPrimaryKeyIndex.AddSecondaryKey(secondaryStringKeyTree.GetKeyName());
+			//newPrimaryKeyIndex.AddSecondaryKey(secondaryStringKeyTree.GetKeyName());
 		}
 
-		tbl.primaryKeyTree = newPrimaryKeyIndex;		
-		primary_key_trees.push_back(newPrimaryKeyIndex);
+		//tbl.primaryKeyTree = newPrimaryKeyIndex;		
+		//primary_key_trees.push_back(newPrimaryKeyIndex);
 
 		SaveTable(tbl);
+	}
+}
+/// <summary>
+/// Updates Primary Key Trees without destroying the old ones.
+/// </summary>
+inline void Database::newPrimaryTreeUpdate()
+{
+	for (Table t : tables)
+	{
+		string tablename = t.table_name;
+		std::vector<BPTree>::iterator it = std::find(primary_key_trees.begin(), primary_key_trees.end(), t.primaryKeyTree);
+		if (it != primary_key_trees.end())
+		{
+			// tree exists, now we need to see if it should be updated
+			for (Row r : t.newrows)
+			{
+				r.InUse();
+				for (Column<int> c : r.intColumn)
+				{
+
+					//check to see if the colname is the primary key
+					if (c.GetName() == t.primaryKeyName)
+					{
+						int search = primary_key_trees[it - primary_key_trees.begin()].search(c.GetValue()).GetIntColumnByName(c.GetName()).GetValue();
+						if (search != c.GetValue())
+						{
+							cout << "Inserting new found row into tree." << endl;
+							primary_key_trees[it - primary_key_trees.begin()].insert(c.GetValue(), r);
+						}
+					}
+				}
+			}
+			t.primaryKeyTree = primary_key_trees[it - primary_key_trees.begin()];
+		}
+		else
+		{
+			//tree does not exist, create one, populate it, then push it to the primary keys
+			BPTree newtree;
+			newtree.SetPrimaryKey(t.primaryKeyName);
+			newtree.Name = t.table_name;
+			for (Row r : t.newrows)
+			{
+				r.InUse();
+				for (Column<int> c : r.intColumn)
+				{
+					//check to see if the colname is the primary key
+					if (c.GetName() == t.primaryKeyName)
+					{
+						newtree.insert(c.GetValue(), r);
+					}
+				}
+			}
+			t.primaryKeyTree = newtree;
+			primary_key_trees.push_back(newtree);
+			this->SaveTable(t);
+		}
 	}
 }

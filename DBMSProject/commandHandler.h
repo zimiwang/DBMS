@@ -424,7 +424,7 @@ public:
 				std::string tbl_name = Parser::get_table_name(cmd, "from", ";");
 				cout << "Selecting from Table: " << tbl_name << endl;
 
-				tbl_name = Utils::remove_char(tbl_name, ';');
+				// tbl_name = Utils::remove_char(tbl_name, ';');
 				tree = db->get_tree(tbl_name);
 			}				
 			if (tree.Name.length() > 0)
