@@ -570,10 +570,10 @@ public:
 	void SearchBTree(vector<string> cols, string colName, string sk, Database* db) {
 		// check which BTree type to use
 		bool continueOn = true;		
-		for (BTree<char> tree : db->secondaryCharTrees) {
+		for (BTree<char *> tree : db->secondaryCharTrees) {
 			if (tree.GetKeyName() == colName) {
 				// search the tree and print the results
-				SearchBTreeKey(cols, tree, sk[0]);
+				SearchBTreeKey(cols, tree, (char*)sk[0]);
 				// stop searching and break
 				continueOn = false;
 				break;
@@ -1163,18 +1163,18 @@ public:
 		else if (type == 2)
 		{
 			//char
-			vector<char> groups;
+			vector<char*> groups;
 			for (Row r : tablerows)
 			{
-				Column<char> s = r.GetCharColumnByName(groupcolname);
-				char val = s.GetValue();
+				Column<char *> s = r.GetCharColumnByName(groupcolname);
+				char * val = s.GetValue();
 				if (std::find(groups.begin(), groups.end(), val) == groups.end())
 				{
 					groups.push_back(val);
 				}
 			}
 
-			for (char n : groups)
+			for (char *n : groups)
 			{
 				for (Row r : tablerows)
 				{
@@ -1271,18 +1271,18 @@ public:
 		else if (type == 2)
 		{
 			//char
-			vector<char> groups;
+			vector<char*> groups;
 			for (Row r : tablerows)
 			{
-				Column<char> s = r.GetCharColumnByName(groupcolname);
-				char val = s.GetValue();
+				Column<char*> s = r.GetCharColumnByName(groupcolname);
+				char *val = s.GetValue();
 				if (std::find(groups.begin(), groups.end(), val) == groups.end())
 				{
 					groups.push_back(val);
 				}
 			}
 			sort(groups.begin(), groups.end());
-			for (char n : groups)
+			for (char * n : groups)
 			{
 				for (Row r : tablerows)
 				{

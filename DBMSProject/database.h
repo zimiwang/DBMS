@@ -37,7 +37,7 @@ public:
 	std::vector<Table> join_tables;
 	std::vector<BTree<string>> secondaryStringTrees;
 	std::vector<BTree<int>> secondaryIntTrees;
-	std::vector<BTree<char>> secondaryCharTrees;
+	std::vector<BTree<char*>> secondaryCharTrees;
 	std::vector<BPTree> primary_key_trees;
 
 	const string PRIMARY_KEY = "ID";
@@ -507,7 +507,7 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 									{
 										combinedRow.strColumn.push_back(loc);
 									}
-									for (Column<char> loc : destrow.charColumn)
+									for (Column<char *> loc : destrow.charColumn)
 									{
 										combinedRow.charColumn.push_back(loc);
 									}
@@ -890,10 +890,11 @@ void Database::updateRows()
 				}
 				else if (col.second == "char")
 				{
-					char char_arr;
+					// TODO char array... here
+					char * char_arr;
 					string str_obj(rw[rowfind]);
-					char_arr = str_obj[0];					
-					Column<char> newcol = Column<char>();
+					char_arr = (char *)str_obj[0];					
+					Column<char *> newcol = Column<char *>();
 					newcol.AddValue(char_arr);
 					newcol.SetName(col.first);
 					nrow.charColumn.push_back(newcol);
@@ -924,7 +925,7 @@ inline void Database::updatePrimaryTrees()
 	{
 		// BPTree newPrimaryKeyIndex;	
 		BTree<int> secondaryIntKeyTree;
-		BTree<char> secondaryCharKeyTree;
+		BTree<char *> secondaryCharKeyTree;
 		BTree<string> secondaryStringKeyTree;
 
 		// newPrimaryKeyIndex.Name = tbl.table_name;
@@ -958,7 +959,7 @@ inline void Database::updatePrimaryTrees()
 
 			// check for other secondary keys
 			if (r.hasSecondaryKeyChar(tbl.secondaryKeys)) {
-				for (Column<char> c : r.charColumn)
+				for (Column<char *> c : r.charColumn)
 				{				
 					// check to see if the colname is a secondary key
 					if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
