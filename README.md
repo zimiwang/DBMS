@@ -247,15 +247,16 @@ Add a key to the specified table. The key type has primary, secondary, and forei
 **19. Return Sum of Column**
 Return the sum of rows from a specified column of a specified table.
 
-   select sum([Column Name]) from [Table Name];  
+    select sum([Column Name]) from [Table Name];  
 
 **20. Return Average of Column**
 Return the average of the rows from a specified column of a specified table.
 
-   select avg([Column Name]) from [Table Name];  
+    select avg([Column Name]) from [Table Name];  
 
 **21. Logout**  
-Re-login with a new account  
+Re-login with a new account.  
+
     logout;  
 
 
