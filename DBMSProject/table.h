@@ -303,6 +303,11 @@ void Table::AddKey(std::string type, std::string name) {
 
 	keys.insert(std::pair<std::string, std::string>(type, name));
 
+	if (type == "secondary")
+	{
+		secondaryKeys.push_back(name);
+	}
+
 }
 
 
