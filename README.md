@@ -52,8 +52,9 @@ The database management system is capable of performing the following operations
 16. Rename Column
 17. Drop Column  
 18. Add Key  
-19. Return Sum of Column
-20. Return Average of Column
+19. Return Sum of Column  
+20. Return Average of Column  
+21. Logout  
 
 **Get help**  
 Get a list of all command lines and their functionality.
@@ -251,7 +252,11 @@ Return the sum of rows from a specified column of a specified table.
 **20. Return Average of Column**
 Return the average of the rows from a specified column of a specified table.
 
-   select avg([Column Name]) from [Table Name]
+   select avg([Column Name]) from [Table Name]  
+
+**21. Logout**  
+Re-login with a new account  
+    logout;  
 
 
 **Please Note**
