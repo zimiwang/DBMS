@@ -36,21 +36,13 @@ public:
     };
 };
 
-//Node::Node() {
-//    key = new PrimaryKey[MAX];         // number of keys in a node
-//    ptr = new Node*[MAX + 1]; // array of pointers to other nodes
-//    for (int i = 0; i < MAX; i++) {
-//        ptr[i] = nullptr;
-//    }
-//}
 
 // BP tree
 class BPTree {
     Node* root;                                         // root node
     int minKey;
     int maxKey;
-    string PrimaryKeyColumn;
-    vector<string> SecondaryKeyColumns;
+    string PrimaryKeyColumn;    
 
     void insertInternal(PrimaryKey x, Node* parentNode, Node* child) {
         if (parentNode->size < MAX) {
@@ -307,18 +299,7 @@ public:
 
     }
 
-    /// <summary>
-    /// Adds a secondary key column
-    /// </summary>
-    /// <param name="column">The column name</param>
-    void AddSecondaryKey(string column) {
-        if (column == "") {
-            cout << "Corruption in the data. Incoming Column Name is empty." << endl;
-        }
-        else {
-            SecondaryKeyColumns.push_back(column);
-        }
-    }
+    
 
     /// <summary>
     /// Checks if the given column name is a primarky key
@@ -333,18 +314,7 @@ public:
         return false;
     }
 
-    /// <summary>
-    /// Checks if the given column name is a secondary key
-    /// </summary>
-    /// <param name="column"></param>
-    /// <returns>Returns true if column name is a secondary key</returns>
-    bool IsSecondaryKey(string column) {
-        if (find(SecondaryKeyColumns.begin(), SecondaryKeyColumns.end(), column) != SecondaryKeyColumns.end()) {
-            return true;
-        }
 
-        return false;
-    }
 
     Row search(int x) {
         Row row;

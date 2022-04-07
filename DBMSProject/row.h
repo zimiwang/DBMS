@@ -76,8 +76,7 @@ public:
 /// </summary>
 class Row {	
 private:
-	bool empty;
-
+	bool empty;	
 	/// <summary>
 	/// Checks to see if all the columns in the columns parameter are in the columns of the row
 	/// </summary>
