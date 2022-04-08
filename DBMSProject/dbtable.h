@@ -134,17 +134,20 @@ private:
 	}
 
 public:	
+
+	// Data to be saved (serialization)
 	string table_name;	
 	string primaryKeyName = "ID";
 	map<string, string> columns;
+	vector<Row> rows;
+	vector<Keys> foreignKeys;
+	vector<Keys> secondaryKeys;
+	Keys primaryKey;
 
+	// Data that is not saved
 	vector<BTree<string>> secondaryStringTrees;
 	vector<BTree<char*>> secondaryCharTrees;
 	vector<BTree<int>> secondaryIntTrees;
-	vector<Row> rows;
-	Keys primaryKey;
-	vector<Keys> secondaryKeys;
-	vector<Keys> foreignKeys;
 	BPTree primaryTree;
 
 	DBTable(string name, vector<string> cols) {

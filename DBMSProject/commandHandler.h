@@ -530,7 +530,7 @@ public:
 
 						}
 						// search based on sk
-						else if (tree.IsSecondaryKey(coln[0])) {
+						else if (false){ //tree.IsSecondaryKey(coln[0])) { //talk about this in a meeting
 							if (Utils::contains(cmd, "between")) {
 								SearchOnRange(tree, cols);
 							}
