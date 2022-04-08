@@ -22,26 +22,25 @@
 
 // global variables
 HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+
+// ***Unreachable
 Table* create_table(std::string table_name, std::vector<pair<std::string, std::string>> columns_info);
+std::string to_lower(std::string str);
+Database* read_sql_file(string path);
+std::string login_interface();
+int mainFunct(string cmd);
 
 std::string current_db_name;
-std::string to_lower(std::string str);
 std::string table_name;
 std::string db_name;
 std::string cmd = "";
 std::string statement;
 
-Database* read_sql_file(string path);
 Database* db = NULL;
 
 // function initializers
 void color(int s);
-
 void setup_intro();
-
-std::string login_interface();
-
-int mainFunct(string cmd);
 
 /*
 void show_help();

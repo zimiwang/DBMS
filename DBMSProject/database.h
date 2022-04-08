@@ -42,6 +42,8 @@ public:
 
 	const string PRIMARY_KEY = "ID";
 
+	// ***Unreachable
+	void CreateTable(std::string tableName);
 
 	static void List();
 	void List_Tables();
@@ -50,7 +52,6 @@ public:
 	void Save();
 	void SaveTable(Table table);
 	void DropTable(std::string name);
-	void CreateTable(std::string tableName);
 	bool find_table(std::string name);
 	void insert_into(std::string statement, std::string table_name);
 	void List_Info();
