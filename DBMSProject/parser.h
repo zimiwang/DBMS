@@ -19,14 +19,18 @@ public:
 		KEYWORDS.push_back("and");
 		KEYWORDS.push_back("where");
 	}
+
+	// ***Unreachable
+	vector<string> static split_text(string input);
+	vector<string> static split_text(string input, string delimeter);
+
+
 	Dictionary static get_where_clause(string cmd);
 	vector<string> static findKeyWords(vector<string>, string cmd);
-	vector<string> static split_text(string input);
 	vector<string> static get_select_columns(string cmd);
 	static string* split_str(std::string str, char delim);
 	vector<string> static get_create_columns(string cmd);
 	vector<string> static get_where_clause(string cmd, string op);
-	vector<string> static split_text(string input, string delimeter);
 	vector<string> static get_insert_columns(string cmd, string table_name);
 	vector<vector<string> > static get_insert_rows(string cmd, string table_name);
 	std::string static to_lower(std::string s);
