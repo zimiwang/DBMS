@@ -65,7 +65,7 @@ public:
 	void keytotable(std::string keytype, std::string keyname, std::string table_name);
 	void sortKeys();
 	void updateRows();
-	void updatePrimaryTrees();
+	void updateSecondaryTrees();
 	void newPrimaryTreeUpdate();
 	float sumRows(std::string table, std::string column);
 
@@ -162,7 +162,7 @@ void Database::Save()
 
 	updateRows();
 	sortKeys();
-	updatePrimaryTrees();
+	updateSecondaryTrees();
 	newPrimaryTreeUpdate();
 
 }
@@ -799,7 +799,7 @@ void Database::delete_column(std::string column_name, std::string table_name)
 	
 	SaveTable(current_table);
 	updateRows();
-	updatePrimaryTrees();
+	updateSecondaryTrees();
 	newPrimaryTreeUpdate();
 	
 	
@@ -918,37 +918,20 @@ void Database::updateRows()
 /// Updates the primary key trees for each table. TODO - Add a check to see if the table needs to be updated - maybe a bool flag in
 /// table.h that says whether or not it has been altered since the last table was generated.
 /// </summary>
-inline void Database::updatePrimaryTrees()
+inline void Database::updateSecondaryTrees()
 {
-	// primary_key_trees.clear();
 	for (Table tbl : tables)
 	{
-		// BPTree newPrimaryKeyIndex;	
 		BTree<int> secondaryIntKeyTree;
 		BTree<char *> secondaryCharKeyTree;
 		BTree<string> secondaryStringKeyTree;
-
-		// newPrimaryKeyIndex.Name = tbl.table_name;
 
 		for (Row r : tbl.newrows)
 		{
 			/*Row* rpoint = &r;*/
 			r.InUse();
 			for (Column<int> c : r.intColumn)
-			{				
-
-				////check to see if the colname is the primary key
-				//if (c.GetName() == tbl.primaryKeyName)
-				//{
-				//	//index based on the value here
-				//	newPrimaryKeyIndex.insert(c.GetValue(), r);
-
-				//	// set primary key
-				//	if (!newPrimaryKeyIndex.HasPrimaryKey()) {
-				//		newPrimaryKeyIndex.SetPrimaryKey(c.GetName());
-				//		//newPrimaryKeyIndex.AddSecondaryKey("name");
-				//	}
-				//}			
+			{							
 				// check to see if the colname is a secondary key
 				if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
 					// add value to secondary tree
@@ -987,19 +970,13 @@ inline void Database::updatePrimaryTrees()
 		// add the secondarytrees to the arrays if they are not empty
 		if (!secondaryIntKeyTree.IsEmpty()) {
 			secondaryIntTrees.push_back(secondaryIntKeyTree);
-			//newPrimaryKeyIndex.AddSecondaryKey(secondaryIntKeyTree.GetKeyName());
 		}
 		if (!secondaryCharKeyTree.IsEmpty()) {
 			secondaryCharTrees.push_back(secondaryCharKeyTree);
-			//newPrimaryKeyIndex.AddSecondaryKey(secondaryCharKeyTree.GetKeyName());
 		}
 		if (!secondaryStringKeyTree.IsEmpty()) {
 			secondaryStringTrees.push_back(secondaryStringKeyTree);
-			//newPrimaryKeyIndex.AddSecondaryKey(secondaryStringKeyTree.GetKeyName());
 		}
-
-		//tbl.primaryKeyTree = newPrimaryKeyIndex;		
-		//primary_key_trees.push_back(newPrimaryKeyIndex);
 
 		SaveTable(tbl);
 	}

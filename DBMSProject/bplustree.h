@@ -314,8 +314,6 @@ public:
         return false;
     }
 
-
-
     Row search(int x) {
         Row row;
         if (root == NULL) {
