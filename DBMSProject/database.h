@@ -70,6 +70,9 @@ public:
 	void newPrimaryTreeUpdate();
 	float sumRows(std::string table, std::string column);
 
+	//if you change this you should probably change the error message below in updateRows
+	const int DEFAULT_CHAR_ARRAY_SIZE = 15;
+
 	
 	/// <summary>
 	/// constructor for empty database
@@ -891,10 +894,31 @@ void Database::updateRows()
 				}
 				else if (col.second == "char")
 				{
-					// TODO char array... here
-					char * char_arr;
+					//check for declared length of char array
+					int size = -1;
+					try 
+					{
+						size = stoi(Utils::get_string_between_two_strings(col.first, "[", "]"));
+					}
+					catch(exception &err)
+					{
+						//catch here and just use the default length
+						size = DEFAULT_CHAR_ARRAY_SIZE;
+						//tell the dummy that they didn't provide a char array length and the default is being used instead
+						string mes = "ERROR. NO CHAR ARRAY SIZE LIMIT FOUND FOR COLUMN " + col.first + ". USING SYSTEM DEFAULT OF 15.";
+						std::cerr << mes << endl;
+					}
+
+					//initialize the character array
+					char * char_arr = new char[size];
+					memset(char_arr, ' ', size);
 					string str_obj(rw[rowfind]);
-					char_arr = (char *)str_obj[0];					
+
+					//copy the string making sure to terminate it regardless of the length of the string provided
+					copy(str_obj.begin(), str_obj.end(), char_arr);
+					char_arr[size-1] = '\0';
+
+					//create the column and push it to the row
 					Column<char *> newcol = Column<char *>();
 					newcol.AddValue(char_arr);
 					newcol.SetName(col.first);
@@ -1006,7 +1030,7 @@ inline void Database::newPrimaryTreeUpdate()
 						int search = primary_key_trees[it - primary_key_trees.begin()].search(c.GetValue()).GetIntColumnByName(c.GetName()).GetValue();
 						if (search != c.GetValue())
 						{
-							cout << "Inserting new found row into tree." << endl;
+							// DEBUG MESSAGE cout << "Inserting new found row into tree." << endl;
 							primary_key_trees[it - primary_key_trees.begin()].insert(c.GetValue(), r);
 						}
 					}

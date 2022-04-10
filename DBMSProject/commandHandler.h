@@ -327,7 +327,9 @@ public:
 			addKey(db, new_cmd);
 		}
 
-		return -1;
+		db->updateSecondaryTrees();
+		db->newPrimaryTreeUpdate();
+		return 1;
 	}
 
 
@@ -481,7 +483,7 @@ public:
 				// tbl_name = Utils::remove_char(tbl_name, ';');
 				tree = db->get_tree(tbl_name);
 			}				
-			if (tree.Name.length() > 0)
+			if (tree.Name.length() > 0 && tree.getRoot() != NULL)
 			{
 				std::vector<std::string> cols = Parser::get_select_columns(cmd);
 				cols = Utils::trimColumns(cols);
@@ -515,6 +517,13 @@ public:
 							// search table
 							if (Utils::contains(cmd, "between")) {
 								SearchOnRange(tree, cols);
+							}
+							else if (conditional != "=")
+							{
+								// Condition where logical operators other than = are in use.
+								// As a cheap hack to get this to work, this is handled the same as a non-pk value.
+								// No speedup is granted by nature of the value being a pk.
+								FullSearch(tree, clauses, cols, conditional);
 							}
 							else {
 								//string pk = clauses.GetValuesByKey("where")[2];
@@ -771,6 +780,9 @@ public:
 		else {
 			cout << "Did not create Table" << endl;
 		}
+		db->updateRows();
+		db->updateSecondaryTrees();
+		db->newPrimaryTreeUpdate();
 		return 1;
 	}
 
