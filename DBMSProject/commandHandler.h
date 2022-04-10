@@ -1490,8 +1490,11 @@ public:
 		bool hasAS = false;
 
 		// run handler function
-		float sum = db->sumRows(sourceTable, columnName); 
-		int avg = floor(sum / 2);
+		float sum = db->sumRows(sourceTable, columnName);
+		int numberOfIntColumns = db->numberOfIntColumns(sourceTable, columnName);
+		
+
+		int avg = floor(sum / numberOfIntColumns);
 		Row nr;
 		Column<int> c;
 		c.SetName(columnName);
@@ -1500,7 +1503,6 @@ public:
 		vector<string> cols;
 		cols.push_back(columnName);
 		nr.PrintRow(cols);
-		//cout << "(commandHandler.h) sum = " << sum << "\n";
 
 		return 1;
 	}
