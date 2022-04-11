@@ -20,15 +20,23 @@ C:\Program Files(x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\MSVC\14.2
 
 class FileHelper {
 private:
+
+	/// *** Unreachable Method
 	bool static CheckExtension(std::string filename, std::string ext);
 
+
 public:
-	void static listfiles(std::string dir, std::string ext);
+
+	/// *** Unreachable Method
 	std::string static readfile(std::string dir, std::string filename);
 	std::string static writefile(std::string contents, std::string filename, bool isbinary);
 
+
+	void static listfiles(std::string dir, std::string ext);
 };
 
+
+/// *** Unreachable Method
 /// <summary>
 /// Compares if filename size is greater than ext
 /// </summary>

@@ -891,7 +891,7 @@ public:
 
 
 
-	/// <summary>
+/// <summary>
 /// command handler: delete rows in a table
 /// </summary>
 /// <returns>1 on completion</returns>

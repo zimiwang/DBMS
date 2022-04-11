@@ -20,9 +20,11 @@ public:
 		KEYWORDS.push_back("where");
 	}
 
-	// ***Unreachable
+	/// ***Unreachable
 	vector<string> static split_text(string input);
 	vector<string> static split_text(string input, string delimeter);
+	vector<string> static get_update_clause(string cmd);
+	string static get_table_name(string cmd);
 
 
 	Dictionary static get_where_clause(string cmd);
@@ -34,10 +36,8 @@ public:
 	vector<string> static get_insert_columns(string cmd, string table_name);
 	vector<vector<string> > static get_insert_rows(string cmd, string table_name);
 	std::string static to_lower(std::string s);
-	vector<string> static get_update_clause(string cmd);
 	string static get_conditional(string stm);
 	string static get_table_name(string cmd, string first_delim, string second_delim);
-	string static get_table_name(string cmd);
 	string static get_foreign_key(string cmd);
 	vector<vector<string>> static get_update_clauses(string cmd);
 	vector<string> static get_join_info(string cmd);
@@ -254,6 +254,9 @@ string Parser::get_foreign_key(string cmd) {
 	return foreignKey;
 }
 
+
+
+/// *** Unreachable Method
 /// Author: Andrew
 /// Date: 11-28-2021
 /// Parses an update command
@@ -579,6 +582,11 @@ vector<string> Parser::get_create_columns(string cmd) {
 }
 
 
+/// <summary>
+/// ***Unreachable Method
+/// </summary>
+/// <param name="cmd"></param>
+/// <returns></returns>
 std::string Parser::get_table_name(string cmd) {
 	smatch sm;
 	string ret;

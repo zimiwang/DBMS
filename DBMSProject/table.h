@@ -16,6 +16,12 @@
 
 class Table {
 public:
+
+	/// ***Unreachable Method
+	void Print_Rows(std::vector<std::string> column_names, vector<string> where_clause, string conditional);
+	void Rename_table(std::string new_table_name);
+
+
 	/// The name of the table
 	std::string table_name;
 
@@ -42,8 +48,6 @@ public:
 	/// Counter for row ID
 	int ID_count = 0;
 
-	void Print_Rows(std::vector<std::string> column_names, vector<string> where_clause, string conditional);
-
 	void Insert(std::vector<std::string> row);
 
 	void AddKey(std::string key, std::string value);
@@ -53,8 +57,6 @@ public:
 	void DeleteRow(vector<string> row);
 
 	int get_column_index(std::string column_name);
-
-	void Rename_table(std::string new_table_name);
 
 	map<std::string, std::string> Rename_column(std::string new_column_name, std::string old_column_name);
 
@@ -174,7 +176,7 @@ int Table::get_column_index(std::string column_name) {
 }
 
 
-
+///***Unreachable Method
 /// <summary>
 /// Prints the rows using the specified where clause and column names
 /// </summary>
@@ -359,6 +361,8 @@ void Table::DeleteRow(vector<string> row) {
 }
 #pragma once
 
+
+/// ***Unreachable Method
 /// <summary>
 /// rename an existing table
 /// </summary>

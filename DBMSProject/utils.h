@@ -11,10 +11,12 @@
 
 namespace Utils {
 
+	/// *** Unreachable Methods
+	/// std::string get_string_between_string_and_space(const std::string str, const std::string start)
+
+
 	std::string WHITESPACE = " \n\r\t\f\v";
 	
-
-
 	/// <summary>
 	/// Splits a string into tokens and saves them into a vector
 	/// </summary>
@@ -139,7 +141,13 @@ namespace Utils {
 			last_delim_pos - end_pos_of_first_delim));
 	}
 
-
+	/// ***Unreachable Method
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="str"></param>
+	/// <param name="start"></param>
+	/// <returns></returns>
 	std::string get_string_between_string_and_space(const std::string str, const std::string start) {
 		std::size_t first_delim_pos = str.find(start);
 		std::size_t end_first_pos = first_delim_pos + start.length();

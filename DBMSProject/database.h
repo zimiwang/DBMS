@@ -25,6 +25,11 @@ private:
 
 public:
 	
+	// ***Unreachable
+	void CreateTable(std::string tableName);
+	bool find_table(std::string name);
+
+
 	/// <summary>
 	/// The name of the database 
 	/// </summary>
@@ -42,9 +47,6 @@ public:
 
 	const string PRIMARY_KEY = "ID";
 
-	// ***Unreachable
-	void CreateTable(std::string tableName);
-
 	static void List();
 	void List_Tables();
 	void AddTable(Table& tbl);
@@ -52,7 +54,6 @@ public:
 	void Save();
 	void SaveTable(Table table);
 	void DropTable(std::string name);
-	bool find_table(std::string name);
 	void insert_into(std::string statement, std::string table_name);
 	void List_Info();
 	Table get_table(std::string tbl_name);
@@ -391,6 +392,7 @@ void Database::List_Tables()
 }
 
 /// return a boolean; true if the a table is found, false otherwise
+/// *** Unreachable Method
 bool Database::find_table(std::string name)
 {
 	for (Table tbl : tables)
@@ -626,6 +628,12 @@ void Database::RenameTable(std::string old_table_name, std::string new_table_nam
 	this->Save();
 }
 
+/// <summary>
+/// Delete rows in a table
+/// </summary>
+/// <param name="tbl_name"></param>
+/// <param name="conditional"></param>
+/// <param name="clause"></param>
 void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<string> clause) {
 
 	int count = 0;
