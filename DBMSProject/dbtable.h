@@ -17,7 +17,7 @@ struct Keys {
 };
 
 
-class DBTable {
+class Table {
 private:
 
 	bool wasCreated = true;
@@ -56,7 +56,7 @@ private:
 					primaryKey.keyName = "ID_" + name;
 					primaryKey.type = Utils::trim(tmp[1]);
 				}				
-				columns.insert(std::pair<std::string, std::string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
+				columns.insert(pair<string, string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
 				int letstes = 0;
 			}
 			else
@@ -71,7 +71,7 @@ private:
 		{
 			if (hasID == false) //We have no ID column defined by the user, manually add one
 			{
-				columns.insert(std::pair<std::string, std::string>(("ID_" + name), "int"));
+				columns.insert(pair<string, string>(("ID_" + name), "int"));
 				primaryKey.keyName = "ID_" + name;
 				primaryKey.type = "int";
 
@@ -143,6 +143,7 @@ public:
 	vector<Keys> foreignKeys;
 	vector<Keys> secondaryKeys;
 	Keys primaryKey;
+	vector<Keys> allKeys;
 
 	// Data that is not saved
 	vector<BTree<string>> secondaryStringTrees;
@@ -150,9 +151,13 @@ public:
 	vector<BTree<int>> secondaryIntTrees;
 	BPTree primaryTree;
 
-	DBTable(string name, vector<string> cols) {
-		table_name = name;		
+	Table() {
 
+	}
+
+	Table(string name, vector<string> cols) {
+		table_name = name;		
+		
 		RecordPrimaryKey(name, cols);
 	}
 
@@ -218,6 +223,9 @@ public:
 		else if (keytype == "foreign") {
 			foreignKeys.push_back(newKey);
 		}
+
+		// add key to all keys
+		allKeys.push_back(newKey);
 	}
 
 	/// <summary>
@@ -238,6 +246,60 @@ public:
 		CreateSecondaryTrees();
 	}
 	
-	
+	/// <summary>
+	/// Gets the index of the provided column
+	/// </summary>
+	/// <param name="column_name"></param>
+	/// <returns>index of the provided column</returns>
+	int get_column_index(std::string column_name) {
+		int ret = -1;
+		//std::map<std::string, std::string>::iterator it;
+		int col_index;
+
+		//it = columns.find(column_name);
+		auto it = columns.find(column_name);
+
+		if (it != columns.end()) {
+			col_index = std::distance(columns.begin(), it);
+			ret = col_index;
+		}
+
+		return ret;
+	}
+
+
+	void DeleteRow(Row row) {
+		for (int i = 0; i < rows.size(); i++) {
+			if (rows[i] == row) {
+				rows.erase(rows.begin() + i);
+			}
+		}
+	}
+
+
+	void DeleteColumn(string columnName) {
+		// delete column name
+		columns.erase(columnName);
+
+		for (Row row : rows) {
+			row.deleteColumn(columnName);
+		}
+	}
+
+
+	void RenameColumn(string prevColumn, string newColumn) {
+		// delete column name
+		auto it = columns.find(prevColumn);
+		string type = it->second;
+		columns.erase(prevColumn);
+
+		// add new column name
+		columns.insert(pair<string, string>(newColumn, type));
+
+
+		for (Row row : rows) {
+			row.renameColumn(prevColumn, newColumn);
+		}
+	}
 
 };
