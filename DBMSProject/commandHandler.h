@@ -382,7 +382,7 @@ public:
 		BPTree newPrimaryKeyIndex;
 		newPrimaryKeyIndex.Name = t.table_name;
 
-		for (Row r : t.newrows)
+		for (Row r : t.rows)
 		{
 			/*Row* rpoint = &r;*/
 			r.InUse();
@@ -403,7 +403,7 @@ public:
 			}
 
 		}
-		t.primaryKeyTree = newPrimaryKeyIndex;
+		t.primaryTree = newPrimaryKeyIndex;
 		return newPrimaryKeyIndex;
 	}
 
@@ -773,7 +773,7 @@ public:
 		table_name = Parser::get_table_name(cmd, "table", "(");
 		vector<string> cols = Parser::get_create_columns(cmd);
 		Table* tbl = new Table(table_name, cols);
-		if (tbl->wasCreated) {
+		if (tbl->table_name.length() > 0) {
 			// add the table
 			db->AddTable(*tbl);
 		}
@@ -840,7 +840,7 @@ public:
 		std::cout << "Table name: " << tbl.table_name << std::endl;
 		std::cout << "----------------------------- " << std::endl;
 		std::cout << "Column names: " << std::endl;
-		std::vector<std::string> it = tbl.get_column_names();
+		std::vector<std::string> it = tbl.rows[0].GetColumnNames();
 
 		for (int i = 0; i < it.size(); i++)
 		{
@@ -850,7 +850,7 @@ public:
 
 		std::cout << "----------------------------- " << std::endl;
 		std::cout << "Number of Rows: " << tbl.rows.size() << std::endl;
-		std::cout << "Number of Keys: " << tbl.keys.size() << std::endl;
+		std::cout << "Number of Keys: " << tbl.getKeySize() << std::endl;
 	}
 
 
@@ -1010,7 +1010,8 @@ public:
 		//ensure the key type is valid, then check to see if the key is a column in the table
 		if (keytype == "primary" || keytype == "secondary" || keytype == "foreign")
 		{
-			if (db->get_table(tablename).get_column_index(keyname) != -1)
+			std::vector<string> cols = db->get_table(tablename).rows[0].GetColumnNames();
+			if (std::find(cols.begin(), cols.end(), keyname) != cols.end())
 			{
 				db->keytotable(keytype, keyname, tablename);
 			}

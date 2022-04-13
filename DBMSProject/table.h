@@ -1,97 +1,51 @@
-/*
-*	File: 	    table.h
-*   Author:     Andrew Nunez
-*   Date:       Sept. 23, 2021
-*
-*   This file holds a class that defines a table and it's data to read and write from a .bin file.
-*/
 #pragma once
-#include <iostream>
-#include <map>
+
+
 #include <string>
 #include <vector>
 #include "parser.h"
 #include "row.h"
 #include "bplustree.h"
+#include "bminustree.h"
+#include <map>
+
+using namespace std;
+
+struct Keys {
+	string keyName;
+	string type;
+};
+
 
 class Table {
-public:
-	/// The name of the table
-	std::string table_name;
+private:
 
-	/// The name of the Database
-	std::string database_name;
-
-	/// The collection of keys <type, name> of the table -- depreciate this later.
-	std::map<std::string, std::string> keys;
-
-	std::string primaryKeyName = "ID";
-
-	std::vector<std::string> secondaryKeys;
-	std::vector<std::string> foreignKeys;
-
-	/// The collection of column names and types to a table
-	std::map<std::string, std::string> columns;
-
-	/// The collection of arrays of rows for the table.
-	std::vector<std::vector<std::string>> rows;
-	std::vector<Row> newrows;
-
-	BPTree primaryKeyTree;
 	bool wasCreated = true;
-	/// Counter for row ID
-	int ID_count = 0;
 
-	void Print_Rows(std::vector<std::string> column_names, vector<string> where_clause, string conditional);
+	template <typename T>
+	BTree<T> FindSecondaryTree(string name, vector<BTree<T>> trees) {
+		
+		for (BTree<T> tree : trees) {
+			if (tree.GetKeyName() == name) return tree;
+		}
 
-	void Insert(std::vector<std::string> row);
-
-	void AddKey(std::string key, std::string value);
-
-	int GetLargestColumnSize();
-
-	void DeleteRow(vector<string> row);
-
-	int get_column_index(std::string column_name);
-
-	void Rename_table(std::string new_table_name);
-
-	map<std::string, std::string> Rename_column(std::string new_column_name, std::string old_column_name);
-
-
-	// TODO: Add column names
-	std::vector<std::vector<std::string> > Select(std::vector<std::string> col_names);
-
-	std::vector<std::string> get_column_names();
-
-	void Delete();
-
-	Table() {
-	}
-
-	// Use this as as create in DB CreateTable method
-	// TODO: Tie into user input
-	Table(std::string name) {
-		table_name = name;
-		primaryKeyName = "ID_" + name;
-		keys.insert(std::pair<std::string, std::string>("primary", primaryKeyName));
+		cout << "could not find secondary tree named: " << name << endl;
+		BTree<T> emptyTree = new BTree<T>();
+		return emptyTree;
 
 	}
 
 
 	/// <summary>
-	/// Creates a new instances of a table with columns assigned
+	/// Assign columns and primary key
 	/// </summary>
 	/// <param name="name"></param>
 	/// <param name="cols"></param>
-	Table(std::string name, vector<string> cols)
-		: Table(name) {
-		this->table_name = name;
+	void RecordPrimaryKey(string name, vector<string> cols) {
 		bool hasID = false;
 		bool isCreate = true;
 
-		for (std::string col : cols) {
-
+		for (string col : cols) {
 			vector<string> tmp = Utils::split(col, " ");
 
 			if (tmp.size() == 2)
@@ -99,8 +53,9 @@ public:
 				if (tmp[0] == ("ID_" + name))
 				{
 					hasID = true;
-				}
-				//columns.insert(Utils::trim(tmp[0]), Utils::trim(tmp[1]));
+					primaryKey.keyName = "ID_" + name;
+					primaryKey.type = Utils::trim(tmp[1]);
+				}				
 				columns.insert(std::pair<std::string, std::string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
 				int letstes = 0;
 			}
@@ -112,289 +67,193 @@ public:
 				break;
 			}
 		}
-		if (isCreate = true)
+		if (isCreate == true)
 		{
 			if (hasID == false) //We have no ID column defined by the user, manually add one
 			{
 				columns.insert(std::pair<std::string, std::string>(("ID_" + name), "int"));
-			}		
+				primaryKey.keyName = "ID_" + name;
+				primaryKey.type = "int";
+
+			}
+		}			
+	}
+
+
+
+	/// <summary>
+	/// Creates the secondary trees for each secondary key
+	/// </summary>
+	void CreateSecondaryTrees() {
+
+		// create trees based on secondary key types
+		for (Keys key : secondaryKeys) {
+			if (key.type == "char") {
+				BTree<char*> tree;
+				tree.SetKeyName(key.keyName);
+				CreateSecondaryTree(tree);
+			}
+			else if (key.type == "int") {
+				BTree<int> tree;
+				tree.SetKeyName(key.keyName);
+				CreateSecondaryTree(tree);
+			}
+			else if (key.type == "string") {
+				BTree<string> tree;
+				tree.SetKeyName(key.keyName);
+				CreateSecondaryTree(tree);
+			}
 		}
 
 	}
+
+	/// <summary>
+	/// Creates a secondary tree and inserts all the rows
+	/// </summary>
+	/// <typeparam name="T">The type of key value</typeparam>
+	/// <param name="tree">The tree to create an insert rows</param>
+	template <typename T>
+	void CreateSecondaryTree(BTree<T> tree) {
+		string name = tree.GetKeyName();	// column name
+		for (Row row : rows) {
+				int type = row.GetColumnType(name);
+			if (type == 0) {
+				// string
+				tree.insert(row.GetStringColumnByName(name).GetValue(), row);
+			}
+			else if (type == 1) {
+				// int 
+				tree.insert(row.GetIntColumnByName(name).GetValue(), row);
+			}
+			else {
+				// char
+				tree.insert(row.GetCharColumnByName(name).GetValue(), row);
+			}
+		}
+	}
+
+public:	
+
+	// Data to be saved (serialization)
+	string table_name;	
+	string primaryKeyName = "ID";
+	map<string, string> columns;
+	vector<Row> rows;
+	vector<Keys> foreignKeys;
+	vector<Keys> secondaryKeys;
+	Keys primaryKey;
+
+	// Data that is not saved
+	vector<BTree<string>> secondaryStringTrees;
+	vector<BTree<char*>> secondaryCharTrees;
+	vector<BTree<int>> secondaryIntTrees;
+	BPTree primaryTree;
+
+	Table(string name, vector<string> cols) {
+		table_name = name;		
+
+		RecordPrimaryKey(name, cols);
+	}
+	/// <summary>
+	/// Support for a reference to the number of keys that was recorded in the old table structure
+	/// </summary>
+	/// <returns></returns>
+	int getKeySize()
+	{
+		int x = 1; // 1 for the primary key
+		for (Keys k : secondaryKeys) {
+			x = x + 1;
+		}
+		for (Keys k : foreignKeys)
+		{
+			x = x + 1;
+		}
+
+		return x;
+			
+	}
+	/// <summary>
+	/// Adds a new row to the table. Updates the Primary and Secondary Keys accordingly
+	/// </summary>
+	/// <param name="key">The key of the Row</param>
+	/// <param name="row">The row</param>
+	/// <param name="primaryKey">True if the row is being inserted into the primarykey</param>
+	/// <param name="secondaryKey">True if the row is being inserted into the secondarKey</param>
+	/// <param name="sKey">The secondary Key of the Row</param>
+	/// <param name="secondaryKeyType">The type of key value for the secondaryKey</param>
+	template <typename T>
+	void AddRow(T key, Row row, bool primaryKey = true, bool secondaryKey = false, T sKey = "", string secondaryName = "", string secondaryKeyType = "int") {
+		bool errorFound = false;
+		if (primaryKey) {
+			primaryTree.insert(key, row);
+			rows.push_back(row);
+		}
+		if (secondaryKey) {
+			if (secondaryKeyType == "int") {
+				BTree<int> tree = FindSecondaryTree(secondaryName, secondaryIntTrees);
+				if (!tree.IsEmpty()) tree.insert(sKey, row);
+				else errorFound = true;
+			}
+			else if (secondaryKeyType == "string") {
+				BTree<string> tree = FindSecondaryTree(secondaryName, secondaryStringTrees);
+				if (!tree.IsEmpty()) tree.insert(sKey, row);
+				else errorFound = true;
+			}
+			else {
+				BTree<char*> tree = FindSecondaryTree(secondaryName, secondaryCharTrees);
+				if (!tree.IsEmpty()) tree.insert(sKey, row);
+				else errorFound = true;
+			}
+
+			if (errorFound) cout << "Error: An error occured while trying to insert a row." << endl;
+			else rows.push_back(row);
+		}
+
+
+		if (primaryKey || secondaryKey) {
+			cout << "Could not update tree. PrimarKey or SecondaryKey not Defined." << endl;
+		}
+	}
+
+	/// <summary>
+	/// Adds a new key to the table
+	/// </summary>
+	/// <param name="keytype"></param>
+	/// <param name="keyname"></param>
+	void AddKey(string keytype, string keyname) {
+		Keys newKey;
+		newKey.keyName = keyname;
+		newKey.type = keytype;
+
+		if (keytype == "primary") {
+			primaryKey = newKey;
+		}
+		else if (keytype == "secondary") {			
+			secondaryKeys.push_back(newKey);		
+		}
+		else if (keytype == "foreign") {
+			foreignKeys.push_back(newKey);
+		}
+	}
+
+	/// <summary>
+	///  Creates all the trees for the table.
+	///	 NOTE: If the primary keys, secondary keys, and rows aren't
+	///  in the table already, then it won't create any trees.
+	/// </summary>
+	void CreateTrees() {
+		// create primary tree
+		if (primaryKey.keyName != "") {
+			
+			for (Row row : rows) {
+				primaryTree.insert(row.GetIntColumnByName(primaryKey.keyName).GetValue(), row);
+			}
+		}
+		
+		// create secondary trees
+		CreateSecondaryTrees();
+	}
+	
+	
 
 };
-
-
-/// <summary>
-/// Gets the size of the largest column
-/// </summary>
-/// <returns>The size of the largest column</returns>
-int Table::GetLargestColumnSize() {
-	int ret = 0;
-
-	for (std::vector<std::string> row : rows) {
-		for (std::string& value : row) {
-			if (value.length() > ret) {
-				ret = value.length();
-			}
-		}
-
-	}
-
-	for (auto const& it : columns) {
-		if (it.first.length() > ret) {
-			ret = it.first.length();
-		}
-
-	}
-
-	return ret;
-
-}
-
-/// <summary>
-/// Gets the index of the provided column
-/// </summary>
-/// <param name="column_name"></param>
-/// <returns>index of the provided column</returns>
-int Table::get_column_index(std::string column_name) {
-	int ret = -1;
-	//std::map<std::string, std::string>::iterator it;
-	int col_index;
-
-	//it = columns.find(column_name);
-	auto it = columns.find(column_name);
-
-	if (it != columns.end()) {
-		col_index = std::distance(columns.begin(), it);
-		ret = col_index;
-	}
-
-	return ret;
-}
-
-
-
-/// <summary>
-/// Prints the rows using the specified where clause and column names
-/// </summary>
-/// <param name="column_names"></param>
-/// <param name="where_clause"></param>
-/// <param name="conditional"></param>
-void Table::Print_Rows(std::vector<std::string> column_names, vector<string> where_clause, string conditional) {
-	
-	int row_count = 0;
-
-	std::map<std::string, std::string> print_cols;
-	std::vector<std::vector<std::string> > print_rows;
-
-	std::vector<int> indices;
-	std::map<std::string, std::string>::iterator it;
-	int col_index;
-	int where_idx = -1;
-
-	if (where_clause.size() > 0) {
-		where_idx = this->get_column_index(where_clause[0]);
-	}
-
-
-	if (column_names.size() > 0 && column_names[0] == "*") {
-		column_names.clear();
-
-		for (auto const& it : columns) {
-			column_names.push_back(it.first);
-		}
-	}
-
-	for (std::string name : column_names) {
-		it = columns.find(name);
-
-		if (it != columns.end()) {
-			col_index = std::distance(columns.begin(), it);
-			print_cols.insert({ it->first, it->second });
-			indices.push_back(col_index);
-		}
-		else {
-			std::cout << "Column Name does not exist: " << name << std::endl;
-			return;
-		}
-
-	}
-
-	// Where clause goes here
-	for (std::vector<std::string> row : rows) {
-		std::vector<std::string> new_row;
-
-		for (int i = 0; i < indices.size(); i += 1) {
-			new_row.push_back(row[indices[i]]);
-		}
-
-		if (where_idx == -1) {
-			print_rows.push_back(new_row);
-		}
-		else if (new_row[where_idx] == where_clause[1]) {
-			print_rows.push_back(new_row);
-		}
-
-	}
-
-	columns = print_cols;
-	rows = print_rows;
-
-	int col_char_count = GetLargestColumnSize();
-	int row_char_count = (columns.size() * (col_char_count + 3)) + 1;
-
-	std::cout << "| ";
-
-	for (std::string name : column_names) {
-		std::cout << name;
-
-		for (int i = 0; i < col_char_count - name.length(); i += 1) {
-			std::cout << " ";
-		}
-
-		std::cout << " | ";
-	}
-
-	std::cout << std::endl;
-
-	for (int i = 0; i < row_char_count; i += 1) {
-		std::cout << "=";
-	}
-
-	std::cout << std::endl;
-
-	for (std::vector<std::string> row : print_rows) {
-		std::cout << "| ";
-
-		for (std::string& value : row) {
-			std::cout << value;
-
-			for (int i = 0; i < col_char_count - value.length(); i += 1) {
-				std::cout << " ";
-			}
-
-			std::cout << " | ";
-
-		}
-
-		std::cout << std::endl;
-
-		for (int i = 0; i < row_char_count; i += 1) {
-			std::cout << "-";
-		}
-
-		std::cout << std::endl;
-
-		row_count += 1;
-	}
-
-	std::cout << row_count << " rows selected." << std::endl;
-
-}
-
-/// <summary>
-/// Adds a key to the table
-/// </summary>
-/// <param name="key"></param>
-/// <param name="value"></param>
-void Table::AddKey(std::string type, std::string name) {
-	std::cout << "Adding: " << type << " " << name << std::endl;
-
-	keys.insert(std::pair<std::string, std::string>(type, name));
-
-	if (type == "secondary")
-	{
-		secondaryKeys.push_back(name);
-	}
-
-}
-
-
-/// <summary>
-/// Inserts a row vector to the table
-/// </summary>
-/// <param name="row"></param>
-void Table::Insert(std::vector<std::string> row) {
-	rows.push_back(row);
-}
-
-
-/// <summary>
-/// Selects the columns from the table
-/// </summary>
-/// <param name="col_names"></param>
-/// <returns></returns>
-std::vector<std::vector<std::string> > Table::Select(std::vector<std::string> col_names) {
-	return rows;
-}
-
-
-
-/// <summary>
-/// Deletes the table
-/// </summary>
-void Table::Delete() {
-	delete this;
-}
-
-std::vector<std::string> Table::get_column_names() {
-	std::vector<std::string> temp;
-	auto iter = columns.begin();
-
-	while (iter != columns.end()) {
-		temp.push_back(Utils::trim(iter->first));
-		iter++;
-	}
-
-	return temp;
-}
-
-/// <summary>
-/// Delete the provided row
-/// </summary>
-/// <param name="row"></param>
-void Table::DeleteRow(vector<string> row) {
-	rows.erase(std::remove(rows.begin(), rows.end(), row), rows.end());
-}
-#pragma once
-
-/// <summary>
-/// rename an existing table
-/// </summary>
-/// <param name="new_table_name"></param>
-void Table::Rename_table(std::string new_table_name) 
-{
-	this->table_name = new_table_name;
-}
-
-/// <summary>
-/// Rename a column in an existing table
-/// </summary>
-/// <param name="new_column_name"></param>
-/// <param name="old_column_name"></param>
-/// <returns></returns>
-map<std::string, std::string> Table::Rename_column(std::string new_column_name, std::string old_column_name)
-{
-	std::map<std::string, std::string> new_columns;
-	std::map<std::string, std::string>::iterator it;
-
-	for (it = columns.begin(); it != columns.end(); it++)
-	{
-		cout << it->first << ' ' << it->second << endl;
-	}
-
-	for (it = columns.begin(); it != columns.end(); it++) 
-	{
-		if (it->first != old_column_name)
-		{
-			new_columns.insert({ it->first, it->second });
-		}
-		else
-		{
-			new_columns.insert(std::pair<string, std::string>(new_column_name, it->second));
-		}
-	}
-
-	return new_columns;
-}

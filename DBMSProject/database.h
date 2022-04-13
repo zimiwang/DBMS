@@ -103,74 +103,74 @@ void Database::Delete()
 	delete this;
 }
 
-
-/// Author: Andrew Nunez
-/// <summary>
-/// Save the state of the current database to disk
-/// </summary>
-void Database::Save()
-{
-	std::string line;
-	std::string contents;
-	std::ofstream out("data/" + database_name + ".db");
-
-	contents = "database:" + database_name + "\n";
-
-	auto table = tables.begin();
-
-	for (; table != tables.end(); table++)
-	{
-		contents += ("table_name:" + table->table_name);
-
-		// Add keys
-		if (table->keys.size() > 0)
-		{
-			contents += "\nkeys:";
-			for (auto const& key : table->keys)
-			{
-				contents += (key.first + " " + key.second + ",");
-			}
-
-			contents.pop_back();
-		}
-
-		// Add Columns
-		if (table->columns.size() > 0)
-		{
-			contents += "\ncolumns:";
-			for (auto const& column : table->columns)
-			{
-				contents += (column.first + " " + column.second + ",");
-			}
-
-			contents.pop_back();
-		}
-
-		// Add Rows
-		for (auto& row : table->rows)
-		{
-			contents += "\nrow:";
-
-			for (auto& val : row)
-			{
-				contents += (val + ",");
-			}
-
-			contents.pop_back();
-		}
-
-		contents += "\n;\n";
-	}
-
-	out << contents;
-	out.close();
-
-	updateRows();
-	sortKeys();
-	updateSecondaryTrees();
-	newPrimaryTreeUpdate();
-
-}
+///////////////////////////////////////////////////////////////////////////////// this to be replaced by serialization
+///// Author: Andrew Nunez
+///// <summary>
+///// Save the state of the current database to disk
+///// </summary>
+//void Database::Save()
+//{
+//	std::string line;
+//	std::string contents;
+//	std::ofstream out("data/" + database_name + ".db");
+//
+//	contents = "database:" + database_name + "\n";
+//
+//	auto table = tables.begin();
+//
+//	for (; table != tables.end(); table++)
+//	{
+//		contents += ("table_name:" + table->table_name);
+//
+//		// Add keys
+//		if (table->keys.size() > 0)
+//		{
+//			contents += "\nkeys:";
+//			for (auto const& key : table->keys)
+//			{
+//				contents += (key.first + " " + key.second + ",");
+//			}
+//
+//			contents.pop_back();
+//		}
+//
+//		// Add Columns
+//		if (table->columns.size() > 0)
+//		{
+//			contents += "\ncolumns:";
+//			for (auto const& column : table->columns)
+//			{
+//				contents += (column.first + " " + column.second + ",");
+//			}
+//
+//			contents.pop_back();
+//		}
+//
+//		// Add Rows
+//		for (auto& row : table->rows)
+//		{
+//			contents += "\nrow:";
+//
+//			for (auto& val : row)
+//			{
+//				contents += (val + ",");
+//			}
+//
+//			contents.pop_back();
+//		}
+//
+//		contents += "\n;\n";
+//	}
+//
+//	out << contents;
+//	out.close();
+//
+//	updateRows();
+//	sortKeys();
+//	updateSecondaryTrees();
+//	newPrimaryTreeUpdate();
+//
+//}
 
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
 

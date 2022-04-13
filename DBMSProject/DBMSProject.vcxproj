@@ -143,16 +143,17 @@
   <ItemGroup>
     <ClInclude Include="bplustree.h" />
     <ClInclude Include="database.h" />
-    <ClInclude Include="dbtable.h" />
+    <ClInclude Include="table.h" />
     <ClInclude Include="dictionary.h" />
     <ClInclude Include="filehelper.h" />
     <ClInclude Include="bminustree.h" />
     <ClInclude Include="parser.h" />
     <ClInclude Include="row.h" />
-    <ClInclude Include="table.h" />
+    <ClInclude Include="oldtable.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="commandHandler.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
