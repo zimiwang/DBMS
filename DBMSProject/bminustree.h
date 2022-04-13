@@ -7,6 +7,11 @@
 #include "row.h"
 using namespace std;
 
+/// *** Unreachable Methods
+/// vector<Row> CreateRowVector(Key<T> key)
+/// vector<Row> CreateRowVector(Row row)
+
+
 template <typename T> struct DuplicateKey {
     T key;
     vector<Row> rows;

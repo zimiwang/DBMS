@@ -23,6 +23,7 @@ public:
 	std::string cmd;
 	std::string statement;
 	std::string current_username = "";
+	std::string open_db_name;
 
 	/// <summary>
 	/// command handler: exit the dbms--this is fairly self-explanatary
@@ -158,9 +159,10 @@ public:
 		db = new_db;
 		cmd = new_cmd;
 
+		current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
+
 		if (current_username.empty() == 1)
 		{
-			current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
 			db = new Database(current_db_name);
 
 			if (db->database_name != current_db_name) {
@@ -179,7 +181,7 @@ public:
 
 				std::istringstream is(line);
 				is >> temp;
-				std::size_t found = line.find(" " + current_db_name);
+				std::size_t found = line.find(current_username + ":" + current_db_name);
 
 				if (temp == current_username) {
 
@@ -192,7 +194,6 @@ public:
 
 			if (isExist)
 			{
-				current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
 				db = new Database(current_db_name);
 
 				if (db->database_name != current_db_name) {
@@ -891,7 +892,7 @@ public:
 
 
 
-	/// <summary>
+/// <summary>
 /// command handler: delete rows in a table
 /// </summary>
 /// <returns>1 on completion</returns>
@@ -1051,7 +1052,7 @@ public:
 				is >> temp;
 				if (temp == username) {
 
-					data += (line + " " + db + "\n");
+					data += (line + " " + username + ":" + db + "\n");
 					
 				}
 				else {
@@ -1490,8 +1491,11 @@ public:
 		bool hasAS = false;
 
 		// run handler function
-		float sum = db->sumRows(sourceTable, columnName); 
-		int avg = floor(sum / 2);
+		float sum = db->sumRows(sourceTable, columnName);
+		int numberOfIntColumns = db->numberOfIntColumns(sourceTable, columnName);
+		
+
+		int avg = floor(sum / numberOfIntColumns);
 		Row nr;
 		Column<int> c;
 		c.SetName(columnName);
@@ -1500,7 +1504,6 @@ public:
 		vector<string> cols;
 		cols.push_back(columnName);
 		nr.PrintRow(cols);
-		//cout << "(commandHandler.h) sum = " << sum << "\n";
 
 		return 1;
 	}

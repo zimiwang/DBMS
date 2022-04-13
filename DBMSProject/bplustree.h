@@ -11,6 +11,9 @@
 using namespace std;
 const int MAX = 3;
 
+/// *** Unreachable Method
+/// void display(Node* cursor)
+
 
 struct PrimaryKey {
     int key;
@@ -486,7 +489,7 @@ public:
         }
     };
 
-
+    /// *** Unreachable Method
     void display(Node* cursor) {
         if (cursor != NULL) {
             for (int i = 0; i < cursor->size; i++) {

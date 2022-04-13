@@ -25,6 +25,11 @@ private:
 
 public:
 	
+	// ***Unreachable
+	void CreateTable(std::string tableName);
+	bool find_table(std::string name);
+
+
 	/// <summary>
 	/// The name of the database 
 	/// </summary>
@@ -42,9 +47,6 @@ public:
 
 	const string PRIMARY_KEY = "ID";
 
-	// ***Unreachable
-	void CreateTable(std::string tableName);
-
 	static void List();
 	void List_Tables();
 	void AddTable(Table& tbl);
@@ -52,7 +54,6 @@ public:
 	void Save();
 	void SaveTable(Table table);
 	void DropTable(std::string name);
-	bool find_table(std::string name);
 	void insert_into(std::string statement, std::string table_name);
 	void List_Info();
 	Table get_table(std::string tbl_name);
@@ -69,6 +70,7 @@ public:
 	void updateSecondaryTrees();
 	void newPrimaryTreeUpdate();
 	float sumRows(std::string table, std::string column);
+	int numberOfIntColumns(std::string sourceTable, std::string columnName);
 
 	//if you change this you should probably change the error message below in updateRows
 	const int DEFAULT_CHAR_ARRAY_SIZE = 15;
@@ -390,6 +392,7 @@ void Database::List_Tables()
 }
 
 /// return a boolean; true if the a table is found, false otherwise
+/// *** Unreachable Method
 bool Database::find_table(std::string name)
 {
 	for (Table tbl : tables)
@@ -456,6 +459,41 @@ float Database::sumRows(std::string fromTable, std::string column)
 	}
 
 	return sum;
+}
+
+
+
+/// <summary>
+/// give the number of columns of a specific table that are integers
+/// </summary>
+/// <param name="sourceTable">string of the table to read from</param>
+/// <param name="columnName">string of the column name</param>
+/// <returns>integer value of the number of int columns</returns>
+int Database::numberOfIntColumns(std::string sourceTable, std::string columnName)
+{
+	int rowsNumber = 0;
+
+	//get the table information (table, column, rows)
+	Table table = this->get_table(sourceTable);
+	int columnIndex = table.get_column_index(columnName);
+	std::vector<std::vector<std::string>> rows = table.rows;
+
+	// iterate through the rows
+	for (int i = 0; i < rows.size(); i++)
+	{
+		try {
+			std::string value = std::string(rows[i][columnIndex]);
+			stoi(value);
+			rowsNumber++;
+		}
+		// this catch should run if the row is not a string that can be converted into an int (! 0-9)
+		catch (const std::exception& e)
+		{
+			rowsNumber += 0;
+		}
+	}
+
+	return rowsNumber;
 }
 
 
@@ -590,6 +628,12 @@ void Database::RenameTable(std::string old_table_name, std::string new_table_nam
 	this->Save();
 }
 
+/// <summary>
+/// Delete rows in a table
+/// </summary>
+/// <param name="tbl_name"></param>
+/// <param name="conditional"></param>
+/// <param name="clause"></param>
 void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<string> clause) {
 
 	int count = 0;
