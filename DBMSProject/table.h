@@ -149,6 +149,10 @@ public:
 	vector<BTree<int>> secondaryIntTrees;
 	BPTree primaryTree;
 
+	Table()
+	{
+
+	}
 	Table(string name, vector<string> cols) {
 		table_name = name;		
 

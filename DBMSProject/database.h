@@ -255,124 +255,124 @@ void Database::UpdateTable(string table_name, vector<vector<string>> update_clau
 	}
 		this->Save();
 }
-
-/// Author: Andrew Nunez
-/// <summary>
-/// Read the given file name 
-/// </summary>
-/// <param name="db_name">name of the database to read</param>
-void Database::Read(std::string db_name)
-{
-	int tmp_size, i = 0;
-	std::string line;
-	std::string* tmp_parent_array;
-	std::string* tmp_child_array;
-	std::ifstream file("data/" + db_name + ".db");
-
-	std::string tbl_name;
-	std::map<std::string, std::string> keys;
-	std::vector<std::vector<std::string>> rows;
-	std::map<std::string, std::string> columns;
-
-	if (file.is_open())
-	{
-		while (getline(file, line))
-		{
-			tmp_size = std::count(line.begin(), line.end(), ',') + 1;
-
-			// Begin parsing each line
-			if (line.find("database:") == 0)
-			{
-				database_name = line.substr(line.find(":") + 1);
-			}
-			else if (line.find("table_name:") == 0)
-			{
-				tbl_name = line.substr(line.find(":") + 1);
-			}
-			else if (line.find("row:") == 0)
-			{
-				std::vector<std::string> tmp_v;
-				tmp_parent_array = Parser::split_str(line, ',');
-
-				for (i = 0; i < tmp_size; i++)
-				{
-					tmp_v.push_back(tmp_parent_array[i]);
-				}
-
-				rows.push_back(tmp_v);
-			}
-			else if (line.find("keys:") == 0)
-			{
-				tmp_parent_array = Parser::split_str(line, ',');
-				for (i = 0; i < tmp_size; i++)
-				{
-					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
-					keys.insert({ tmp_child_array[0], tmp_child_array[1] });
-				}
-
-			}
-			else if (line.find("columns:") == 0)
-			{
-				tmp_parent_array = Parser::split_str(line, ',');
-
-				for (i = 0; i < tmp_size; i++)
-				{
-					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
-
-					if (line.find("keys:") == 0)
-					{
-						keys.insert({ tmp_child_array[0], tmp_child_array[1] });
-					}
-					else if (line.find("columns:") == 0)
-					{
-						columns.insert({ tmp_child_array[0], tmp_child_array[1] });
-					}
-				}
-			}
-			/*else if (line.find(",") != std::string::npos)
-			{
-				tmp_parent_array = Parser::split_str(line, ',');
-
-				for (i = 0; i < tmp_size; i++)
-				{
-					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
-
-					if (line.find("keys:") == 0)
-					{
-						keys.insert({ tmp_child_array[0], tmp_child_array[1] });
-					}
-					else if (line.find("columns:") == 0)
-					{
-						columns.insert({ tmp_child_array[0], tmp_child_array[1] });
-					}
-				}
-			}*/
-			else if (line.find(";") == 0)
-			{
-				Table* tbl = new Table(tbl_name);
-				tbl->keys = keys;
-				tbl->rows = rows;
-				tbl->columns = columns;
-				//tbl->spread_keys();
-				this->AddTable(*tbl);
-
-				rows.clear();
-				columns.clear();
-				keys.clear();
-
-			}
-			else
-			{
-				std::cout << "Database is Corrupt!" << std::endl;
-			}
-		}
-		file.close();
-	}
-	else
-	{
-		std::cout << "Database does not exist!" << std::endl;
-	}
-}
+////////////////////////////////////////////////////////////////////////////will be depreciated by serialization
+///// Author: Andrew Nunez
+///// <summary>
+///// Read the given file name 
+///// </summary>
+///// <param name="db_name">name of the database to read</param>
+//void Database::Read(std::string db_name)
+//{
+//	int tmp_size, i = 0;
+//	std::string line;
+//	std::string* tmp_parent_array;
+//	std::string* tmp_child_array;
+//	std::ifstream file("data/" + db_name + ".db");
+//
+//	std::string tbl_name;
+//	std::map<std::string, std::string> keys;
+//	std::vector<std::vector<std::string>> rows;
+//	std::map<std::string, std::string> columns;
+//
+//	if (file.is_open())
+//	{
+//		while (getline(file, line))
+//		{
+//			tmp_size = std::count(line.begin(), line.end(), ',') + 1;
+//
+//			// Begin parsing each line
+//			if (line.find("database:") == 0)
+//			{
+//				database_name = line.substr(line.find(":") + 1);
+//			}
+//			else if (line.find("table_name:") == 0)
+//			{
+//				tbl_name = line.substr(line.find(":") + 1);
+//			}
+//			else if (line.find("row:") == 0)
+//			{
+//				std::vector<std::string> tmp_v;
+//				tmp_parent_array = Parser::split_str(line, ',');
+//
+//				for (i = 0; i < tmp_size; i++)
+//				{
+//					tmp_v.push_back(tmp_parent_array[i]);
+//				}
+//
+//				rows.push_back(tmp_v);
+//			}
+//			else if (line.find("keys:") == 0)
+//			{
+//				tmp_parent_array = Parser::split_str(line, ',');
+//				for (i = 0; i < tmp_size; i++)
+//				{
+//					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+//					keys.insert({ tmp_child_array[0], tmp_child_array[1] });
+//				}
+//
+//			}
+//			else if (line.find("columns:") == 0)
+//			{
+//				tmp_parent_array = Parser::split_str(line, ',');
+//
+//				for (i = 0; i < tmp_size; i++)
+//				{
+//					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+//
+//					if (line.find("keys:") == 0)
+//					{
+//						keys.insert({ tmp_child_array[0], tmp_child_array[1] });
+//					}
+//					else if (line.find("columns:") == 0)
+//					{
+//						columns.insert({ tmp_child_array[0], tmp_child_array[1] });
+//					}
+//				}
+//			}
+//			/*else if (line.find(",") != std::string::npos)
+//			{
+//				tmp_parent_array = Parser::split_str(line, ',');
+//
+//				for (i = 0; i < tmp_size; i++)
+//				{
+//					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+//
+//					if (line.find("keys:") == 0)
+//					{
+//						keys.insert({ tmp_child_array[0], tmp_child_array[1] });
+//					}
+//					else if (line.find("columns:") == 0)
+//					{
+//						columns.insert({ tmp_child_array[0], tmp_child_array[1] });
+//					}
+//				}
+//			}*/
+//			else if (line.find(";") == 0)
+//			{
+//				Table* tbl = new Table(tbl_name);
+//				tbl->keys = keys;
+//				tbl->rows = rows;
+//				tbl->columns = columns;
+//				//tbl->spread_keys();
+//				this->AddTable(*tbl);
+//
+//				rows.clear();
+//				columns.clear();
+//				keys.clear();
+//
+//			}
+//			else
+//			{
+//				std::cout << "Database is Corrupt!" << std::endl;
+//			}
+//		}
+//		file.close();
+//	}
+//	else
+//	{
+//		std::cout << "Database does not exist!" << std::endl;
+//	}
+//}
 
 /// list the "data" files in the db
 void Database::List()
@@ -871,12 +871,7 @@ void Database::sortKeys()
 		tbl.foreignKeys.clear();
 		for (std::pair<std::string, std::string> current_key : tbl.keys)
 		{
-			if (current_key.first == "primary")
-			{
-				//found primary key
-				tbl.primaryKeyName = current_key.second;
-			}
-			else if (current_key.first == "secondary")
+			if (current_key.first == "secondary")
 			{
 				//found secondary key
 				tbl.secondaryKeys.push_back(current_key.second);
@@ -893,88 +888,88 @@ void Database::sortKeys()
 	}
 }
 
-
-/// <summary>
-/// Updates the new row data structure from each tree based on the old row storage methodology.
-/// </summary>
-void Database::updateRows()
-{
-	for (Table tbl : tables)
-	{
-		tbl.newrows.clear();
-		for (std::vector<std::string> rw : tbl.rows)
-		{
-			Row nrow = Row();
-			int rowfind = 0;
-			int introws = 0;
-			int strrows = 0;
-			int charrows = 0;
-
-			for (std::pair<std::string, std::string> col : tbl.columns)
-			{
-				if (col.second == "string")
-				{
-					Column<string> newcol = Column<string>();
-					newcol.AddValue(rw[rowfind]);
-					newcol.SetName(col.first);
-					nrow.strColumn.push_back(newcol);
-					
-				}
-				else if (col.second == "int")
-				{
-					Column<int> newcol = Column<int>();
-					newcol.AddValue(stoi(rw[rowfind]));
-					newcol.SetName(col.first);
-					nrow.intColumn.push_back(newcol);
-
-				}
-				else if (col.second == "char")
-				{
-					//check for declared length of char array
-					int size = -1;
-					try 
-					{
-						size = stoi(Utils::get_string_between_two_strings(col.first, "[", "]"));
-					}
-					catch(exception &err)
-					{
-						//catch here and just use the default length
-						size = DEFAULT_CHAR_ARRAY_SIZE;
-						//tell the dummy that they didn't provide a char array length and the default is being used instead
-						string mes = "ERROR. NO CHAR ARRAY SIZE LIMIT FOUND FOR COLUMN " + col.first + ". USING SYSTEM DEFAULT OF 15.";
-						std::cerr << mes << endl;
-					}
-
-					//initialize the character array
-					char * char_arr = new char[size];
-					memset(char_arr, ' ', size);
-					string str_obj(rw[rowfind]);
-
-					//copy the string making sure to terminate it regardless of the length of the string provided
-					copy(str_obj.begin(), str_obj.end(), char_arr);
-					char_arr[size-1] = '\0';
-
-					//create the column and push it to the row
-					Column<char *> newcol = Column<char *>();
-					newcol.AddValue(char_arr);
-					newcol.SetName(col.first);
-					nrow.charColumn.push_back(newcol);
-				}
-				else
-				{
-					//unsupported column type - assume string? - come back to this
-					Column<string> newcol = Column<string>();
-					newcol.AddValue(rw[rowfind]);
-					newcol.SetName(col.first);
-					nrow.strColumn.push_back(newcol);
-				}
-				rowfind = rowfind + 1;
-			}
-			tbl.newrows.push_back(nrow);
-		}		
-	SaveTable(tbl);
-	}
-}
+////////////////////////////////////////////////////////////////////////////////depreciated
+///// <summary>
+///// Updates the new row data structure from each tree based on the old row storage methodology.
+///// </summary>
+//void Database::updateRows()
+//{
+//	for (Table tbl : tables)
+//	{
+//		tbl.newrows.clear();
+//		for (std::vector<std::string> rw : tbl.rows)
+//		{
+//			Row nrow = Row();
+//			int rowfind = 0;
+//			int introws = 0;
+//			int strrows = 0;
+//			int charrows = 0;
+//
+//			for (std::pair<std::string, std::string> col : tbl.columns)
+//			{
+//				if (col.second == "string")
+//				{
+//					Column<string> newcol = Column<string>();
+//					newcol.AddValue(rw[rowfind]);
+//					newcol.SetName(col.first);
+//					nrow.strColumn.push_back(newcol);
+//					
+//				}
+//				else if (col.second == "int")
+//				{
+//					Column<int> newcol = Column<int>();
+//					newcol.AddValue(stoi(rw[rowfind]));
+//					newcol.SetName(col.first);
+//					nrow.intColumn.push_back(newcol);
+//
+//				}
+//				else if (col.second == "char")
+//				{
+//					//check for declared length of char array
+//					int size = -1;
+//					try 
+//					{
+//						size = stoi(Utils::get_string_between_two_strings(col.first, "[", "]"));
+//					}
+//					catch(exception &err)
+//					{
+//						//catch here and just use the default length
+//						size = DEFAULT_CHAR_ARRAY_SIZE;
+//						//tell the dummy that they didn't provide a char array length and the default is being used instead
+//						string mes = "ERROR. NO CHAR ARRAY SIZE LIMIT FOUND FOR COLUMN " + col.first + ". USING SYSTEM DEFAULT OF 15.";
+//						std::cerr << mes << endl;
+//					}
+//
+//					//initialize the character array
+//					char * char_arr = new char[size];
+//					memset(char_arr, ' ', size);
+//					string str_obj(rw[rowfind]);
+//
+//					//copy the string making sure to terminate it regardless of the length of the string provided
+//					copy(str_obj.begin(), str_obj.end(), char_arr);
+//					char_arr[size-1] = '\0';
+//
+//					//create the column and push it to the row
+//					Column<char *> newcol = Column<char *>();
+//					newcol.AddValue(char_arr);
+//					newcol.SetName(col.first);
+//					nrow.charColumn.push_back(newcol);
+//				}
+//				else
+//				{
+//					//unsupported column type - assume string? - come back to this
+//					Column<string> newcol = Column<string>();
+//					newcol.AddValue(rw[rowfind]);
+//					newcol.SetName(col.first);
+//					nrow.strColumn.push_back(newcol);
+//				}
+//				rowfind = rowfind + 1;
+//			}
+//			tbl.newrows.push_back(nrow);
+//		}		
+//	SaveTable(tbl);
+//	}
+//}
 /// <summary>
 /// Updates the primary key trees for each table. TODO - Add a check to see if the table needs to be updated - maybe a bool flag in
 /// table.h that says whether or not it has been altered since the last table was generated.
@@ -987,7 +982,7 @@ inline void Database::updateSecondaryTrees()
 		BTree<char *> secondaryCharKeyTree;
 		BTree<string> secondaryStringKeyTree;
 
-		for (Row r : tbl.newrows)
+		for (Row r : tbl.rows)
 		{
 			/*Row* rpoint = &r;*/
 			r.InUse();
@@ -1054,7 +1049,7 @@ inline void Database::newPrimaryTreeUpdate()
 		if (it != primary_key_trees.end())
 		{
 			// tree exists, now we need to see if it should be updated
-			for (Row r : t.newrows)
+			for (Row r : t.rows)
 			{
 				r.InUse();
 				for (Column<int> c : r.intColumn)
@@ -1072,7 +1067,7 @@ inline void Database::newPrimaryTreeUpdate()
 					}
 				}
 			}
-			t.primaryKeyTree = primary_key_trees[it - primary_key_trees.begin()];
+			t.primaryTree = primary_key_trees[it - primary_key_trees.begin()];
 		}
 		else
 		{
@@ -1080,7 +1075,7 @@ inline void Database::newPrimaryTreeUpdate()
 			BPTree newtree;
 			newtree.SetPrimaryKey(t.primaryKeyName);
 			newtree.Name = t.table_name;
-			for (Row r : t.newrows)
+			for (Row r : t.rows)
 			{
 				r.InUse();
 				for (Column<int> c : r.intColumn)
@@ -1092,7 +1087,7 @@ inline void Database::newPrimaryTreeUpdate()
 					}
 				}
 			}
-			t.primaryKeyTree = newtree;
+			t.primaryTree = newtree;
 			primary_key_trees.push_back(newtree);
 			this->SaveTable(t);
 		}
