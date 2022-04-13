@@ -100,9 +100,9 @@ public:
 			{
 				break;
 			}
-
-			return 1;
 		}
+
+		return isRun;
 	}
 
 

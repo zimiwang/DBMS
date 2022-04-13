@@ -29,11 +29,14 @@ public:
 		{
 			int accountFound = 0;
 
-			std::string u, p;
+			std::string u, p, line;
 
 			// Print after login successfully
-			while (read >> u >> p)
+			while (std::getline(read, line))
 			{
+				stringstream input(line);
+				input >> u >> p;
+
 				if (u == username && p == password) {
 					std::cout << "\nLOGIN SUCESS! Welcome to use RDBMS\n";
 
