@@ -163,7 +163,7 @@ void Database::Delete()
 //		contents += "\n;\n";
 //	}
 //
-//	out << contents;
+//	out << contents;insert
 //	out.close();
 //
 //	updateRows();

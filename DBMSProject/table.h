@@ -24,7 +24,7 @@ private:
 
 	template <typename T>
 	BTree<T> FindSecondaryTree(string name, vector<BTree<T>> trees) {
-		
+
 		for (BTree<T> tree : trees) {
 			if (tree.GetKeyName() == name) return tree;
 		}
@@ -55,8 +55,8 @@ private:
 					hasID = true;
 					primaryKey.keyName = "ID_" + name;
 					primaryKey.type = Utils::trim(tmp[1]);
-				}				
-				columns.insert(std::pair<std::string, std::string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
+				}
+				columns.insert(pair<string, string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
 				int letstes = 0;
 			}
 			else
@@ -71,12 +71,12 @@ private:
 		{
 			if (hasID == false) //We have no ID column defined by the user, manually add one
 			{
-				columns.insert(std::pair<std::string, std::string>(("ID_" + name), "int"));
+				columns.insert(pair<string, string>(("ID_" + name), "int"));
 				primaryKey.keyName = "ID_" + name;
 				primaryKey.type = "int";
 
 			}
-		}			
+		}
 	}
 
 
@@ -116,6 +116,7 @@ private:
 	void CreateSecondaryTree(BTree<T> tree) {
 		string name = tree.GetKeyName();	// column name
 		for (Row row : rows) {
+			row.get
 				int type = row.GetColumnType(name);
 			if (type == 0) {
 				// string
@@ -132,16 +133,17 @@ private:
 		}
 	}
 
-public:	
+public:
 
 	// Data to be saved (serialization)
-	string table_name;	
+	string table_name;
 	string primaryKeyName = "ID";
 	map<string, string> columns;
 	vector<Row> rows;
 	vector<Keys> foreignKeys;
 	vector<Keys> secondaryKeys;
 	Keys primaryKey;
+	vector<Keys> allKeys;
 
 	// Data that is not saved
 	vector<BTree<string>> secondaryStringTrees;
@@ -149,33 +151,16 @@ public:
 	vector<BTree<int>> secondaryIntTrees;
 	BPTree primaryTree;
 
-	Table()
-	{
+	Table() {
 
 	}
+
 	Table(string name, vector<string> cols) {
-		table_name = name;		
+		table_name = name;
 
 		RecordPrimaryKey(name, cols);
 	}
-	/// <summary>
-	/// Support for a reference to the number of keys that was recorded in the old table structure
-	/// </summary>
-	/// <returns></returns>
-	int getKeySize()
-	{
-		int x = 1; // 1 for the primary key
-		for (Keys k : secondaryKeys) {
-			x = x + 1;
-		}
-		for (Keys k : foreignKeys)
-		{
-			x = x + 1;
-		}
 
-		return x;
-			
-	}
 	/// <summary>
 	/// Adds a new row to the table. Updates the Primary and Secondary Keys accordingly
 	/// </summary>
@@ -189,7 +174,7 @@ public:
 	void AddRow(T key, Row row, bool primaryKey = true, bool secondaryKey = false, T sKey = "", string secondaryName = "", string secondaryKeyType = "int") {
 		bool errorFound = false;
 		if (primaryKey) {
-			primaryTree.insert(key, row);
+			primaryTree.insert(key, row.);
 			rows.push_back(row);
 		}
 		if (secondaryKey) {
@@ -201,10 +186,10 @@ public:
 			else if (secondaryKeyType == "string") {
 				BTree<string> tree = FindSecondaryTree(secondaryName, secondaryStringTrees);
 				if (!tree.IsEmpty()) tree.insert(sKey, row);
-				else errorFound = true;
+				else erroFound = true;
 			}
 			else {
-				BTree<char*> tree = FindSecondaryTree(secondaryName, secondaryCharTrees);
+				BTree<char*> tree = FindSecondaryTree(secondaryName, secondaryCharTree);
 				if (!tree.IsEmpty()) tree.insert(sKey, row);
 				else errorFound = true;
 			}
@@ -214,7 +199,7 @@ public:
 		}
 
 
-		if (primaryKey || secondaryKey) {
+		if (primaryKey || secondarKey) {
 			cout << "Could not update tree. PrimarKey or SecondaryKey not Defined." << endl;
 		}
 	}
@@ -232,12 +217,15 @@ public:
 		if (keytype == "primary") {
 			primaryKey = newKey;
 		}
-		else if (keytype == "secondary") {			
-			secondaryKeys.push_back(newKey);		
+		else if (keytype == "secondary") {
+			secondaryKeys.push_back(newKey);
 		}
 		else if (keytype == "foreign") {
 			foreignKeys.push_back(newKey);
 		}
+
+		// add key to all keys
+		allKeys.push_back(newKey);
 	}
 
 	/// <summary>
@@ -248,16 +236,70 @@ public:
 	void CreateTrees() {
 		// create primary tree
 		if (primaryKey.keyName != "") {
-			
+
 			for (Row row : rows) {
 				primaryTree.insert(row.GetIntColumnByName(primaryKey.keyName).GetValue(), row);
 			}
 		}
-		
+
 		// create secondary trees
 		CreateSecondaryTrees();
 	}
-	
-	
+
+	/// <summary>
+	/// Gets the index of the provided column
+	/// </summary>
+	/// <param name="column_name"></param>
+	/// <returns>index of the provided column</returns>
+	int get_column_index(std::string column_name) {
+		int ret = -1;
+		//std::map<std::string, std::string>::iterator it;
+		int col_index;
+
+		//it = columns.find(column_name);
+		auto it = columns.find(column_name);
+
+		if (it != columns.end()) {
+			col_index = std::distance(columns.begin(), it);
+			ret = col_index;
+		}
+
+		return ret;
+	}
+
+
+	void DeleteRow(Row row) {
+		for (int i = 0; i < rows.size(); i++) {
+			if (rows[i] == row) {
+				rows.erase(rows.begin() + i);
+			}
+		}
+	}
+
+
+	void DeleteColumn(string columnName) {
+		// delete column name
+		columns.erase(columnName);
+
+		for (Row row : rows) {
+			row.deleteColumn(columnName);
+		}
+	}
+
+
+	void RenameColumn(string prevColumn, string newColumn) {
+		// delete column name
+		auto it = columns.find(prevColumn);
+		string type = it->second;
+		columns.erase(prevColumn);
+
+		// add new column name
+		columns.insert(pair<string, string>(newColumn, type));
+
+
+		for (Row row : rows) {
+			row.renameColumn(prevColumn, newColumn);
+		}
+	}
 
 };
