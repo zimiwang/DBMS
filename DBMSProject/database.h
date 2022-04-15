@@ -225,7 +225,7 @@ void Database::UpdateTable(string table_name, vector<vector<string>> update_clau
 		vector<vector<string>> new_rows;
 		//cout << "get_where_clause: " << where_clause[0] << endl;
 		//cout << "get_update_clause: " << update_clause[0][i] << endl;
-
++-
 		int where_idx = tbl.get_column_index(where_clause[0]);
 		int update_idx = tbl.get_column_index(update_clause[i][0]);
 
@@ -818,7 +818,7 @@ void Database::List_Info() {
 /// </summary>
 /// <param name="statement">user-inputted command</param>
 /// <param name="table_name">name of the table</param>
-void Database::insert_into(std::string statement, std::string table_name)
+void Database::insert_into(string statement, string table_name)
 {
 	Table current_table = get_table(table_name);;
 	vector<string> columns = Parser::get_insert_columns(statement, table_name);
