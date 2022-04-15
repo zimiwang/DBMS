@@ -80,6 +80,32 @@ public:
 /// A Row class that contains all the values of a row
 /// </summary>
 class Row {	
+public:
+	/// <summary>
+	/// Gets all the column names in the row
+	/// </summary>
+	/// <returns></returns>
+	vector<string> GetColumnNames() {
+		vector<string> columns;
+
+		// Go through the rows columns 
+		for (Column<int> i : intColumn) {
+			// Got through the incoming columns
+			columns.push_back(i.GetName());
+		}
+
+		// The same as above
+		for (Column<string> i : strColumn) {
+			columns.push_back(i.GetName());
+		}
+
+		// The same as above
+		for (Column<char*> i : charColumn) {
+			columns.push_back(i.GetName());
+		}
+
+		return columns;
+	}
 private:
 	bool empty;	
 	/// <summary>
@@ -100,34 +126,6 @@ private:
 
 		return found;
 	}
-
-	/// <summary>
-	/// Gets all the column names in the row
-	/// </summary>
-	/// <returns></returns>
-	vector<string> GetColumnNames() {
-		vector<string> columns;
-
-		// Go through the rows columns 
-		for (Column<int> i : intColumn) {
-			// Got through the incoming columns
-			columns.push_back(i.GetName());
-		}
-
-		// The same as above
-		for (Column<string> i : strColumn) {
-			columns.push_back(i.GetName());
-		}
-
-		// The same as above
-		for (Column<char *> i : charColumn) {
-			columns.push_back(i.GetName());
-		}
-
-		return columns;
-	}
-
-
 	/// <summary>
 	/// Prints a formatted value of a column 
 	/// </summary>
@@ -603,7 +601,6 @@ public:
 		// chars will always have one character so no need for checking size
 		return size;
 	}
-
 
 	/// <summary>
 	///	Finds the total columns being used

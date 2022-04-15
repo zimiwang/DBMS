@@ -104,6 +104,74 @@ void Database::Delete()
 	delete this;
 }
 
+///////////////////////////////////////////////////////////////////////////////// this to be replaced by serialization
+///// Author: Andrew Nunez
+///// <summary>
+///// Save the state of the current database to disk
+///// </summary>
+//void Database::Save()
+//{
+//	std::string line;
+//	std::string contents;
+//	std::ofstream out("data/" + database_name + ".db");
+//
+//	contents = "database:" + database_name + "\n";
+//
+//	auto table = tables.begin();
+//
+//	for (; table != tables.end(); table++)
+//	{
+//		contents += ("table_name:" + table->table_name);
+//
+//		// Add keys
+//		if (table->keys.size() > 0)
+//		{
+//			contents += "\nkeys:";
+//			for (auto const& key : table->keys)
+//			{
+//				contents += (key.first + " " + key.second + ",");
+//			}
+//
+//			contents.pop_back();
+//		}
+//
+//		// Add Columns
+//		if (table->columns.size() > 0)
+//		{
+//			contents += "\ncolumns:";
+//			for (auto const& column : table->columns)
+//			{
+//				contents += (column.first + " " + column.second + ",");
+//			}
+//
+//			contents.pop_back();
+//		}
+//
+//		// Add Rows
+//		for (auto& row : table->rows)
+//		{
+//			contents += "\nrow:";
+//
+//			for (auto& val : row)
+//			{
+//				contents += (val + ",");
+//			}
+//
+//			contents.pop_back();
+//		}
+//
+//		contents += "\n;\n";
+//	}
+//
+//	out << contents;
+//	out.close();
+//
+//	updateRows();
+//	sortKeys();
+//	updateSecondaryTrees();
+//	newPrimaryTreeUpdate();
+//
+//}
 
 /// Author: Andrew Nunez
 /// <summary>
@@ -840,44 +908,77 @@ void Database::insert_into(string statement, string table_name)
 		values[0].push_back(newid);
 	}
 
-	vector<string> col_names = current_table.get_column_names();
-
-	vector<int> order;
-
-	for (string str : col_names) {
-		auto it = std::find(columns.begin(), columns.end(), str);
-
-		if (it != columns.end()) {
-			order.push_back(std::distance(columns.begin(), it));
-		}
-		else {
-			order.push_back(-1);
-		}
-	}
-
-	int cnt = 0;
+	map<string, string> tabcols = current_table.columns;
 	
-	for (vector<string> row : values)
+	Row r = Row();
+	std::map<string, string> merge;
+	std::transform(columns.begin(), columns.end(), values.begin(), std::inserter(merge, merge.end()), std::make_pair<string const&, string const&>);
+	for (string c : columns)
 	{
-		vector<string> temp;
-		for (int j = 0; j < order.size(); j++)
+		std::map<string, string>::iterator it = tabcols.find(c);
+		if (it != tabcols.end())
 		{
-			if (order[j] == -1)
+			string coltype = it->second;
+
+			if (coltype == "int")
 			{
-				temp.push_back("NULL");
+				Column<int> column = new Column<int>();
+				std::map<string, string>::iterator valit = merge.find(c);
+				column.SetName(c);
+				column.AddValue(stoi(valit->second));
+				r.intColumn.push_back(column);
+			}
+			else if (coltype == "char")
+			{
+				std::map<string, string>::iterator valit = merge.find(c);
+				//check for declared length of char array
+					int size = -1;
+					try 
+					{
+						size = stoi(Utils::get_string_between_two_strings(valit->first, "[", "]"));
+					}
+					catch(exception &err)
+					{
+						//catch here and just use the default length
+						size = DEFAULT_CHAR_ARRAY_SIZE;
+						//tell the dummy that they didn't provide a char array length and the default is being used instead
+						string mes = "ERROR. NO CHAR ARRAY SIZE LIMIT FOUND FOR COLUMN " + valit->first + ". USING SYSTEM DEFAULT OF 15.";
+						std::cerr << mes << endl;
+					}
+
+					//initialize the character array
+					char * char_arr = new char[size];
+					memset(char_arr, ' ', size);
+					string str_obj(valit->second);
+
+					//copy the string making sure to terminate it regardless of the length of the string provided
+					copy(str_obj.begin(), str_obj.end(), char_arr);
+					char_arr[size-1] = '\0';
+
+					//create the column and push it to the row
+					Column<char *> newcol = Column<char *>();
+					newcol.AddValue(char_arr);
+					newcol.SetName(valit->first);
+					r.charColumn.push_back(newcol);
+			}
+			else if (coltype == "string")
+			{
+				Column<string> column = new Column<string>();
+				std::map<string, string>::iterator valit = merge.find(c);
+				column.SetName(c);
+				column.AddValue(valit->second);
+				r.strColumn.push_back(column);
 			}
 			else
 			{
-				temp.push_back(Utils::trim(row[order[j]]));
+				//unsupported coltype found - shouldn't ever happen
 			}
 		}
-
-		cnt += 1;
-
-		current_table.Insert(temp);
+		else
+		{
+			//col provided not present within the table - user goofed up 
+		}
 	}
-
-	SaveTable(current_table);
 
 }
 /// <summary>
