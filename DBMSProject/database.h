@@ -8,7 +8,7 @@
 #pragma once
 #include <algorithm>
 #include "filehelper.h"
-#include "table.h"
+//#include "table.h"
 #include "bplustree.h"
 #include <stdbool.h>
 #include "row.h"
@@ -16,6 +16,7 @@
 #include<iostream>
 #include<string>
 #include "bminustree.h"
+#include "dbtable.h"
 using namespace std;
 
 class Database
@@ -162,7 +163,7 @@ void Database::Delete()
 //		contents += "\n;\n";
 //	}
 //
-//	out << contents;
+//	out << contents;insert
 //	out.close();
 //
 //	updateRows();
@@ -171,6 +172,74 @@ void Database::Delete()
 //	newPrimaryTreeUpdate();
 //
 //}
+
+/// Author: Andrew Nunez
+/// <summary>
+/// Save the state of the current database to disk
+/// </summary>
+void Database::Save()
+{
+	std::string line;
+	std::string contents;
+	std::ofstream out("data/" + database_name + ".db");
+
+	contents = "database:" + database_name + "\n";
+
+	auto table = tables.begin();
+
+	for (; table != tables.end(); table++)
+	{
+		contents += ("table_name:" + table->table_name);
+
+		// Add keys
+		if (table->allKeys.size() > 0)
+		{
+			contents += "\nkeys:";
+			for (Keys key : table->allKeys)
+			{
+				contents += (key.keyName + " " + key.type + ",");
+			}
+
+			contents.pop_back();
+		}
+
+		// Add Columns
+		if (table->columns.size() > 0)
+		{
+			contents += "\ncolumns:";
+			for (auto const& column : table->columns)
+			{
+				contents += (column.first + " " + column.second + ",");
+			}
+
+			contents.pop_back();
+		}
+
+		// Add Rows
+		for (Row row : table->rows)
+		{
+			contents += "\nrow:";
+
+			/*for (auto& val : row)
+			{
+				contents += (val + ",");
+			}*/
+
+			contents.pop_back();
+		}
+
+		contents += "\n;\n";
+	}
+
+	out << contents;
+	out.close();
+
+	updateRows();
+	sortKeys();
+	updateSecondaryTrees();
+	newPrimaryTreeUpdate();
+
+}
 
 // TODO: Accept a list of columns, tie into user input. This might change to accepting a table name and a list of columns and creating a Table constructor. That may be the cleanest way
 
@@ -205,7 +274,10 @@ void Database::DropTable(std::string name)
 	}
 }
 
-
+/// TO BE UPDATED
+/// 
+/// 
+/// 
 /// <summary>
 /// with an inputted name and update clause or multiple update clauses, 
 /// the table is updated by creating a new table and deleting the old one, then saving it.
@@ -222,7 +294,7 @@ void Database::UpdateTable(string table_name, vector<vector<string>> update_clau
 		vector<vector<string>> new_rows;
 		//cout << "get_where_clause: " << where_clause[0] << endl;
 		//cout << "get_update_clause: " << update_clause[0][i] << endl;
-
++-
 		int where_idx = tbl.get_column_index(where_clause[0]);
 		int update_idx = tbl.get_column_index(update_clause[i][0]);
 
@@ -256,7 +328,6 @@ void Database::UpdateTable(string table_name, vector<vector<string>> update_clau
 	}
 		this->Save();
 }
-*/
 
 ////////////////////////////////////////////////////////////////////////////will be depreciated by serialization
 ///// Author: Andrew Nunez
@@ -377,6 +448,128 @@ void Database::UpdateTable(string table_name, vector<vector<string>> update_clau
 //	}
 //}
 
+/// TO BE UPDATED
+/// 
+/// 
+/// 
+/// Author: Andrew Nunez
+/// <summary>
+/// Read the given file name 
+/// </summary>
+/// <param name="db_name">name of the database to read</param>
+void Database::Read(std::string db_name)
+{
+	int tmp_size, i = 0;
+	std::string line;
+	std::string* tmp_parent_array;
+	std::string* tmp_child_array;
+	std::ifstream file("data/" + db_name + ".db");
+
+	std::string tbl_name;
+	std::map<std::string, std::string> keys;
+	std::vector<std::vector<std::string>> rows;
+	std::map<std::string, std::string> columns;
+
+	if (file.is_open())
+	{
+		while (getline(file, line))
+		{
+			tmp_size = std::count(line.begin(), line.end(), ',') + 1;
+
+			// Begin parsing each line
+			if (line.find("database:") == 0)
+			{
+				database_name = line.substr(line.find(":") + 1);
+			}
+			else if (line.find("table_name:") == 0)
+			{
+				tbl_name = line.substr(line.find(":") + 1);
+			}
+			else if (line.find("row:") == 0)
+			{
+				std::vector<std::string> tmp_v;
+				tmp_parent_array = Parser::split_str(line, ',');
+
+				for (i = 0; i < tmp_size; i++)
+				{
+					tmp_v.push_back(tmp_parent_array[i]);
+				}
+
+				rows.push_back(tmp_v);
+			}
+			else if (line.find("keys:") == 0)
+			{
+				tmp_parent_array = Parser::split_str(line, ',');
+				for (i = 0; i < tmp_size; i++)
+				{
+					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+					keys.insert({ tmp_child_array[0], tmp_child_array[1] });
+				}
+
+			}
+			else if (line.find("columns:") == 0)
+			{
+				tmp_parent_array = Parser::split_str(line, ',');
+
+				for (i = 0; i < tmp_size; i++)
+				{
+					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+
+					if (line.find("keys:") == 0)
+					{
+						keys.insert({ tmp_child_array[0], tmp_child_array[1] });
+					}
+					else if (line.find("columns:") == 0)
+					{
+						columns.insert({ tmp_child_array[0], tmp_child_array[1] });
+					}
+				}
+			}
+			/*else if (line.find(",") != std::string::npos)
+			{
+				tmp_parent_array = Parser::split_str(line, ',');
+
+				for (i = 0; i < tmp_size; i++)
+				{
+					tmp_child_array = Parser::split_str(tmp_parent_array[i], ' ');
+
+					if (line.find("keys:") == 0)
+					{
+						keys.insert({ tmp_child_array[0], tmp_child_array[1] });
+					}
+					else if (line.find("columns:") == 0)
+					{
+						columns.insert({ tmp_child_array[0], tmp_child_array[1] });
+					}
+				}
+			}*/
+			//else if (line.find(";") == 0)
+			//{
+			//	Table* tbl = new Table(tbl_name);
+			//	tbl->keys = keys;
+			//	tbl->rows = rows;
+			//	tbl->columns = columns;
+			//	//tbl->spread_keys();
+			//	this->AddTable(*tbl);
+
+			//	rows.clear();
+			//	columns.clear();
+			//	keys.clear();
+
+			//}
+			else
+			{
+				std::cout << "Database is Corrupt!" << std::endl;
+			}
+		}
+		file.close();
+	}
+	else
+	{
+		std::cout << "Database does not exist!" << std::endl;
+	}
+}
+
 /// list the "data" files in the db
 void Database::List()
 {
@@ -444,23 +637,50 @@ float Database::sumRows(std::string fromTable, std::string column)
 	//get the table information (table, column, rows)
 	Table table = this->get_table(fromTable);
 	int columnIndex = table.get_column_index(column);
-	std::vector<std::vector<std::string>> rows = table.rows;
-
+	//std::vector<std::vector<std::string>> rows = table.rows;
+	vector<Row> rows = table.rows;
+	int columnType = rows[0].GetColumnType(column);
+	
 	// iterate through the rows
-	for (int i = 0; i < rows.size(); i++)
-	{
-		try {
-			std::string value = std::string(rows[i][columnIndex]);
+	for (Row row : rows) {
+		try {			
+			string value;
+			if (columnType == 0) {
+				value = row.GetStringColumnByName(column).GetValue();
+			}
+			else if (columnType == 1) {
+				value = to_string(row.GetIntColumnByName(column).GetValue());
+			}
+			else {
+				value = row.GetCharColumnByName(column).GetValue();
+			}
+
 			sum += stoi(value);
 		}
-		// this catch should run if the row is not a string that can be converted into an int (! 0-9)
-		catch(const std::exception& e)
-		{
-			sum += 0; 
+		catch (const exception& e) {
+			sum += 0;
 		}
+
+		return sum;
 	}
 
-	return sum;
+
+
+	// iterate through the rows
+	//for (int i = 0; i < rows.size(); i++)
+	//{
+	//	try {
+	//		string value = string(rows[i]);
+	//		sum += stoi(value);
+	//	}
+	//	// this catch should run if the row is not a string that can be converted into an int (! 0-9)
+	//	catch(const std::exception& e)
+	//	{
+	//		sum += 0; 
+	//	}
+	//}
+
+	//return sum;
 }
 */
 
@@ -480,22 +700,46 @@ int Database::numberOfIntColumns(std::string sourceTable, std::string columnName
 	//get the table information (table, column, rows)
 	Table table = this->get_table(sourceTable);
 	int columnIndex = table.get_column_index(columnName);
-	std::vector<std::vector<std::string>> rows = table.rows;
+	//std::vector<std::vector<std::string>> rows = table.rows;
+	vector<Row> rows = table.rows;
+	int columnType = rows[0].GetColumnType(columnName);
 
 	// iterate through the rows
-	for (int i = 0; i < rows.size(); i++)
-	{
+	for (Row row : rows) {
 		try {
-			std::string value = std::string(rows[i][columnIndex]);
+			string value;
+			if (columnType == 0) {
+				value = row.GetStringColumnByName(columnName).GetValue();
+			}
+			else if (columnType == 1) {
+				value = to_string(row.GetIntColumnByName(columnName).GetValue());
+			}
+			else {
+				value = row.GetCharColumnByName(columnName).GetValue();
+			}
+
 			stoi(value);
 			rowsNumber++;
 		}
 		// this catch should run if the row is not a string that can be converted into an int (! 0-9)
-		catch (const std::exception& e)
-		{
+		catch (const exception& e) {
 			rowsNumber += 0;
 		}
 	}
+
+	//for (int i = 0; i < rows.size(); i++)
+	//{
+	//	try {
+	//		std::string value = std::string(rows[i][columnIndex]);
+	//		stoi(value);
+	//		rowsNumber++;
+	//	}
+	//	// this catch should run if the row is not a string that can be converted into an int (! 0-9)
+	//	catch (const std::exception& e)
+	//	{
+	//		rowsNumber += 0;
+	//	}
+	//}
 
 	return rowsNumber;
 }
@@ -524,7 +768,7 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 	{
 		//colindex shouldn't ever be -1 but from here we loop through the rows and match local foreign key to foreign 
 		//primary key --- TO NOTE | CURRENTLY CAN ONLY JOIN ON INT COLUMNS
-		for (Row r : src.newrows)
+		for (Row r : src.rows)
 		{
 			
 			for (Column<int> col : r.intColumn)
@@ -532,10 +776,10 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 				if (col.GetName() == foreign_key) //this should pass exactly once per row
 				{
 					//we have the local row value, search through the primary index of the destination tree for the matching row
-					Row foreignRow = dest.primaryKeyTree.search(col.GetValue());
+					Row foreignRow = dest.primaryTree.search(col.GetValue());
 					Row destrow = Row();  //empty by default
 					bool keeprow = false;
-					for (Row r2 : dest.newrows)
+					for (Row r2 : dest.rows)
 					{
 						for (Column<int> col2 : r2.intColumn)
 						{
@@ -565,7 +809,7 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 									newindex.AddValue(rowcount);
 									rowcount++;
 									combinedRow.intColumn.push_back(newindex);
-									join.newrows.push_back(combinedRow);
+									join.rows.push_back(combinedRow);
 								}
 							}
 						}
@@ -634,8 +878,16 @@ void Database::RenameTable(std::string old_table_name, std::string new_table_nam
 	this->Save();
 }
 
-
-/*
+/// NEEDS TO BE UPDATED
+/// 
+/// 
+/// 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="tbl_name"></param>
+/// <param name="conditional"></param>
+/// <param name="clause"></param>
 void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<string> clause) {
 
 	int count = 0;
@@ -643,14 +895,16 @@ void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<
 
 	Table currentTable = this->get_table(tbl_name);
 	int col_ndx = currentTable.get_column_index(clause[0]);
-	vector<vector<string> > rows = currentTable.rows;
-	for (vector<string> row : rows) {
+	//vector<vector<string> > rows = currentTable.rows;
+	vector<Row> rows = currentTable.rows;
+
+	for (Row row : rows) {
 
 		if (col_ndx != -1)
 		{
-			cout << row[col_ndx] << conditional << value << endl;
+			//cout << row[col_ndx] << conditional << value << endl;
 
-			if (conditional == "=") {
+		/*	if (conditional == "=") {
 				if (row[col_ndx] == value)
 				{
 					currentTable.DeleteRow(row);
@@ -694,7 +948,7 @@ void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<
 			}
 			else {
 				std::cout << "Given conditional statement is not supported!" << std::endl;
-			}
+			}*/
 
 
 		}
@@ -718,7 +972,9 @@ void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<
 void Database::RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name)
 {
 	Table tbl = this->get_table(table_name);
-	std::map<std::string, std::string> new_columns;
+	tbl.RenameColumn(old_column_name, new_column_name);
+
+	/*std::map<std::string, std::string> new_columns;
 
 	new_columns = tbl.Rename_column(new_column_name, old_column_name);
 	tbl.columns = new_columns;
@@ -726,7 +982,7 @@ void Database::RenameColumn(std::string old_column_name, std::string new_column_
 	this->DropTable(table_name);
 	this->AddTable(tbl);
 
-	this->Save();
+	this->Save();*/
 }
 */
 
@@ -738,7 +994,7 @@ void Database::List_Info() {
 	std::cout << "Database Name:    	" << database_name << endl;
 	std::cout << "Number of Tables: 	" << tables.size() << endl;
 	std::cout << "==========================" << endl;
-	for (Table tbl : tables) {
+	/*for (Table tbl : tables) {
 		cout << ">    " << tbl.table_name << endl;
 
 		for (vector<string> row : tbl.rows) {
@@ -750,7 +1006,7 @@ void Database::List_Info() {
 	}
 	std::cout << "==========================" << endl;
 
-	std::cout << "Total Size: " << size << " bytes" << endl;
+	std::cout << "Total Size: " << size << " bytes" << endl;*/
 }
 */
 
@@ -761,7 +1017,6 @@ void Database::List_Info() {
 /// </summary>
 /// <param name="statement">user-inputted command</param>
 /// <param name="table_name">name of the table</param>
-/*
 void Database::insert_into(std::string statement, std::string table_name)
 {
 	Table current_table = get_table(table_name);;
@@ -784,49 +1039,79 @@ void Database::insert_into(std::string statement, std::string table_name)
 		values[0].push_back(newid);
 	}
 
-	vector<string> col_names = current_table.get_column_names();
-
-	vector<int> order;
-
-	for (string str : col_names) {
-		auto it = std::find(columns.begin(), columns.end(), str);
-
-		if (it != columns.end()) {
-			order.push_back(std::distance(columns.begin(), it));
-		}
-		else {
-			order.push_back(-1);
-		}
-	}
-
-	int cnt = 0;
+	map<string, string> tabcols = current_table.columns;
 	
-	for (vector<string> row : values)
+	Row r = Row();
+	std::map<string, string> merge;
+	std::transform(columns.begin(), columns.end(), values.begin(), std::inserter(merge, merge.end()), std::make_pair<string const&, string const&>);
+	for (string c : columns)
 	{
-		vector<string> temp;
-		for (int j = 0; j < order.size(); j++)
+		std::map<string, string>::iterator it = tabcols.find(c);
+		if (it != tabcols.end())
 		{
-			if (order[j] == -1)
+			string coltype = it->second;
+
+			if (coltype == "int")
 			{
-				temp.push_back("NULL");
+				Column<int> column = new Column<int>();
+				std::map<string, string>::iterator valit = merge.find(c);
+				column.SetName(c);
+				column.AddValue(stoi(valit->second));
+				r.intColumn.push_back(column);
+			}
+			else if (coltype == "char")
+			{
+				std::map<string, string>::iterator valit = merge.find(c);
+				//check for declared length of char array
+					int size = -1;
+					try 
+					{
+						size = stoi(Utils::get_string_between_two_strings(valit->first, "[", "]"));
+					}
+					catch(exception &err)
+					{
+						//catch here and just use the default length
+						size = DEFAULT_CHAR_ARRAY_SIZE;
+						//tell the dummy that they didn't provide a char array length and the default is being used instead
+						string mes = "ERROR. NO CHAR ARRAY SIZE LIMIT FOUND FOR COLUMN " + valit->first + ". USING SYSTEM DEFAULT OF 15.";
+						std::cerr << mes << endl;
+					}
+
+					//initialize the character array
+					char * char_arr = new char[size];
+					memset(char_arr, ' ', size);
+					string str_obj(valit->second);
+
+					//copy the string making sure to terminate it regardless of the length of the string provided
+					copy(str_obj.begin(), str_obj.end(), char_arr);
+					char_arr[size-1] = '\0';
+
+					//create the column and push it to the row
+					Column<char *> newcol = Column<char *>();
+					newcol.AddValue(char_arr);
+					newcol.SetName(valit->first);
+					r.charColumn.push_back(newcol);
+			}
+			else if (coltype == "string")
+			{
+				Column<string> column = new Column<string>();
+				std::map<string, string>::iterator valit = merge.find(c);
+				column.SetName(c);
+				column.AddValue(valit->second);
+				r.strColumn.push_back(column);
 			}
 			else
 			{
-				temp.push_back(Utils::trim(row[order[j]]));
+				//unsupported coltype found - shouldn't ever happen
 			}
 		}
-
-		cnt += 1;
-
-		current_table.Insert(temp);
+		else
+		{
+			//col provided not present within the table - user goofed up 
+		}
 	}
 
-	SaveTable(current_table);
-
 }
-*/
-
-
 
 /// <summary>
 /// Deletes a column from the database
@@ -839,30 +1124,12 @@ void Database::delete_column(std::string column_name, std::string table_name)
 	//get the index of the column name
 	Table current_table = get_table(table_name);;
 
-	int colindex = current_table.get_column_index(column_name);
-
-	if (colindex != -1)
-	{
-		//loop through rows to delete the value at the column index
-
-		for (int i = 0; i < current_table.rows.size(); i++)
-		{
-			current_table.rows[i].erase(current_table.rows[i].begin() + colindex);
-		}
-
-		
-
-
-		//loop through the new rows to delete that value
-		//delete the reference in column storage
-		current_table.columns.erase(current_table.columns.find(column_name));
-
-	}
+	current_table.DeleteColumn(column_name);
 	
-	SaveTable(current_table);
-	updateRows();
-	updateSecondaryTrees();
-	newPrimaryTreeUpdate();
+	//SaveTable(current_table);
+	//updateRows();
+	//updateSecondaryTrees();
+	//newPrimaryTreeUpdate();
 	
 	
 }
@@ -892,188 +1159,185 @@ void Database::keytotable(std::string keytype, std::string keyname, std::string 
 /*
 void Database::sortKeys()
 {
-	for (Table tbl : tables)
-	{
-		tbl.secondaryKeys.clear();
-		tbl.foreignKeys.clear();
-		for (std::pair<std::string, std::string> current_key : tbl.keys)
-		{
-			if (current_key.first == "secondary")
-			{
-				//found secondary key
-				tbl.secondaryKeys.push_back(current_key.second);
-			}
-			else if (current_key.first == "foreign")
-			{
-				//foreign key found
-				tbl.foreignKeys.push_back(current_key.second);
+	//for (Table tbl : tables)
+	//{
+	//	tbl.secondaryKeys.clear();
+	//	tbl.foreignKeys.clear();
+	//	for (std::pair<std::string, std::string> current_key : tbl.keys)
+	//	{
+	//		if (current_key.first == "primary")
+	//		{
+	//			//found primary key
+	//			tbl.primaryKeyName = current_key.second;
+	//		}
+	//		else if (current_key.first == "secondary")
+	//		{
+	//			//found secondary key
+	//			tbl.secondaryKeys.push_back(current_key.second);
+	//		}
+	//		else if (current_key.first == "foreign")
+	//		{
+	//			//foreign key found
+	//			tbl.foreignKeys.push_back(current_key.second);
 
-			}
+	//		}
 
-		}
-		SaveTable(tbl);
-	}
+	//	}
+	//	SaveTable(tbl);
+	//}
+}
+
+
+/// <summary>
+/// Updates the new row data structure from each tree based on the old row storage methodology.
+/// </summary>
+void Database::updateRows()
+{
+	//for (Table tbl : tables)
+	//{
+	//	tbl.newrows.clear();
+	//	for (std::vector<std::string> rw : tbl.rows)
+	//	{
+	//		Row nrow = Row();
+	//		int rowfind = 0;
+	//		int introws = 0;
+	//		int strrows = 0;
+	//		int charrows = 0;
+
+	//		for (std::pair<std::string, std::string> col : tbl.columns)
+	//		{
+	//			if (col.second == "string")
+	//			{
+	//				Column<string> newcol = Column<string>();
+	//				newcol.AddValue(rw[rowfind]);
+	//				newcol.SetName(col.first);
+	//				nrow.strColumn.push_back(newcol);
+	//				
+	//			}
+	//			else if (col.second == "int")
+	//			{
+	//				Column<int> newcol = Column<int>();
+	//				newcol.AddValue(stoi(rw[rowfind]));
+	//				newcol.SetName(col.first);
+	//				nrow.intColumn.push_back(newcol);
+
+	//			}
+	//			else if (col.second == "char")
+	//			{
+	//				//check for declared length of char array
+	//				int size = -1;
+	//				try 
+	//				{
+	//					size = stoi(Utils::get_string_between_two_strings(col.first, "[", "]"));
+	//				}
+	//				catch(exception &err)
+	//				{
+	//					//catch here and just use the default length
+	//					size = DEFAULT_CHAR_ARRAY_SIZE;
+	//					//tell the dummy that they didn't provide a char array length and the default is being used instead
+	//					string mes = "ERROR. NO CHAR ARRAY SIZE LIMIT FOUND FOR COLUMN " + col.first + ". USING SYSTEM DEFAULT OF 15.";
+	//					std::cerr << mes << endl;
+	//				}
+
+	//				//initialize the character array
+	//				char * char_arr = new char[size];
+	//				memset(char_arr, ' ', size);
+	//				string str_obj(rw[rowfind]);
+
+	//				//copy the string making sure to terminate it regardless of the length of the string provided
+	//				copy(str_obj.begin(), str_obj.end(), char_arr);
+	//				char_arr[size-1] = '\0';
+
+	//				//create the column and push it to the row
+	//				Column<char *> newcol = Column<char *>();
+	//				newcol.AddValue(char_arr);
+	//				newcol.SetName(col.first);
+	//				nrow.charColumn.push_back(newcol);
+	//			}
+	//			else
+	//			{
+	//				//unsupported column type - assume string? - come back to this
+	//				Column<string> newcol = Column<string>();
+	//				newcol.AddValue(rw[rowfind]);
+	//				newcol.SetName(col.first);
+	//				nrow.strColumn.push_back(newcol);
+	//			}
+	//			rowfind = rowfind + 1;
+	//		}
+	//		tbl.newrows.push_back(nrow);
+	//	}		
+	/*SaveTable(tbl);
+	}*/
 }
 */
 
 
-////////////////////////////////////////////////////////////////////////////////depreciated
-///// <summary>
-///// Updates the new row data structure from each tree based on the old row storage methodology.
-///// </summary>
-//void Database::updateRows()
-//{
-//	for (Table tbl : tables)
-//	{
-//		tbl.newrows.clear();
-//		for (std::vector<std::string> rw : tbl.rows)
-//		{
-//			Row nrow = Row();
-//			int rowfind = 0;
-//			int introws = 0;
-//			int strrows = 0;
-//			int charrows = 0;
-//
-//			for (std::pair<std::string, std::string> col : tbl.columns)
-//			{
-//				if (col.second == "string")
-//				{
-//					Column<string> newcol = Column<string>();
-//					newcol.AddValue(rw[rowfind]);
-//					newcol.SetName(col.first);
-//					nrow.strColumn.push_back(newcol);
-//					
-//				}
-//				else if (col.second == "int")
-//				{
-//					Column<int> newcol = Column<int>();
-//					newcol.AddValue(stoi(rw[rowfind]));
-//					newcol.SetName(col.first);
-//					nrow.intColumn.push_back(newcol);
-//
-//				}
-//				else if (col.second == "char")
-//				{
-//					//check for declared length of char array
-//					int size = -1;
-//					try 
-//					{
-//						size = stoi(Utils::get_string_between_two_strings(col.first, "[", "]"));
-//					}
-//					catch(exception &err)
-//					{
-//						//catch here and just use the default length
-//						size = DEFAULT_CHAR_ARRAY_SIZE;
-//						//tell the dummy that they didn't provide a char array length and the default is being used instead
-//						string mes = "ERROR. NO CHAR ARRAY SIZE LIMIT FOUND FOR COLUMN " + col.first + ". USING SYSTEM DEFAULT OF 15.";
-//						std::cerr << mes << endl;
-//					}
-//
-//					//initialize the character array
-//					char * char_arr = new char[size];
-//					memset(char_arr, ' ', size);
-//					string str_obj(rw[rowfind]);
-//
-//					//copy the string making sure to terminate it regardless of the length of the string provided
-//					copy(str_obj.begin(), str_obj.end(), char_arr);
-//					char_arr[size-1] = '\0';
-//
-//					//create the column and push it to the row
-//					Column<char *> newcol = Column<char *>();
-//					newcol.AddValue(char_arr);
-//					newcol.SetName(col.first);
-//					nrow.charColumn.push_back(newcol);
-//				}
-//				else
-//				{
-//					//unsupported column type - assume string? - come back to this
-//					Column<string> newcol = Column<string>();
-//					newcol.AddValue(rw[rowfind]);
-//					newcol.SetName(col.first);
-//					nrow.strColumn.push_back(newcol);
-//				}
-//				rowfind = rowfind + 1;
-//			}
-//			tbl.newrows.push_back(nrow);
-//		}		
-//	SaveTable(tbl);
-//	}
-//}
+
 /// <summary>
 /// Updates the primary key trees for each table. TODO - Add a check to see if the table needs to be updated - maybe a bool flag in
 /// table.h that says whether or not it has been altered since the last table was generated.
 /// </summary>
-/*
-inline void Database::updateSecondaryTrees()
-{
-	for (Table tbl : tables)
-	{
-		BTree<int> secondaryIntKeyTree;
-		BTree<char *> secondaryCharKeyTree;
-		BTree<string> secondaryStringKeyTree;
+	//for (Table tbl : tables)
+	//{
+	//	BTree<int> secondaryIntKeyTree;
+	//	BTree<char *> secondaryCharKeyTree;
+	//	BTree<string> secondaryStringKeyTree;
 
-		for (Row r : tbl.rows)
-		{
-		*/
-			/*Row* rpoint = &r;*/
-		/*
-			r.InUse();
-			for (Column<int> c : r.intColumn)
-			{							
-				// check to see if the colname is a secondary key
-				if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
-					// add value to secondary tree
-					secondaryIntKeyTree.insert(c.GetValue(), r);
-					secondaryIntKeyTree.SetKeyName(c.GetName());
-				}
-			}
+	//	for (Row r : tbl.newrows)
+	//	{
+	//		/*Row* rpoint = &r;*/
+	//		r.InUse();
+	//		for (Column<int> c : r.intColumn)
+	//		{							
+	//			// check to see if the colname is a secondary key
+	//			if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
+	//				// add value to secondary tree
+	//				secondaryIntKeyTree.insert(c.GetValue(), r);
+	//				secondaryIntKeyTree.SetKeyName(c.GetName());
+	//			}
+	//		}
 
-			// check for other secondary keys
-			if (r.hasSecondaryKeyChar(tbl.secondaryKeys)) {
-				for (Column<char *> c : r.charColumn)
-				{				
-					// check to see if the colname is a secondary key
-					if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
-						// add value to secondary tree
-						secondaryCharKeyTree.insert(c.GetValue(), r);
-						secondaryCharKeyTree.SetKeyName(c.GetName());
-					}
-				}
-			}
-			if (r.hasSecondaryKeyString(tbl.secondaryKeys)) {
-				for (Column<string> c : r.strColumn)
-				{
-				*/
-					/*secondaryStringKeyTree.insert(c.GetValue(), r);
-					secondaryStringKeyTree.SetKeyName(c.GetName());*/
-					// check to see if the colname is a secondary key
-				/*
-					if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
-						// add value to secondary tree
-						secondaryStringKeyTree.insert(c.GetValue(), r);
-						secondaryStringKeyTree.SetKeyName(c.GetName());
-					}
-				}
-			}
+	//		// check for other secondary keys
+	//		if (r.hasSecondaryKeyChar(tbl.secondaryKeys)) {
+	//			for (Column<char *> c : r.charColumn)
+	//			{				
+	//				// check to see if the colname is a secondary key
+	//				if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
+	//					// add value to secondary tree
+	//					secondaryCharKeyTree.insert(c.GetValue(), r);
+	//					secondaryCharKeyTree.SetKeyName(c.GetName());
+	//				}
+	//			}
+	//		}
+	//		if (r.hasSecondaryKeyString(tbl.secondaryKeys)) {
+	//			for (Column<string> c : r.strColumn)
+	//			{
+	//				/*secondaryStringKeyTree.insert(c.GetValue(), r);
+	//				secondaryStringKeyTree.SetKeyName(c.GetName());*/
+	//				// check to see if the colname is a secondary key
+	//				if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
+	//					// add value to secondary tree
+	//					secondaryStringKeyTree.insert(c.GetValue(), r);
+	//					secondaryStringKeyTree.SetKeyName(c.GetName());
+	//				}
+	//			}
+	//		}
 
-		}
-		// add the secondarytrees to the arrays if they are not empty
-		if (!secondaryIntKeyTree.IsEmpty()) {
-			secondaryIntTrees.push_back(secondaryIntKeyTree);
-		}
-		if (!secondaryCharKeyTree.IsEmpty()) {
-			secondaryCharTrees.push_back(secondaryCharKeyTree);
-		}
-		if (!secondaryStringKeyTree.IsEmpty()) {
-			secondaryStringTrees.push_back(secondaryStringKeyTree);
-		}
+	//	}
+	//	// add the secondarytrees to the arrays if they are not empty
+	//	if (!secondaryIntKeyTree.IsEmpty()) {
+	//		secondaryIntTrees.push_back(secondaryIntKeyTree);
+	//	}
+	//	if (!secondaryCharKeyTree.IsEmpty()) {
+	//		secondaryCharTrees.push_back(secondaryCharKeyTree);
+	//	}
+	//	if (!secondaryStringKeyTree.IsEmpty()) {
+	//		secondaryStringTrees.push_back(secondaryStringKeyTree);
+	//	}
 
-		SaveTable(tbl);
-	}
+	//	SaveTable(tbl);
+	//}
 }
-*/
-
-
 
 /// <summary>
 /// Updates Primary Key Trees without destroying the old ones.
@@ -1081,55 +1345,55 @@ inline void Database::updateSecondaryTrees()
 /*
 inline void Database::newPrimaryTreeUpdate()
 {
-	for (Table t : tables)
-	{
-		string tablename = t.table_name;
-		std::vector<BPTree>::iterator it = std::find(primary_key_trees.begin(), primary_key_trees.end(), t.primaryKeyTree);
-		if (it != primary_key_trees.end())
-		{
-			// tree exists, now we need to see if it should be updated
-			for (Row r : t.rows)
-			{
-				r.InUse();
-				for (Column<int> c : r.intColumn)
-				{
+	//for (Table t : tables)
+	//{
+	//	string tablename = t.table_name;
+	//	std::vector<BPTree>::iterator it = std::find(primary_key_trees.begin(), primary_key_trees.end(), t.primaryKeyTree);
+	//	if (it != primary_key_trees.end())
+	//	{
+	//		// tree exists, now we need to see if it should be updated
+	//		for (Row r : t.newrows)
+	//		{
+	//			r.InUse();
+	//			for (Column<int> c : r.intColumn)
+	//			{
 
-					//check to see if the colname is the primary key
-					if (c.GetName() == t.primaryKeyName)
-					{
-						int search = primary_key_trees[it - primary_key_trees.begin()].search(c.GetValue()).GetIntColumnByName(c.GetName()).GetValue();
-						if (search != c.GetValue())
-						{
-							// DEBUG MESSAGE cout << "Inserting new found row into tree." << endl;
-							primary_key_trees[it - primary_key_trees.begin()].insert(c.GetValue(), r);
-						}
-					}
-				}
-			}
-			t.primaryTree = primary_key_trees[it - primary_key_trees.begin()];
-		}
-		else
-		{
-			//tree does not exist, create one, populate it, then push it to the primary keys
-			BPTree newtree;
-			newtree.SetPrimaryKey(t.primaryKeyName);
-			newtree.Name = t.table_name;
-			for (Row r : t.rows)
-			{
-				r.InUse();
-				for (Column<int> c : r.intColumn)
-				{
-					//check to see if the colname is the primary key
-					if (c.GetName() == t.primaryKeyName)
-					{
-						newtree.insert(c.GetValue(), r);
-					}
-				}
-			}
-			t.primaryTree = newtree;
-			primary_key_trees.push_back(newtree);
-			this->SaveTable(t);
-		}
-	}
+	//				//check to see if the colname is the primary key
+	//				if (c.GetName() == t.primaryKeyName)
+	//				{
+	//					int search = primary_key_trees[it - primary_key_trees.begin()].search(c.GetValue()).GetIntColumnByName(c.GetName()).GetValue();
+	//					if (search != c.GetValue())
+	//					{
+	//						// DEBUG MESSAGE cout << "Inserting new found row into tree." << endl;
+	//						primary_key_trees[it - primary_key_trees.begin()].insert(c.GetValue(), r);
+	//					}
+	//				}
+	//			}
+	//		}
+	//		t.primaryKeyTree = primary_key_trees[it - primary_key_trees.begin()];
+	//	}
+	//	else
+	//	{
+	//		//tree does not exist, create one, populate it, then push it to the primary keys
+	//		BPTree newtree;
+	//		newtree.SetPrimaryKey(t.primaryKeyName);
+	//		newtree.Name = t.table_name;
+	//		for (Row r : t.newrows)
+	//		{
+	//			r.InUse();
+	//			for (Column<int> c : r.intColumn)
+	//			{
+	//				//check to see if the colname is the primary key
+	//				if (c.GetName() == t.primaryKeyName)
+	//				{
+	//					newtree.insert(c.GetValue(), r);
+	//				}
+	//			}
+	//		}
+	//		t.primaryKeyTree = newtree;
+	//		primary_key_trees.push_back(newtree);
+	//		this->SaveTable(t);
+	//	}
+	//}
 }
 */

@@ -286,11 +286,40 @@ private:
 
 	}
 
+	//void IterateColumns(void (*func)(string, string)) {
+	//	bool continueOn = true;
+	//	// Go through the rows columns 
+	//	for (int i = 0; i < intColumn.size(); i++) {
+	//		if (intColumn[i].GetName() == columnName) {
+	//			intColumn.erase(intColumn.begin() + i);
+	//			continueOn = false;
+	//		}
+	//	}
+
+	//	if (continueOn) {
+	//		for (int i = 0; i < strColumn.size(); i++) {
+	//			if (strColumn[i].GetValue() == columnName) {
+	//				strColumn.erase(strColumn.begin() + i);
+	//				continueOn = false;
+	//			}
+	//		}
+	//	}
+
+	//	if (continueOn) {
+	//		for (int i = 0; i < charColumn.size(); i++) {
+	//			if (charColumn[i].GetValue() == columnName) {
+	//				charColumn.erase(charColumn.begin() + i);
+	//			}
+	//		}
+	//	}
+	//}
+
 public:		
 	vector<Column<string>> strColumn;
 	vector<Column<int>> intColumn;
 	vector<Column<char*>> charColumn;		
-	
+	string primaryKeyColumn;
+
 	/// <summary>
 	/// Creates an empty row
 	/// </summary>
@@ -298,11 +327,20 @@ public:
 		empty = true;	
 	}
 
+	Row(string primaryKey) {
+		primaryKeyColumn = primaryKey;
+		empty = true;
+	}
+
 	/// <summary>
 	/// Sets the row as being used so the row is not empty
 	/// </summary>
 	void InUse() {
 		empty = false;
+	}
+
+	bool operator ==(Row row1) {
+		return (row1.GetPrimaryKey() == this->GetPrimaryKey());
 	}
 
 	/// <summary>
@@ -331,8 +369,67 @@ public:
 		return hasSecondaryKey(secondaryKeys, 2);
 	}
 
+	int GetPrimaryKey() {
+		return GetIntColumnByName(primaryKeyColumn).GetValue();
+	}
 	
+	void deleteColumn(string columnName) {
+		bool continueOn = true;
+		// Go through the rows columns 
+		for (int i = 0; i < intColumn.size(); i++) {
+			if (intColumn[i].GetName() == columnName) {
+				intColumn.erase(intColumn.begin() + i);
+				continueOn = false;
+			}
+		}
 
+		if (continueOn) {
+			for (int i = 0; i < strColumn.size(); i++) {
+				if (strColumn[i].GetValue() == columnName) {
+					strColumn.erase(strColumn.begin() + i);
+					continueOn = false;
+				}
+			}
+		}
+
+		if (continueOn) {
+			for (int i = 0; i < charColumn.size(); i++) {
+				if (charColumn[i].GetValue() == columnName) {
+					charColumn.erase(charColumn.begin() + i);
+				}
+			}
+		}
+	
+	}
+
+	void renameColumn(string prevColumn, string newColumn) {
+		bool continueOn = true;
+		// Go through the rows columns 
+		for (int i = 0; i < intColumn.size(); i++) {
+			if (intColumn[i].GetName() == prevColumn) {
+				intColumn[i].SetName(newColumn);
+				continueOn = false;
+			}
+		}
+
+		if (continueOn) {
+			for (int i = 0; i < strColumn.size(); i++) {
+				if (strColumn[i].GetValue() == prevColumn) {
+					strColumn[i].SetName(newColumn);
+					continueOn = false;
+				}
+			}
+		}
+
+		if (continueOn) {
+			for (int i = 0; i < charColumn.size(); i++) {
+				if (charColumn[i].GetValue() == prevColumn) {
+					charColumn[i].SetName(newColumn);
+				}
+			}
+		}
+	}
+	
 
 	/// <summary>
 	/// Gets the column of type char* by its name
