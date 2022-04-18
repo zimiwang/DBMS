@@ -575,6 +575,11 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 	return join;
 }
 
+/// <summary>
+/// Gets a tree via a table name
+/// </summary>
+/// <param name="name">name of table we want the tree from</param>
+/// <returns>the primary key of the specified table</returns>
 BPTree Database::get_tree(string name) {
 	BPTree ret;
 
