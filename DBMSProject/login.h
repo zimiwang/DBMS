@@ -178,7 +178,7 @@ public:
 
 		std::string username, password;
 
-		std::cout << "\nPlease enter username: ";
+		std::cout << "Please enter username: ";
 		std::cin >> username;
 
 		std::cout << "Please enter password: ";
@@ -193,14 +193,14 @@ public:
 				system("cls");
 
 				std::cout << "\n*********** Welcome Back ***********";
-				std::cout << "\n 1. Register a new user";
-				std::cout << "\n 2. Delete a user";
-				std::cout << "\n 3. Change password";
-				std::cout << "\n 0. Back to last page \n";
+				std::cout << "1. Register a new user \n";
+				std::cout << "2. Delete a user \n";
+				std::cout << "3. Change password \n";
+				std::cout << "0. Back to last page \n";
 
 				int choice;
 
-				std::cout << "Please enter a number for your choice: \n";
+				std::cout << "\nPlease enter a number for your choice: \n";
 				std::cin >> choice;
 
 				switch (choice)
