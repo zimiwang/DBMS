@@ -23,12 +23,12 @@ using namespace std;
 /// <summary>
 /// A serialization class that contains function(s) for serialization 
 /// </summary>
-template<typename T> class Serialization {
+class Serialization {
 
 private:
 
-
-	std::vector<T> variableVector =
+	template <typename T>
+	std::vector<T*> variableVector =
 	{
 		std::string database_name,
 		std::vector<Table> tables,
@@ -80,9 +80,7 @@ public:
 	/// <summary>
 	/// serialize the inputted class
 	/// </summary>
-	/// <returns>returns 1 on success, 0 otherwise</returns>
-	template <class T>
-	T serialize()
+	int serialize()
 	{
 		cout << "serialize start: \n";
 
