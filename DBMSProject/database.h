@@ -212,7 +212,8 @@ void Database::DropTable(std::string name)
 /// </summary>
 /// <param name="table_name"></param>
 /// <param name="update_clause"></param>
-/// <param name="where_clause"></param>
+/// <param name="where_clause"></param/
+/*
 void Database::UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause) {
 	Table tbl = this->get_table(table_name);
 
@@ -255,6 +256,8 @@ void Database::UpdateTable(string table_name, vector<vector<string>> update_clau
 	}
 		this->Save();
 }
+*/
+
 ////////////////////////////////////////////////////////////////////////////will be depreciated by serialization
 ///// Author: Andrew Nunez
 ///// <summary>
@@ -432,6 +435,7 @@ Table Database::get_table(std::string name)
 /// <param name="table">table name to use</param>
 /// <param name="column">name of which column to add</param>
 /// <returns>float of the sum</returns>
+/*
 float Database::sumRows(std::string fromTable, std::string column)
 {
 	float sum = 0;
@@ -458,6 +462,7 @@ float Database::sumRows(std::string fromTable, std::string column)
 
 	return sum;
 }
+*/
 
 
 
@@ -467,6 +472,7 @@ float Database::sumRows(std::string fromTable, std::string column)
 /// <param name="sourceTable">string of the table to read from</param>
 /// <param name="columnName">string of the column name</param>
 /// <returns>integer value of the number of int columns</returns>
+/*
 int Database::numberOfIntColumns(std::string sourceTable, std::string columnName)
 {
 	int rowsNumber = 0;
@@ -493,7 +499,7 @@ int Database::numberOfIntColumns(std::string sourceTable, std::string columnName
 
 	return rowsNumber;
 }
-
+*/
 
 
 
@@ -504,6 +510,7 @@ int Database::numberOfIntColumns(std::string sourceTable, std::string columnName
 /// <param name="dest_table">table who's primary key is the foreign key</param>
 /// <param name="foreign_key">which column of table 1 is the foreign key</param>
 /// <returns></returns>
+/*
 Table Database::join_table(std::string src_table, std::string dest_table, std::string foreign_key, std::string exkey)
 {
 	Table join;
@@ -572,6 +579,7 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 	this->join_tables.push_back(join);
 	return join;
 }
+*/
 
 BPTree Database::get_tree(string name) {
 	BPTree ret;
@@ -626,6 +634,8 @@ void Database::RenameTable(std::string old_table_name, std::string new_table_nam
 	this->Save();
 }
 
+
+/*
 void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<string> clause) {
 
 	int count = 0;
@@ -695,6 +705,8 @@ void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<
 	}
 	SaveTable(currentTable);
 }
+*/
+
 
 /// <summary>
 /// Rename a column in an existing table
@@ -702,6 +714,7 @@ void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<
 /// <param name="old_column_name"></param>
 /// <param name="new_column_name"></param>
 /// <param name="table_name"></param>
+/*
 void Database::RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name)
 {
 	Table tbl = this->get_table(table_name);
@@ -715,9 +728,11 @@ void Database::RenameColumn(std::string old_column_name, std::string new_column_
 
 	this->Save();
 }
+*/
 
 
 /// list the tables and print their information
+/*
 void Database::List_Info() {
 	int size = 0;
 	std::cout << "Database Name:    	" << database_name << endl;
@@ -737,6 +752,7 @@ void Database::List_Info() {
 
 	std::cout << "Total Size: " << size << " bytes" << endl;
 }
+*/
 
 
 
@@ -745,6 +761,7 @@ void Database::List_Info() {
 /// </summary>
 /// <param name="statement">user-inputted command</param>
 /// <param name="table_name">name of the table</param>
+/*
 void Database::insert_into(std::string statement, std::string table_name)
 {
 	Table current_table = get_table(table_name);;
@@ -807,11 +824,16 @@ void Database::insert_into(std::string statement, std::string table_name)
 	SaveTable(current_table);
 
 }
+*/
+
+
+
 /// <summary>
 /// Deletes a column from the database
 /// </summary>
 /// <param name="column_name"></param>
 /// <param name="table_name"></param>
+/*
 void Database::delete_column(std::string column_name, std::string table_name)
 {
 	//get the index of the column name
@@ -844,6 +866,10 @@ void Database::delete_column(std::string column_name, std::string table_name)
 	
 	
 }
+*/
+
+
+
 /// <summary>
 /// adds a key to the old key storage from the table
 /// </summary>
@@ -863,6 +889,7 @@ void Database::keytotable(std::string keytype, std::string keyname, std::string 
 /// <summary>
 /// sorts keys into the lists they belong in. Something to note: Since we only have 1 primary key, it will be set to the most recently specified primary
 /// </summary>
+/*
 void Database::sortKeys()
 {
 	for (Table tbl : tables)
@@ -887,6 +914,8 @@ void Database::sortKeys()
 		SaveTable(tbl);
 	}
 }
+*/
+
 
 ////////////////////////////////////////////////////////////////////////////////depreciated
 ///// <summary>
@@ -974,6 +1003,7 @@ void Database::sortKeys()
 /// Updates the primary key trees for each table. TODO - Add a check to see if the table needs to be updated - maybe a bool flag in
 /// table.h that says whether or not it has been altered since the last table was generated.
 /// </summary>
+/*
 inline void Database::updateSecondaryTrees()
 {
 	for (Table tbl : tables)
@@ -984,7 +1014,9 @@ inline void Database::updateSecondaryTrees()
 
 		for (Row r : tbl.rows)
 		{
+		*/
 			/*Row* rpoint = &r;*/
+		/*
 			r.InUse();
 			for (Column<int> c : r.intColumn)
 			{							
@@ -1011,9 +1043,11 @@ inline void Database::updateSecondaryTrees()
 			if (r.hasSecondaryKeyString(tbl.secondaryKeys)) {
 				for (Column<string> c : r.strColumn)
 				{
+				*/
 					/*secondaryStringKeyTree.insert(c.GetValue(), r);
 					secondaryStringKeyTree.SetKeyName(c.GetName());*/
 					// check to see if the colname is a secondary key
+				/*
 					if (count(tbl.secondaryKeys.begin(), tbl.secondaryKeys.end(), c.GetName())) {
 						// add value to secondary tree
 						secondaryStringKeyTree.insert(c.GetValue(), r);
@@ -1037,9 +1071,14 @@ inline void Database::updateSecondaryTrees()
 		SaveTable(tbl);
 	}
 }
+*/
+
+
+
 /// <summary>
 /// Updates Primary Key Trees without destroying the old ones.
 /// </summary>
+/*
 inline void Database::newPrimaryTreeUpdate()
 {
 	for (Table t : tables)
@@ -1093,3 +1132,4 @@ inline void Database::newPrimaryTreeUpdate()
 		}
 	}
 }
+*/

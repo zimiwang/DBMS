@@ -18,6 +18,8 @@
 
 
 #include "commandHandler.h"
+#include "serialization.h"
+
 //#include "mainReferenceHeader.h"
 
 // global variables
@@ -55,6 +57,9 @@ void update_table(Database* db, std::string table_name, std::string col1, std::s
 
 CommandHandler* cmdHandler = new CommandHandler;
 
+template <class T>
+Serialization<T> * serializeInstance = new Serialization<T>;
+
 
 /*	
 	these functions actually call and return the values for their sister-functions in commandHander.h 
@@ -83,7 +88,7 @@ int renameTable() { int retVal = cmdHandler->renameTable(db, cmd); db = cmdHandl
 int renameColumn() { int retVal = cmdHandler->renameColumn(db, cmd); db = cmdHandler->db; return retVal; }
 int alterHandler() { int retVal = cmdHandler->alterHandler(cmd); db = cmdHandler->db; return retVal; }
 int dropColumn() { int retVal = cmdHandler->dropColumn(cmd); db = cmdHandler->db; return retVal; }
-
+template <class T> int serializeHandler() { int retVal = serializeInstance<class T>->serialize(); return retVal; }
 
 
 
@@ -185,7 +190,7 @@ int main(int argc, char** argv)
 			{ "renameColumn", &renameColumn, },
 			{ "alterHandl", &alterHandler, },
 			{ "loginHandler", &loginHandler, },
-			
+			//{ "serializeHandler", &serializeHandler, },
 		};
 
 
@@ -217,7 +222,8 @@ int main(int argc, char** argv)
 		else if (statement.find("rename column ") == 0)		(*sqlCommands.find("renameColumn")).second();
 		else if (statement.find("alter ") == 0)             (*sqlCommands.find("alterHandl")).second();
 		else if (statement.find("logout") == 0)             (*sqlCommands.find("loginHandler")).second();
-		
+		else if (statement.find("serialize") == 0)			{ serializeHandler<class T>(); }
+
 		else												std::cout << "Invalid Command." << std::endl;
 
 	}
