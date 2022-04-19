@@ -850,7 +850,7 @@ public:
 
 		std::cout << "----------------------------- " << std::endl;
 		std::cout << "Number of Rows: " << tbl.rows.size() << std::endl;
-		std::cout << "Number of Keys: " << tbl.getKeySize() << std::endl;
+		//std::cout << "Number of Keys: " << tbl.getKeySize() << std::endl;
 	}
 
 

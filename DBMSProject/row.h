@@ -1,6 +1,9 @@
 #include <string>
 #include <vector>
 #include "utils.h"
+#include <fstream>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 #pragma once
 
 
@@ -15,6 +18,18 @@ template <typename T> class Column {
 	string name;	// The name of the column || Have not decided if we will use this
 	T value;
 	bool empty = false;
+
+
+	friend class boost::serialization::access;
+
+
+	//template<class Archive>
+	//void serialize(Archive& archive, const unsigned version) {
+	//	archive& name;
+	//	archive& empty;
+	//	archive& value;
+	//}
+
 public:	
 	Column<T>(){}
 
@@ -106,8 +121,24 @@ public:
 
 		return columns;
 	}
+
+
 private:
 	bool empty;	
+	friend class boost::serialization::access;	
+
+
+	/*template<class Archive>
+	void serialize(Archive& archive, const unsigned version) {
+		archive& primaryKeyColumn;		
+		archive& strColumn;
+		archive& intColumn;
+		archive& charColumn;
+	}*/
+
+
+
+
 	/// <summary>
 	/// Checks to see if all the columns in the columns parameter are in the columns of the row
 	/// </summary>

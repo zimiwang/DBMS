@@ -8,7 +8,7 @@
 #pragma once
 #include <algorithm>
 #include "filehelper.h"
-//#include "table.h"
+#include "table.h"
 #include "bplustree.h"
 #include <stdbool.h>
 #include "row.h"
@@ -16,7 +16,7 @@
 #include<iostream>
 #include<string>
 #include "bminustree.h"
-#include "dbtable.h"
+//#include "dbtable.h"
 using namespace std;
 
 class Database
@@ -287,45 +287,45 @@ void Database::DropTable(std::string name)
 /// <param name="where_clause"></param>
 void Database::UpdateTable(string table_name, vector<vector<string>> update_clause, vector<string> where_clause) {
 	Table tbl = this->get_table(table_name);
-
-	for (size_t i = 0; i < update_clause.size(); i++)
-	{
-		vector<vector<string>> new_rows;
-		//cout << "get_where_clause: " << where_clause[0] << endl;
-		//cout << "get_update_clause: " << update_clause[0][i] << endl;
-+-
-		int where_idx = tbl.get_column_index(where_clause[0]);
-		int update_idx = tbl.get_column_index(update_clause[i][0]);
-
-		cout << "Where idx: " << where_idx << endl;
-		cout << "Update idx: " << update_idx << endl;
-
-		if (where_idx == -1 || update_idx == -1) {
-			std::cout << "The column name is incorrect" << std::endl;
-			break;
-		}
-
-		else
-		{
-			for (vector<string> row : tbl.rows) {
-				if (row[where_idx] == where_clause[1]) {
-
-					//cout << "get_update_clause: " << update_clause[i][1] << endl;
-
-					row[update_idx] = update_clause[i][1];
-				}
-				new_rows.push_back(row);
-			}
-
-			tbl.rows = new_rows;
-
-			this->DropTable(table_name);
-			this->AddTable(tbl);
-
-		}
-
-	}
-		this->Save();
+//
+//	for (size_t i = 0; i < update_clause.size(); i++)
+//	{
+//		vector<vector<string>> new_rows;
+//		//cout << "get_where_clause: " << where_clause[0] << endl;
+//		//cout << "get_update_clause: " << update_clause[0][i] << endl;
+//+-
+//		int where_idx = tbl.get_column_index(where_clause[0]);
+//		int update_idx = tbl.get_column_index(update_clause[i][0]);
+//
+//		cout << "Where idx: " << where_idx << endl;
+//		cout << "Update idx: " << update_idx << endl;
+//
+//		if (where_idx == -1 || update_idx == -1) {
+//			std::cout << "The column name is incorrect" << std::endl;
+//			break;
+//		}
+//
+//		else
+//		{
+//			for (vector<string> row : tbl.rows) {
+//				if (row[where_idx] == where_clause[1]) {
+//
+//					//cout << "get_update_clause: " << update_clause[i][1] << endl;
+//
+//					row[update_idx] = update_clause[i][1];
+//				}
+//				new_rows.push_back(row);
+//			}
+//
+//			tbl.rows = new_rows;
+//
+//			this->DropTable(table_name);
+//			this->AddTable(tbl);
+//
+//		}
+//
+//	}
+//		this->Save();
 }
 
 /// TO BE UPDATED
@@ -449,6 +449,34 @@ void Database::Read(std::string db_name)
 		std::cout << "Database does not exist!" << std::endl;
 	}
 }
+
+
+
+//void Database::Save() {
+//
+//	// file
+//	const string filename = database_name + ".db";
+//
+//	{
+//		std::ofstream outfile("data/" + filename);
+//		boost::archive::text_oarchive archive(outfile);
+//		archive << tables;
+//	}
+//
+//}
+//
+//
+//void Database::Read(string db_name) {
+//	// file 
+//	const string filename = db_name + ".db";
+//
+//	//{
+//	//	std::ifstream infile(filename);
+//	//	boost::archive::text_iarchive archive(infile);
+//	//	archive >> tables;
+//	//}
+//}
+
 
 /// list the "data" files in the db
 void Database::List()

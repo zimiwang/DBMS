@@ -1,6 +1,8 @@
 #pragma once
 
-
+#include <fstream>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
 #include <string>
 #include <vector>
 #include "parser.h"
@@ -19,8 +21,20 @@ struct Keys {
 
 class Table {
 private:
-
+	//friend class boost::serialization::access;
 	bool wasCreated = true;
+
+
+	//template<class Archive>
+	//void serialize(Archive& archive, const unsigned version) {
+	//	archive& table_name;
+	//	archive& primaryKey;
+	//	archive& secondaryKeys;
+	//	archive& foreignKeys;
+	//	archive& allKeys;
+	//	archive& rows;
+	//}
+
 
 	template <typename T>
 	BTree<T> FindSecondaryTree(string name, vector<BTree<T>> trees) {
@@ -56,7 +70,7 @@ private:
 					primaryKey.keyName = "ID_" + name;
 					primaryKey.type = Utils::trim(tmp[1]);
 				}
-				columns.insert(pair<string, string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
+				//columns.insert(pair<string, string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
 				int letstes = 0;
 			}
 			else
@@ -71,7 +85,7 @@ private:
 		{
 			if (hasID == false) //We have no ID column defined by the user, manually add one
 			{
-				columns.insert(pair<string, string>(("ID_" + name), "int"));
+				//columns.insert(pair<string, string>(("ID_" + name), "int"));
 				primaryKey.keyName = "ID_" + name;
 				primaryKey.type = "int";
 
@@ -116,8 +130,8 @@ private:
 	void CreateSecondaryTree(BTree<T> tree) {
 		string name = tree.GetKeyName();	// column name
 		for (Row row : rows) {
-			row.get
-				int type = row.GetColumnType(name);
+			
+			int type = row.GetColumnType(name);
 			if (type == 0) {
 				// string
 				tree.insert(row.GetStringColumnByName(name).GetValue(), row);
@@ -174,7 +188,7 @@ public:
 	void AddRow(T key, Row row, bool primaryKey = true, bool secondaryKey = false, T sKey = "", string secondaryName = "", string secondaryKeyType = "int") {
 		bool errorFound = false;
 		if (primaryKey) {
-			primaryTree.insert(key, row.);
+			primaryTree.insert(key, row);
 			rows.push_back(row);
 		}
 		if (secondaryKey) {
@@ -186,10 +200,10 @@ public:
 			else if (secondaryKeyType == "string") {
 				BTree<string> tree = FindSecondaryTree(secondaryName, secondaryStringTrees);
 				if (!tree.IsEmpty()) tree.insert(sKey, row);
-				else erroFound = true;
+				else errorFound = true;
 			}
 			else {
-				BTree<char*> tree = FindSecondaryTree(secondaryName, secondaryCharTree);
+				BTree<char*> tree = FindSecondaryTree(secondaryName, secondaryCharTrees);
 				if (!tree.IsEmpty()) tree.insert(sKey, row);
 				else errorFound = true;
 			}
@@ -199,7 +213,7 @@ public:
 		}
 
 
-		if (primaryKey || secondarKey) {
+		if (primaryKey || secondaryKey) {
 			cout << "Could not update tree. PrimarKey or SecondaryKey not Defined." << endl;
 		}
 	}
@@ -267,16 +281,25 @@ public:
 		return ret;
 	}
 
-
+	/// <summary>
+	/// Deletes a row from the table and trees
+	/// </summary>
+	/// <param name="columnName"></param>
 	void DeleteRow(Row row) {
 		for (int i = 0; i < rows.size(); i++) {
 			if (rows[i] == row) {
 				rows.erase(rows.begin() + i);
 			}
 		}
+
+		// trees
 	}
 
-
+	/// <summary>
+	/// Deletes a column from the rows and table
+	/// </summary>
+	/// <param name="prevColumn"></param>
+	/// <param name="newColumn"></param>
 	void DeleteColumn(string columnName) {
 		// delete column name
 		columns.erase(columnName);
@@ -286,7 +309,9 @@ public:
 		}
 	}
 
-
+	/// <summary>
+	/// Renames a column in the table and all rows
+	/// </summary>
 	void RenameColumn(string prevColumn, string newColumn) {
 		// delete column name
 		auto it = columns.find(prevColumn);
@@ -301,5 +326,7 @@ public:
 			row.renameColumn(prevColumn, newColumn);
 		}
 	}
+
+
 
 };

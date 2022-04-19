@@ -115,9 +115,8 @@ private:
 	template <typename T>
 	void CreateSecondaryTree(BTree<T> tree) {
 		string name = tree.GetKeyName();	// column name
-		for (Row row : rows) {
-			row.get
-				int type = row.GetColumnType(name);
+		for (Row row : rows) {		
+			int type = row.GetColumnType(name);
 			if (type == 0) {
 				// string
 				tree.insert(row.GetStringColumnByName(name).GetValue(), row);
@@ -174,7 +173,7 @@ public:
 	void AddRow(T key, Row row, bool primaryKey = true, bool secondaryKey = false, T sKey = "", string secondaryName = "", string secondaryKeyType = "int") {
 		bool errorFound = false;
 		if (primaryKey) {
-			primaryTree.insert(key, row.);
+			primaryTree.insert(key, row);
 			rows.push_back(row);
 		}
 		if (secondaryKey) {
@@ -186,10 +185,10 @@ public:
 			else if (secondaryKeyType == "string") {
 				BTree<string> tree = FindSecondaryTree(secondaryName, secondaryStringTrees);
 				if (!tree.IsEmpty()) tree.insert(sKey, row);
-				else erroFound = true;
+				else errorFound = true;
 			}
 			else {
-				BTree<char*> tree = FindSecondaryTree(secondaryName, secondaryCharTree);
+				BTree<char*> tree = FindSecondaryTree(secondaryName, secondaryCharTrees);
 				if (!tree.IsEmpty()) tree.insert(sKey, row);
 				else errorFound = true;
 			}
@@ -199,7 +198,7 @@ public:
 		}
 
 
-		if (primaryKey || secondarKey) {
+		if (primaryKey || secondaryKey) {
 			cout << "Could not update tree. PrimarKey or SecondaryKey not Defined." << endl;
 		}
 	}
