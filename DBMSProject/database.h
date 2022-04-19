@@ -980,6 +980,8 @@ void Database::insert_into(string statement, string table_name)
 		}
 	}
 
+	
+
 }
 /// <summary>
 /// Deletes a column from the database
