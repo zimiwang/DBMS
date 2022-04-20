@@ -518,12 +518,11 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 	if (colindex != -1 && col2index != -1)
 	{
 		//colindex shouldn't ever be -1 but from here we loop through the rows and match local foreign key to foreign 
-		//primary key --- TO NOTE | CURRENTLY CAN ONLY JOIN ON INT COLUMNS
+		//primary key --- TO NOTE | joins other than int columns are experimental.
 		for (Row r : src.newrows)
 		{
-			
 			for (Column<int> col : r.intColumn)
-			{	
+			{
 				if (col.GetName() == foreign_key) //this should pass exactly once per row
 				{
 					//we have the local row value, search through the primary index of the destination tree for the matching row
@@ -549,7 +548,7 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 									{
 										combinedRow.strColumn.push_back(loc);
 									}
-									for (Column<char *> loc : destrow.charColumn)
+									for (Column<char*> loc : destrow.charColumn)
 									{
 										combinedRow.charColumn.push_back(loc);
 									}
@@ -565,9 +564,105 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 							}
 						}
 					}
-					
+
 				}
 			}
+
+			for (Column<string> col : r.strColumn)
+			{
+				if (col.GetName() == foreign_key) //this should pass exactly once per row
+				{
+					//we have the local row value, search through the primary index of the destination tree for the matching row
+					Row foreignRow = dest.primaryKeyTree.search(r.GetIntColumnByName(dest.primaryKeyName).GetValue());
+					Row destrow = Row();  //empty by default
+					bool keeprow = false;
+					for (Row r2 : dest.newrows)
+					{
+						for (Column<string> col2 : r2.strColumn)
+						{
+							if (col2.GetName() == exkey)
+							{
+								if (col.GetValue() == col2.GetValue())
+								{
+									destrow = r2;
+									//combine the two table's row structure
+									Row combinedRow = Row(r); //i believe this is how you do a deep copy in C++
+									for (Column<int> loc : destrow.intColumn)
+									{
+										combinedRow.intColumn.push_back(loc);
+									}
+									for (Column<string> loc : destrow.strColumn)
+									{
+										combinedRow.strColumn.push_back(loc);
+									}
+									for (Column<char*> loc : destrow.charColumn)
+									{
+										combinedRow.charColumn.push_back(loc);
+									}
+
+									//push our merged row into the new table
+									Column<int> newindex;
+									newindex.SetName("ID_" + join.table_name);
+									newindex.AddValue(rowcount);
+									rowcount++;
+									combinedRow.intColumn.push_back(newindex);
+									join.newrows.push_back(combinedRow);
+								}
+							}
+						}
+					}
+
+				}
+
+				for (Column<char*> col : r.charColumn)
+				{
+					if (col.GetName() == foreign_key) //this should pass exactly once per row
+					{
+						//we have the local row value, search through the primary index of the destination tree for the matching row
+						Row foreignRow = dest.primaryKeyTree.search(r.GetIntColumnByName(dest.primaryKeyName).GetValue());
+						Row destrow = Row();  //empty by default
+						bool keeprow = false;
+						for (Row r2 : dest.newrows)
+						{
+							for (Column<char*> col2 : r2.charColumn)
+							{
+								if (col2.GetName() == exkey)
+								{
+									if (col.GetValue() == col2.GetValue())
+									{
+										destrow = r2;
+										//combine the two table's row structure
+										Row combinedRow = Row(r); //i believe this is how you do a deep copy in C++
+										for (Column<int> loc : destrow.intColumn)
+										{
+											combinedRow.intColumn.push_back(loc);
+										}
+										for (Column<string> loc : destrow.strColumn)
+										{
+											combinedRow.strColumn.push_back(loc);
+										}
+										for (Column<char*> loc : destrow.charColumn)
+										{
+											combinedRow.charColumn.push_back(loc);
+										}
+
+										//push our merged row into the new table
+										Column<int> newindex;
+										newindex.SetName("ID_" + join.table_name);
+										newindex.AddValue(rowcount);
+										rowcount++;
+										combinedRow.intColumn.push_back(newindex);
+										join.newrows.push_back(combinedRow);
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+			
+			
 		}
 	}
 	join.primaryKeyName = "ID_" + join.table_name;
