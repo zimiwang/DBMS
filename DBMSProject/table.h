@@ -175,126 +175,6 @@ int Table::get_column_index(std::string column_name) {
 	return ret;
 }
 
-
-///***Unreachable Method
-/// <summary>
-/// Prints the rows using the specified where clause and column names
-/// </summary>
-/// <param name="column_names"></param>
-/// <param name="where_clause"></param>
-/// <param name="conditional"></param>
-void Table::Print_Rows(std::vector<std::string> column_names, vector<string> where_clause, string conditional) {
-	
-	int row_count = 0;
-
-	std::map<std::string, std::string> print_cols;
-	std::vector<std::vector<std::string> > print_rows;
-
-	std::vector<int> indices;
-	std::map<std::string, std::string>::iterator it;
-	int col_index;
-	int where_idx = -1;
-
-	if (where_clause.size() > 0) {
-		where_idx = this->get_column_index(where_clause[0]);
-	}
-
-
-	if (column_names.size() > 0 && column_names[0] == "*") {
-		column_names.clear();
-
-		for (auto const& it : columns) {
-			column_names.push_back(it.first);
-		}
-	}
-
-	for (std::string name : column_names) {
-		it = columns.find(name);
-
-		if (it != columns.end()) {
-			col_index = std::distance(columns.begin(), it);
-			print_cols.insert({ it->first, it->second });
-			indices.push_back(col_index);
-		}
-		else {
-			std::cout << "Column Name does not exist: " << name << std::endl;
-			return;
-		}
-
-	}
-
-	// Where clause goes here
-	for (std::vector<std::string> row : rows) {
-		std::vector<std::string> new_row;
-
-		for (int i = 0; i < indices.size(); i += 1) {
-			new_row.push_back(row[indices[i]]);
-		}
-
-		if (where_idx == -1) {
-			print_rows.push_back(new_row);
-		}
-		else if (new_row[where_idx] == where_clause[1]) {
-			print_rows.push_back(new_row);
-		}
-
-	}
-
-	columns = print_cols;
-	rows = print_rows;
-
-	int col_char_count = GetLargestColumnSize();
-	int row_char_count = (columns.size() * (col_char_count + 3)) + 1;
-
-	std::cout << "| ";
-
-	for (std::string name : column_names) {
-		std::cout << name;
-
-		for (int i = 0; i < col_char_count - name.length(); i += 1) {
-			std::cout << " ";
-		}
-
-		std::cout << " | ";
-	}
-
-	std::cout << std::endl;
-
-	for (int i = 0; i < row_char_count; i += 1) {
-		std::cout << "=";
-	}
-
-	std::cout << std::endl;
-
-	for (std::vector<std::string> row : print_rows) {
-		std::cout << "| ";
-
-		for (std::string& value : row) {
-			std::cout << value;
-
-			for (int i = 0; i < col_char_count - value.length(); i += 1) {
-				std::cout << " ";
-			}
-
-			std::cout << " | ";
-
-		}
-
-		std::cout << std::endl;
-
-		for (int i = 0; i < row_char_count; i += 1) {
-			std::cout << "-";
-		}
-
-		std::cout << std::endl;
-
-		row_count += 1;
-	}
-
-	std::cout << row_count << " rows selected." << std::endl;
-
-}
-
 /// <summary>
 /// Adds a key to the table
 /// </summary>
@@ -308,6 +188,10 @@ void Table::AddKey(std::string type, std::string name) {
 	if (type == "secondary")
 	{
 		secondaryKeys.push_back(name);
+	}
+	else if (type == "foreign")
+	{
+		foreignKeys.push_back(name);
 	}
 
 }
