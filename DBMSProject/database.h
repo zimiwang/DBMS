@@ -940,7 +940,17 @@ void Database::insert_into(string statement, string table_name)
 	
 	Row r = Row();
 	std::map<string, string> merge;
-	std::transform(columns.begin(), columns.end(), values.begin(), std::inserter(merge, merge.end()), std::make_pair<string const&, string const&>);
+	//std::transform(columns.begin(), columns.end(), values.begin(), std::inserter(merge, merge.end()), std::make_pair<string const&, string const&>);
+
+	int badideabutwhatever = 0;
+	for (string colname : columns)
+	{
+		std::pair<string, string> newval;
+		newval.first = colname;
+		newval.second = values[0][badideabutwhatever];
+		merge.insert(newval);
+		badideabutwhatever = badideabutwhatever + 1;
+	}
 	for (string c : columns)
 	{
 		std::map<string, string>::iterator it = tabcols.find(c);
