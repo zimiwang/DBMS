@@ -1077,7 +1077,7 @@ public:
 		}
 		else if (Utils::contains(cmd, "sum") || Utils::contains(cmd, "SUM"))
 		{
-			return sumHandler(cmd, db);
+			return sumHandler(cmd, db, tree);
 		}
 		else if (Utils::contains(cmd, "count") || Utils::contains(cmd, "COUNT"))
 		{
@@ -1085,7 +1085,7 @@ public:
 		}
 		else if (Utils::contains(cmd, "avg") || Utils::contains(cmd, "AVG") )
 		{
-			return avgHandler(cmd, db);
+			return avgHandler(cmd, db, tree);
 			
 		}
 		else if (Utils::contains(cmd, "group"))
@@ -1399,24 +1399,43 @@ public:
 	int countHandler(string cmd, BPTree tree) {
 
 		int count = 0;
+		bool printError = true;
 
 		vector<Row> tablerows = tree.getFullTable();
-
 		string columnName = Parser::getCountFunctionColumnName(cmd);
-
 		count = tablerows.size();
 
-		Row countrow;
-		Column<int> countcol;
-		countcol.SetName(columnName);
-		countcol.AddValue(count);
-		countrow.intColumn.push_back(countcol);
+		for (Row r : tablerows)
+		{
+			Column<int> c = r.GetIntColumn(columnName);
 
-		vector<string> cols;
-		cols.push_back(columnName);
-		countrow.PrintRow(cols);
+			if (c.GetName() == columnName)
+			{
+				printError = false;
+			}
+		}
+
+		if (!printError)
+		{
+			Row countrow;
+			Column<int> countcol;
+
+			countcol.SetName(columnName);
+			countcol.AddValue(count);
+			countrow.intColumn.push_back(countcol);
+
+			vector<string> cols;
+			cols.push_back(columnName);
+			countrow.PrintRow(cols);
 	
-		return count;
+			return count;
+		}
+		else
+		{
+			cout << "Could not find the column '" << columnName << "'." << endl;
+			return count;
+		}
+
 	}
 
 	/// Author: Andrew Nunez
@@ -1456,26 +1475,45 @@ public:
 	/// <param name="cmd"></param>
 	/// <param name="db"></param>
 	/// <returns></returns>
-	int sumHandler(std::string cmd, Database* db)
+	int sumHandler(std::string cmd, Database* db, BPTree tree)
 	{
 		string columnName = Parser::getSumFunctionColumnName(cmd);
 		string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
 		bool hasAS = false;
+		bool printError = true;
+		vector<Row> tablerows = tree.getFullTable();
 
-		// run handler function
-		int sum = db->sumRows(sourceTable, columnName);
+		for (Row r : tablerows)
+		{
+			Column<int> c = r.GetIntColumn(columnName);
 
-		Row nr;
-		Column<int> c;
-		c.SetName(columnName);
-		c.AddValue((int)sum);
-		nr.intColumn.push_back(c);
-		vector<string> cols;
-		cols.push_back(columnName);
-		nr.PrintRow(cols);
-		//cout << "(commandHandler.h) sum = " << sum << "\n";
+			if (c.GetName() == columnName)
+			{
+				printError = false;
+			}
+		}
 
-		return 1;
+		if (!printError)
+		{
+			// run handler function
+			int sum = db->sumRows(sourceTable, columnName);
+			Row nr;
+			Column<int> c;
+			c.SetName(columnName);
+			c.AddValue((int)sum);
+			nr.intColumn.push_back(c);
+			vector<string> cols;
+			cols.push_back(columnName);
+			nr.PrintRow(cols);
+			//cout << "(commandHandler.h) sum = " << sum << "\n";
+
+			return 1;
+		}
+		else
+		{
+			cout << "Could not find the column '" << columnName << "'." << endl;
+			return 1;
+		}
 	}
 
 
@@ -1486,27 +1524,47 @@ public:
 	/// <param name="cmd"></param>
 	/// <param name="db"></param>
 	/// <returns></returns>
-	int avgHandler(std::string cmd, Database* db)
+	int avgHandler(std::string cmd, Database* db, BPTree tree)
 	{
 		string columnName = Parser::getSumFunctionColumnName(cmd);
 		string sourceTable = Parser::getSumFunctionSourceTableName(cmd);
 		bool hasAS = false;
+		bool printError = true;
+		vector<Row> tablerows = tree.getFullTable();
 
-		// run handler function
-		float sum = db->sumRows(sourceTable, columnName); 
-		int avg = floor(sum / 2);
-		Row nr;
-		Column<int> c;
-		c.SetName(columnName);
-		c.AddValue((int)avg);
-		nr.intColumn.push_back(c);
-		vector<string> cols;
-		cols.push_back(columnName);
-		nr.PrintRow(cols);
-		//cout << "(commandHandler.h) sum = " << sum << "\n";
 
-		return 1;
+		for (Row r : tablerows)
+		{
+			Column<int> c = r.GetIntColumn(columnName);
+
+			if (c.GetName() == columnName)
+			{
+				printError = false;
+			}
+		}
+
+		if (!printError)
+		{
+
+			// run handler function
+			float sum = db->sumRows(sourceTable, columnName);
+			int avg = floor(sum / 2);
+			Row nr;
+			Column<int> c;
+			c.SetName(columnName);
+			c.AddValue((int)avg);
+			nr.intColumn.push_back(c);
+			vector<string> cols;
+			cols.push_back(columnName);
+			nr.PrintRow(cols);
+			//cout << "(commandHandler.h) sum = " << sum << "\n";
+
+			return 1;
+		}
+		else
+		{
+			cout << "Could not find the column '" << columnName << "'." << endl;
+			return 1;
+		}
 	}
-
-
 };
