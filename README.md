@@ -227,7 +227,7 @@ Get the Database information. This will print the database name, number of table
 **15. Rename Table**  
 Rename an existing table and give it a new table name.  
 
-    rename table [Existing Table Name] = [New Table Name];  
+    rename table [Existing Table Name] to [New Table Name];  
 
 **16. Rename Table**  
 Rename an existing column in a table and give it a new column name.
@@ -269,6 +269,8 @@ Re-login with a new account.
 ## Login  
 
 Our Database Management Systems have a login screen. The DBMS can only be used by logging in. Here are the functions of the login interface of this project. All accounts' usernames and passwords are stored in the users.txt file. The file type chooses to use .txt because it can better manage and view existing accounts.  
+
+By logging in, when a user creates a database that will belong to this user, other accounts cannot open that database. If this account cannot open particular database, please use logout command and switch to another account.    
 
 1. User Login
 2. Administrator Login

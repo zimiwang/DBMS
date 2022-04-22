@@ -125,6 +125,11 @@ std::string Parser::to_lower(std::string s)
 	return finout;
 }
 
+/// <summary>
+/// Gets the update clauses specified by the command
+/// </summary>
+/// <param name="cmd">unaltered command received from the user</param>
+/// <returns>a vector of update clauses</returns>
 vector<vector<string>> Parser::get_update_clauses(string cmd) {
 	smatch sm;
 	vector<vector<string>> ret;
@@ -233,6 +238,11 @@ inline vector<string> Parser::get_join_where_info(string cmd)
 
 }
 
+/// <summary>
+/// gets the foreign key specified in a command
+/// </summary>
+/// <param name="cmd">the unaltered command provided by the user</param>
+/// <returns>the name of the foreign key we're joining the tables on</returns>
 string Parser::get_foreign_key(string cmd) {
 	string keyword = "on ";
 	string foreignKey;
@@ -254,12 +264,6 @@ string Parser::get_foreign_key(string cmd) {
 	return foreignKey;
 }
 
-
-
-/// *** Unreachable Method
-/// Author: Andrew
-/// Date: 11-28-2021
-/// Parses an update command
 
 /// <summary>
 /// Parses command line input for valid command clause i.e. splits from "=".
@@ -301,7 +305,6 @@ vector<string> Parser::get_update_clause(string cmd) {
 /// Author: Andrew
 /// Date: 11-28-2021
 /// Get's the where clause parameters for a select or update statement
-
 /// <summary>
 /// parses "where" command and the clause to be searched for
 /// </summary>
@@ -438,7 +441,6 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 /// Author: Andrew
 /// Date: 12-12-2021
 /// Gets the conditional statement from a command
-
 /// <summary>
 /// parses command for condition
 /// </summary>
@@ -469,7 +471,6 @@ string Parser::get_conditional(string stm) {
 /// Author: Andrew Nunez
 /// Date: 11-15-2021
 /// Splits the provided string on the specified delimiter - again, no it doesn'MinDegree
-
 /// <summary>
 /// same as 2 above but with rows
 /// </summary>
@@ -513,10 +514,6 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 
 	return ret;
 }
-
-/// Author: Andrew
-/// Date: 10-28-2021
-/// Splits the provided string on the specified delimiter - you guessed it, no it doesn'MinDegree
 
 /// <summary>
 /// gets a selected column from input command

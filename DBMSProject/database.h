@@ -518,12 +518,11 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 	if (colindex != -1 && col2index != -1)
 	{
 		//colindex shouldn't ever be -1 but from here we loop through the rows and match local foreign key to foreign 
-		//primary key --- TO NOTE | CURRENTLY CAN ONLY JOIN ON INT COLUMNS
+		//primary key --- TO NOTE | joins other than int columns are experimental.
 		for (Row r : src.newrows)
 		{
-			
 			for (Column<int> col : r.intColumn)
-			{	
+			{
 				if (col.GetName() == foreign_key) //this should pass exactly once per row
 				{
 					//we have the local row value, search through the primary index of the destination tree for the matching row
@@ -549,7 +548,7 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 									{
 										combinedRow.strColumn.push_back(loc);
 									}
-									for (Column<char *> loc : destrow.charColumn)
+									for (Column<char*> loc : destrow.charColumn)
 									{
 										combinedRow.charColumn.push_back(loc);
 									}
@@ -565,9 +564,105 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 							}
 						}
 					}
-					
+
 				}
 			}
+
+			for (Column<string> col : r.strColumn)
+			{
+				if (col.GetName() == foreign_key) //this should pass exactly once per row
+				{
+					//we have the local row value, search through the primary index of the destination tree for the matching row
+					Row foreignRow = dest.primaryKeyTree.search(r.GetIntColumnByName(dest.primaryKeyName).GetValue());
+					Row destrow = Row();  //empty by default
+					bool keeprow = false;
+					for (Row r2 : dest.newrows)
+					{
+						for (Column<string> col2 : r2.strColumn)
+						{
+							if (col2.GetName() == exkey)
+							{
+								if (col.GetValue() == col2.GetValue())
+								{
+									destrow = r2;
+									//combine the two table's row structure
+									Row combinedRow = Row(r); //i believe this is how you do a deep copy in C++
+									for (Column<int> loc : destrow.intColumn)
+									{
+										combinedRow.intColumn.push_back(loc);
+									}
+									for (Column<string> loc : destrow.strColumn)
+									{
+										combinedRow.strColumn.push_back(loc);
+									}
+									for (Column<char*> loc : destrow.charColumn)
+									{
+										combinedRow.charColumn.push_back(loc);
+									}
+
+									//push our merged row into the new table
+									Column<int> newindex;
+									newindex.SetName("ID_" + join.table_name);
+									newindex.AddValue(rowcount);
+									rowcount++;
+									combinedRow.intColumn.push_back(newindex);
+									join.newrows.push_back(combinedRow);
+								}
+							}
+						}
+					}
+
+				}
+
+				for (Column<char*> col : r.charColumn)
+				{
+					if (col.GetName() == foreign_key) //this should pass exactly once per row
+					{
+						//we have the local row value, search through the primary index of the destination tree for the matching row
+						Row foreignRow = dest.primaryKeyTree.search(r.GetIntColumnByName(dest.primaryKeyName).GetValue());
+						Row destrow = Row();  //empty by default
+						bool keeprow = false;
+						for (Row r2 : dest.newrows)
+						{
+							for (Column<char*> col2 : r2.charColumn)
+							{
+								if (col2.GetName() == exkey)
+								{
+									if (col.GetValue() == col2.GetValue())
+									{
+										destrow = r2;
+										//combine the two table's row structure
+										Row combinedRow = Row(r); //i believe this is how you do a deep copy in C++
+										for (Column<int> loc : destrow.intColumn)
+										{
+											combinedRow.intColumn.push_back(loc);
+										}
+										for (Column<string> loc : destrow.strColumn)
+										{
+											combinedRow.strColumn.push_back(loc);
+										}
+										for (Column<char*> loc : destrow.charColumn)
+										{
+											combinedRow.charColumn.push_back(loc);
+										}
+
+										//push our merged row into the new table
+										Column<int> newindex;
+										newindex.SetName("ID_" + join.table_name);
+										newindex.AddValue(rowcount);
+										rowcount++;
+										combinedRow.intColumn.push_back(newindex);
+										join.newrows.push_back(combinedRow);
+									}
+								}
+							}
+						}
+					}
+				}
+
+			}
+			
+			
 		}
 	}
 	join.primaryKeyName = "ID_" + join.table_name;
@@ -575,6 +670,11 @@ Table Database::join_table(std::string src_table, std::string dest_table, std::s
 	return join;
 }
 
+/// <summary>
+/// Gets a tree via a table name
+/// </summary>
+/// <param name="name">name of table we want the tree from</param>
+/// <returns>the primary key of the specified table</returns>
 BPTree Database::get_tree(string name) {
 	BPTree ret;
 
@@ -618,14 +718,21 @@ void Database::SaveTable(Table table)
 void Database::RenameTable(std::string old_table_name, std::string new_table_name)
 {
 
-	Table tbl = this->get_table(old_table_name);
+	if (tables.size() != 0)
+	{
+		Table tbl = this->get_table(old_table_name);
 
-	tbl.table_name = new_table_name;
+		tbl.table_name = new_table_name;
 
-	this->DropTable(old_table_name);
-	this->AddTable(tbl);
+		this->DropTable(old_table_name);
+		this->AddTable(tbl);
 
-	this->Save();
+		this->Save();
+	}
+	else
+	{
+		std::cout << "Please create a table first" << std::endl;
+	}
 }
 
 /// <summary>
@@ -639,69 +746,76 @@ void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<
 	int count = 0;
 	string value = clause[1];
 
-	Table currentTable = this->get_table(tbl_name);
-	int col_ndx = currentTable.get_column_index(clause[0]);
-	vector<vector<string> > rows = currentTable.rows;
-	for (vector<string> row : rows) {
+	if (tables.size() != 0)
+	{
+		Table currentTable = this->get_table(tbl_name);
+		int col_ndx = currentTable.get_column_index(clause[0]);
+		vector<vector<string> > rows = currentTable.rows;
+		for (vector<string> row : rows) {
 
-		if (col_ndx != -1)
-		{
-			cout << row[col_ndx] << conditional << value << endl;
+			if (col_ndx != -1)
+			{
+				cout << row[col_ndx] << conditional << value << endl;
 
-			if (conditional == "=") {
-				if (row[col_ndx] == value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
+				if (conditional == "=") {
+					if (row[col_ndx] == value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
 				}
-			}
-			else if (conditional == ">=") {
-				if (row[col_ndx] >= value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
+				else if (conditional == ">=") {
+					if (row[col_ndx] >= value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
 				}
-			}
-			else if (conditional == "<=") {
-				if (row[col_ndx] <= value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
+				else if (conditional == "<=") {
+					if (row[col_ndx] <= value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
 				}
-			}
-			else if (conditional == ">") {
-				if (row[col_ndx] > value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
+				else if (conditional == ">") {
+					if (row[col_ndx] > value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
 				}
-			}
-			else if (conditional == "<") {
-				if (row[col_ndx] < value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
+				else if (conditional == "<") {
+					if (row[col_ndx] < value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
 				}
-			}
-			else if (conditional == "!=") {
-				if (row[col_ndx] != value)
-				{
-					currentTable.DeleteRow(row);
-					count += 1;
+				else if (conditional == "!=") {
+					if (row[col_ndx] != value)
+					{
+						currentTable.DeleteRow(row);
+						count += 1;
+					}
 				}
+				else {
+					std::cout << "Given conditional statement is not supported!" << std::endl;
+				}
+
+
 			}
 			else {
-				std::cout << "Given conditional statement is not supported!" << std::endl;
+				std::cout << count << "Incorrect column name" << endl;
+				break;
 			}
-
-
 		}
-		else {
-			std::cout << count << "Incorrect column name" << endl;
-			break;
-		}
+		SaveTable(currentTable);
 	}
-	SaveTable(currentTable);
+	else
+	{
+		std::cout << "Please create a table first" << std::endl;
+	}
 }
 
 /// <summary>
@@ -712,16 +826,24 @@ void Database::DeleteFrom(std::string tbl_name, std::string conditional, vector<
 /// <param name="table_name"></param>
 void Database::RenameColumn(std::string old_column_name, std::string new_column_name, std::string table_name)
 {
-	Table tbl = this->get_table(table_name);
-	std::map<std::string, std::string> new_columns;
 
-	new_columns = tbl.Rename_column(new_column_name, old_column_name);
-	tbl.columns = new_columns;
+	if (tables.size() != 0)
+	{
+		Table tbl = this->get_table(table_name);
+		std::map<std::string, std::string> new_columns;
 
-	this->DropTable(table_name);
-	this->AddTable(tbl);
+		new_columns = tbl.Rename_column(new_column_name, old_column_name);
+		tbl.columns = new_columns;
 
-	this->Save();
+		this->DropTable(table_name);
+		this->AddTable(tbl);
+
+		this->Save();
+	}
+	else
+	{
+		std::cout << "Please create a table first" << std::endl;
+	}
 }
 
 
@@ -761,58 +883,64 @@ void Database::insert_into(std::string statement, std::string table_name)
 
 	//for (int i = 0; i < columns.size(); i++) cout << "column:" << columns[i] << "\n";
 
-	//check to see if ID is present in the columns
-	if (std::find(columns.begin(), columns.end(), ("ID_" + table_name)) != columns.end())
-	{
-		//no worries, the user SHOULD be setting their own ID
+	if (tables.size() != 0) {
+			//check to see if ID is present in the columns
+		if (std::find(columns.begin(), columns.end(), ("ID_" + table_name)) != columns.end())
+		{
+			//no worries, the user SHOULD be setting their own ID
+		}
+		else
+		{
+			//manually add ID to columns, then a basic iterator representing row number to the values
+			columns.push_back(("ID_" + table_name));
+			string newid = std::to_string(current_table.rows.size() + 1);
+		
+			values[0].push_back(newid);
+		}
+
+		vector<string> col_names = current_table.get_column_names();
+
+		vector<int> order;
+
+		for (string str : col_names) {
+			auto it = std::find(columns.begin(), columns.end(), str);
+
+			if (it != columns.end()) {
+				order.push_back(std::distance(columns.begin(), it));
+			}
+			else {
+				order.push_back(-1);
+			}
+		}
+
+		int cnt = 0;
+	
+		for (vector<string> row : values)
+		{
+			vector<string> temp;
+			for (int j = 0; j < order.size(); j++)
+			{
+				if (order[j] == -1)
+				{
+					temp.push_back("NULL");
+				}
+				else
+				{
+					temp.push_back(Utils::trim(row[order[j]]));
+				}
+			}
+
+			cnt += 1;
+
+			current_table.Insert(temp);
+		}
+
+		SaveTable(current_table);
 	}
 	else
 	{
-		//manually add ID to columns, then a basic iterator representing row number to the values
-		columns.push_back(("ID_" + table_name));
-		string newid = std::to_string(current_table.rows.size() + 1);
-		
-		values[0].push_back(newid);
+		std::cout << "Please create a table first" << std::endl;
 	}
-
-	vector<string> col_names = current_table.get_column_names();
-
-	vector<int> order;
-
-	for (string str : col_names) {
-		auto it = std::find(columns.begin(), columns.end(), str);
-
-		if (it != columns.end()) {
-			order.push_back(std::distance(columns.begin(), it));
-		}
-		else {
-			order.push_back(-1);
-		}
-	}
-
-	int cnt = 0;
-	
-	for (vector<string> row : values)
-	{
-		vector<string> temp;
-		for (int j = 0; j < order.size(); j++)
-		{
-			if (order[j] == -1)
-			{
-				temp.push_back("NULL");
-			}
-			else
-			{
-				temp.push_back(Utils::trim(row[order[j]]));
-			}
-		}
-
-		cnt += 1;
-
-		current_table.Insert(temp);
-	}
-
-	SaveTable(current_table);
 
 }
 /// <summary>
@@ -822,35 +950,40 @@ void Database::insert_into(std::string statement, std::string table_name)
 /// <param name="table_name"></param>
 void Database::delete_column(std::string column_name, std::string table_name)
 {
-	//get the index of the column name
-	Table current_table = get_table(table_name);;
 
-	int colindex = current_table.get_column_index(column_name);
+	if (tables.size() != 0) {
+		//get the index of the column name
+		Table current_table = get_table(table_name);;
 
-	if (colindex != -1)
-	{
-		//loop through rows to delete the value at the column index
+		int colindex = current_table.get_column_index(column_name);
 
-		for (int i = 0; i < current_table.rows.size(); i++)
+		if (colindex != -1)
 		{
-			current_table.rows[i].erase(current_table.rows[i].begin() + colindex);
+			//loop through rows to delete the value at the column index
+
+			for (int i = 0; i < current_table.rows.size(); i++)
+			{
+				current_table.rows[i].erase(current_table.rows[i].begin() + colindex);
+			}
+
+
+
+
+			//loop through the new rows to delete that value
+			//delete the reference in column storage
+			current_table.columns.erase(current_table.columns.find(column_name));
+
 		}
 
-		
-
-
-		//loop through the new rows to delete that value
-		//delete the reference in column storage
-		current_table.columns.erase(current_table.columns.find(column_name));
-
+		SaveTable(current_table);
+		updateRows();
+		updateSecondaryTrees();
+		newPrimaryTreeUpdate();
 	}
-	
-	SaveTable(current_table);
-	updateRows();
-	updateSecondaryTrees();
-	newPrimaryTreeUpdate();
-	
-	
+	else
+	{
+		std::cout << "Please create a table first" << std::endl;
+	}
 }
 /// <summary>
 /// adds a key to the old key storage from the table

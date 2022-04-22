@@ -364,6 +364,28 @@ public:
 	}
 
 	/// <summary>
+	/// Get columns of type int
+	/// </summary>
+	/// <param name="name"></param>
+	/// <param name="printError"></param>
+	/// <returns></returns>
+	Column<int> GetIntColumn(string name, bool printError = true) {
+		Column<int> emptyColumn(true);
+		// check to see if columns is not empty
+		if (intColumn.empty()) {
+			return emptyColumn;
+		}
+		else {
+			for (Column<int> col : intColumn) {
+				if (col.GetName() == name) {
+					return col;
+				}
+			}
+			return emptyColumn;
+		}
+	}
+
+	/// <summary>
 	/// Gets the column of type int by its name
 	/// </summary>
 	/// <param name="name">The name of the column</param>
