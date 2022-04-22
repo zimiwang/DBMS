@@ -506,7 +506,12 @@ public:
 
 						// print whole table
 						vector<Row> rows = tree.getFullTable();
-						rows[0].PrintFullTable(rows, cols);
+						if (!rows.empty()) {
+							rows[0].PrintFullTable(rows, cols);
+						}
+						else {
+							cout << "Could not print" << endl;
+						}
 					}
 					else {
 						// decide to use search based on pk, sk, or full search

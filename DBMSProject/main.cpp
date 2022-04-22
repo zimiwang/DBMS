@@ -109,7 +109,7 @@ int main() {
 int main(int argc, char** argv)
 {
 	// The user login interface has been commented out; if you want to use it, delete the comments
-	/*while (1) {
+	while (1) {
 		int isRun = 0;
 		isRun = loginHandler();
 
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
 			break;
 		}
 	}
-	*/
+	
 
 	setup_intro();
 
