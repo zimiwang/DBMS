@@ -109,15 +109,15 @@ int main() {
 int main(int argc, char** argv)
 {
 	// The user login interface has been commented out; if you want to use it, delete the comments
-	while (1) {
-		int isRun = 0;
-		isRun = loginHandler();
+	//while (1) {
+	//	int isRun = 0;
+	//	isRun = loginHandler();
 
-		if (isRun == 1)
-		{
-			break;
-		}
-	}
+	//	if (isRun == 1)
+	//	{
+	//		break;
+	//	}
+	//}
 	
 
 	setup_intro();

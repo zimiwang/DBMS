@@ -652,10 +652,10 @@ public:
 		string colName = clauses.GetValuesByKey("where")[0];
 		// modified - jw 3/31
 		std::vector<string> coln = Utils::split(colName, conditional);
-		//string cname = coln[0];
-		//string cval = coln[1];
-		string cname = clauses.GetValuesByKey("where")[0];
-		string cval = clauses.GetValuesByKey("where")[2];
+		string cname = coln[0];
+		string cval = coln[1];
+		/*string cname = clauses.GetValuesByKey("where")[0];
+		string cval = clauses.GetValuesByKey("where")[2];*/
 		
 		int type = rows[0].GetColumnType(cname);
 

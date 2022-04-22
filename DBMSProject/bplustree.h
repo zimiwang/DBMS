@@ -342,6 +342,13 @@ public:
         if (root == NULL) {
             cout << "Tree is empty\n";
         }
+        else if (min == max)
+        {
+            Node* currentNode = searchInternal(min);
+            vector<Row> rows;
+            rows.push_back(currentNode->key->locationPtr);
+            return rows;
+        }
         else {
             Node* currentNode = searchInternal(min);
             vector<Row> rows;
