@@ -1076,6 +1076,7 @@ void Database::updateRows()
 					try 
 					{
 						size = stoi(Utils::get_string_between_two_strings(col.first, "[", "]"));
+						size = size + 1;
 					}
 					catch(exception &err)
 					{
