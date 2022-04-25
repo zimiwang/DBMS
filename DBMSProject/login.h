@@ -192,7 +192,7 @@ public:
 
 				system("cls");
 
-				std::cout << "\n*********** Welcome Back ***********";
+				std::cout << "\n*********** Welcome Back ***********\n";
 				std::cout << "1. Register a new user \n";
 				std::cout << "2. Delete a user \n";
 				std::cout << "3. Change password \n";

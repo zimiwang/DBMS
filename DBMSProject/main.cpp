@@ -62,7 +62,7 @@ CommandHandler* cmdHandler = new CommandHandler;
 */
 int exitDBMS() { return cmdHandler->exitDBMS(); }
 int helpMenu() { return cmdHandler->helpMenu(); } /* test incorperated in test.cpp */
-int loginHandler() { return cmdHandler->loginDBMS(); }
+int loginHandler() { int retVal = cmdHandler->loginDBMS(); current_db_name = cmdHandler->current_db_name; return retVal;}
 int noSemiColon() { return cmdHandler->noSemiColon(); }
 int openDatabase() { int retVal = cmdHandler->openDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal;}/* test incorperated in tests.cpp */
 int createDatabase() { int retVal = cmdHandler->createDatabase(current_db_name, db, cmd); current_db_name = cmdHandler->current_db_name; db = cmdHandler->db; return retVal; }/* test incorperated in tests.cpp */

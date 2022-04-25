@@ -94,6 +94,7 @@ public:
 
 			isRun = ret.first;
 			current_username = ret.second;
+			current_db_name = "";
 
 			if (isRun == 1)
 			{
@@ -154,9 +155,10 @@ public:
 	/// <returns>um....</returns>
 	int openDatabase(string new_current_db_name, Database *new_db, string new_cmd)
 	{
-		current_db_name = new_current_db_name;
+		
 		db = new_db;
 		cmd = new_cmd;
+		current_db_name = Utils::trim(Utils::get_string_between_two_strings(cmd, "database ", ";"));
 
 		if (current_username.empty() == 1)
 		{
@@ -179,7 +181,7 @@ public:
 
 				std::istringstream is(line);
 				is >> temp;
-				std::size_t found = line.find(" " + current_db_name);
+				std::size_t found = line.find(current_username + ":" + current_db_name);
 
 				if (temp == current_username) {
 
@@ -203,6 +205,7 @@ public:
 			}
 			else
 			{
+				current_db_name = "";
 				std::cout << current_username << " does not have the access to this database, please login another account " << std::endl;
 			}
 		}
@@ -1044,11 +1047,14 @@ public:
 	void addOwner(std::string db_name, std::string current_username) {
 
 		std::string line, temp;
+		std::string line_2, temp_2;
 		std::string db = db_name;
 		std::string data = "";
 		std::ifstream read("../users.txt");
+		std::ifstream check("../users.txt");
 
-		//std::string username = getUsername();
+		int dbSave = 1;
+
 		std::string username = current_username;
 
 		if (read) {
@@ -1059,7 +1065,7 @@ public:
 				is >> temp;
 				if (temp == username) {
 
-					data += (line + " " + db + "\n");
+					data += (line + " " + username + ":" + db + "\n");
 					
 				}
 				else {
@@ -1069,9 +1075,26 @@ public:
 		}
 		read.close();
 
-		std::ofstream os("../users.txt");
-		os << data;
-		os.close();
+		while (std::getline(check, line_2)) {
+
+			std::size_t found = line_2.find(username + ":" + db);
+
+			if (found != std::string::npos)
+			{
+				dbSave = 0;
+				break;
+			}
+		}
+		check.close();
+
+		// Check whether the user has the same name of the database
+		if (dbSave == 1)
+		{
+			std::ofstream os("../users.txt");
+			os << data;
+			os.close();
+		}
+
 	}
 
 	int columnoperations(string cmd, BPTree tree)
