@@ -297,7 +297,12 @@ public:
             cout << "Corruption in the data. Incoming Column Name is empty." << endl;
         }
         else {
-            PrimaryKeyColumn = column;
+            if (PrimaryKeyColumn == column)
+            {
+                cout << "That is already the primay key.\n";
+            }
+            else
+                PrimaryKeyColumn = column;
         }
 
     }
