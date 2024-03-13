@@ -17,7 +17,7 @@
     <ClInclude Include="utils.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="table.h">
+    <ClInclude Include="oldtable.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="parser.h">
@@ -29,9 +29,27 @@
     <ClInclude Include="database.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="bplustree.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="bminustree.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="row.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="dictionary.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="table.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="commandHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

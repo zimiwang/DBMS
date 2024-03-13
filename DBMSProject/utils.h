@@ -12,6 +12,7 @@
 namespace Utils {
 
 	std::string WHITESPACE = " \n\r\t\f\v";
+	
 
 
 	/// <summary>
@@ -86,6 +87,8 @@ namespace Utils {
 		return rtrim(ltrim(s));
 	}
 
+	
+
 
 	/// <summary>
 	/// Determines if a string is a substring of another
@@ -104,6 +107,19 @@ namespace Utils {
 
 	}
 
+	/// <summary>
+	/// Trims all columns in a vector
+	/// </summary>
+	/// <param name="columns"></param>
+	/// <returns></returns>
+	std::vector<std::string> trimColumns(std::vector<std::string> columns) {
+		std::vector<std::string> newColumns;
+		for (std::string col : columns) {
+			newColumns.push_back(trim(col));
+		}
+
+		return newColumns;
+	}
 	
 	
 	/// <summary>
@@ -123,5 +139,23 @@ namespace Utils {
 			last_delim_pos - end_pos_of_first_delim));
 	}
 
+
+	std::string get_string_between_string_and_space(const std::string str, const std::string start) {
+		std::size_t first_delim_pos = str.find(start);
+		std::size_t end_first_pos = first_delim_pos + start.length();
+		std::size_t last_post = str.find(' ', end_first_pos);
+
+		std::string subString = trim(str.substr(end_first_pos, last_post - end_first_pos));
+		return subString;
+	}
+
+	bool contains(std::vector<std::string> vec, std::string value) {
+		for (std::string sub : vec) {
+			if (sub == value) {
+				return true;
+			}
+		}
+		return false;
+	}
 }
 #pragma once

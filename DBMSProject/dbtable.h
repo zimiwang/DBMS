@@ -24,7 +24,7 @@ private:
 
 	template <typename T>
 	BTree<T> FindSecondaryTree(string name, vector<BTree<T>> trees) {
-
+		
 		for (BTree<T> tree : trees) {
 			if (tree.GetKeyName() == name) return tree;
 		}
@@ -55,7 +55,7 @@ private:
 					hasID = true;
 					primaryKey.keyName = "ID_" + name;
 					primaryKey.type = Utils::trim(tmp[1]);
-				}
+				}				
 				columns.insert(pair<string, string>(Utils::trim(tmp[0]), Utils::trim(tmp[1])));
 				int letstes = 0;
 			}
@@ -76,7 +76,7 @@ private:
 				primaryKey.type = "int";
 
 			}
-		}
+		}			
 	}
 
 
@@ -133,10 +133,10 @@ private:
 		}
 	}
 
-public:
+public:	
 
 	// Data to be saved (serialization)
-	string table_name;
+	string table_name;	
 	string primaryKeyName = "ID";
 	map<string, string> columns;
 	vector<Row> rows;
@@ -156,8 +156,8 @@ public:
 	}
 
 	Table(string name, vector<string> cols) {
-		table_name = name;
-
+		table_name = name;		
+		
 		RecordPrimaryKey(name, cols);
 	}
 
@@ -217,8 +217,8 @@ public:
 		if (keytype == "primary") {
 			primaryKey = newKey;
 		}
-		else if (keytype == "secondary") {
-			secondaryKeys.push_back(newKey);
+		else if (keytype == "secondary") {			
+			secondaryKeys.push_back(newKey);		
 		}
 		else if (keytype == "foreign") {
 			foreignKeys.push_back(newKey);
@@ -236,16 +236,16 @@ public:
 	void CreateTrees() {
 		// create primary tree
 		if (primaryKey.keyName != "") {
-
+			
 			for (Row row : rows) {
 				primaryTree.insert(row.GetIntColumnByName(primaryKey.keyName).GetValue(), row);
 			}
 		}
-
+		
 		// create secondary trees
 		CreateSecondaryTrees();
 	}
-
+	
 	/// <summary>
 	/// Gets the index of the provided column
 	/// </summary>

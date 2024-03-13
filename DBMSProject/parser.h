@@ -3,25 +3,49 @@
 
 #include <fstream>
 #include <regex>
-//#include <bits/stdc++.h>		// comment this out because no uses it and it is recommeded that you don't use it.
+//#include <bits/stdc++.h>		// comment this out because no uses it and it is recommeded that you don'MinDegree use it.
 #include "utils.h"
 #include <iomanip>
+#include "dictionary.h"
 using namespace std;
 
 class Parser {
+	vector<string> KEYWORDS;
+
+
 public:
+	Parser() {
+		KEYWORDS.push_back("between");
+		KEYWORDS.push_back("and");
+		KEYWORDS.push_back("where");
+	}
+
+	// ***Unreachable
 	vector<string> static split_text(string input);
+	vector<string> static split_text(string input, string delimeter);
+
+
+	Dictionary static get_where_clause(string cmd);
+	vector<string> static findKeyWords(vector<string>, string cmd);
 	vector<string> static get_select_columns(string cmd);
 	static string* split_str(std::string str, char delim);
 	vector<string> static get_create_columns(string cmd);
 	vector<string> static get_where_clause(string cmd, string op);
-	vector<string> split_text(string input, string delimeter);
 	vector<string> static get_insert_columns(string cmd, string table_name);
 	vector<vector<string> > static get_insert_rows(string cmd, string table_name);
 	std::string static to_lower(std::string s);
 	vector<string> static get_update_clause(string cmd);
 	string static get_conditional(string stm);
 	string static get_table_name(string cmd, string first_delim, string second_delim);
+	string static get_table_name(string cmd);
+	string static get_foreign_key(string cmd);
+	vector<vector<string>> static get_update_clauses(string cmd);
+	vector<string> static get_join_info(string cmd);
+	vector<string> static get_join_where_info(string cmd);
+	std::string static getSumFunctionColumnName(std::string cmd);
+	std::string static getCountFunctionColumnName(std::string cmd);
+	std::string static getSumFunctionSourceTableName(std::string cmd);
+
 };
 
 /// Converts a string to lower
@@ -33,10 +57,201 @@ public:
 /// <returns>S but lowercase.</returns>
 std::string Parser::to_lower(std::string s)
 {
-	std::for_each(s.begin(), s.end(), [](char& c)
-		{ c = ::tolower(c); });
+	std::string keywords[20] = {"open", "database", "create", "db", "info",
+		"table" , "drop" , "select" , "from" , "update", "delete", "insert",
+		"into", "rename", "column", "where", "on", "join", "group", "order"};
+	//first save a copy of the input
+	std::string input_copy = s;
 
-	return s;
+	//split the copy into a vector of substrings on every instance of ' '
+	vector<string> split;
+	stringstream b(s);
+	std::string current;
+	
+	while (getline(b, current, ' '))
+	{
+		split.push_back(current);
+	}
+
+	vector<string> new_(split);
+
+	//sanitize all of the substrings to check for keywords later - this prooobably will work
+	std::for_each(split.begin(), split.end(), [](string& st)
+		{std::for_each(st.begin(), st.end(), [](char& c)
+			{ c = ::tolower(c); }); });
+
+	//check the sanitized strings against a dictionary of keywords, if the keyword is found,
+	//merge the sanitized string, if it isnt, merge the original
+	std::string finout = "";
+	for (int i = 0; i < split.size(); i++)
+	{
+		bool iskey = false;
+		for (int j = 0; j < 15; j++)
+		{
+			if (split[i].find(keywords[j]) != string::npos)
+			{
+				iskey = true;
+			}
+		}
+		if (iskey == false)
+		{
+			//merge in the unsanitized string
+			if (i == 0)
+			{
+				finout.append(new_[i]);
+			}
+			else {
+				finout.append(" ");
+				finout.append(new_[i]);
+			}
+		}
+		else
+		{
+			//merge in the sanitized string
+			if (i == 0)
+			{
+				finout.append(split[i]);
+			}
+			else {
+				finout.append(" ");
+				finout.append(split[i]);
+			}
+		}
+	}
+
+	//std::for_each(s.begin(), s.end(), [](char& c)
+	//	{ c = ::tolower(c); });
+
+	return finout;
+}
+
+vector<vector<string>> Parser::get_update_clauses(string cmd) {
+	smatch sm;
+	vector<vector<string>> ret;
+	vector<string> upd_clause;
+	vector<string> values;
+
+	regex str_expr("set(?:\\s*)(.*)(?:\\s*where)");
+
+	if (regex_search(cmd, sm, str_expr)) {
+		try {
+
+			values = Utils::split(sm[1], ",");
+
+			for (string str : values)
+			{
+
+				upd_clause = Utils::split(str, "=");
+
+				for (size_t i = 0; i < upd_clause.size(); i++)
+				{
+					upd_clause[i] = Utils::trim(upd_clause[i]);
+					cout << "Update Clause: " << upd_clause[i] << endl;
+				}
+
+				ret.push_back(upd_clause);
+			}
+		}
+			catch (const std::exception& e) {
+			std::cout << "Exception: " << e.what() << std::endl;
+		}
+	}
+	else {
+		cout << "No Match!" << endl;
+	}
+
+	return ret;
+}
+
+/// <summary>
+/// Parses command for necessary info to perform a join on operation
+/// </summary>
+/// <param name="cmd">of form "select * from table1 join table2 on table1col=table2col"</param>
+/// <returns>string vector of form [table1, table2, table1col, table2col]</returns>
+inline vector<string> Parser::get_join_info(string cmd)
+{
+	vector<string> ret;
+	std::string src_table = Utils::get_string_between_two_strings(cmd, "from ", " join");
+	std::string dest_table = Utils::get_string_between_two_strings(cmd, "join ", " on");
+	//std::string fkey = Utils::get_string_between_two_strings(cmd, "on ", ";");
+
+	string fkey = Parser::get_foreign_key(cmd);
+	std::vector<std::string> splitkeys;
+
+	char* token = strtok(const_cast<char*>(fkey.c_str()), "=");
+	while (token != nullptr)
+	{
+		splitkeys.push_back(std::string(token));
+		token = strtok(nullptr, "=");
+	}
+	string localkey = splitkeys[0];
+	string foreignkey = splitkeys[1];
+
+	ret.push_back(src_table);
+	ret.push_back(dest_table);
+	ret.push_back(localkey);
+	ret.push_back(foreignkey);
+
+	return ret;
+
+}
+
+/// <summary>
+/// Parses command for necessary info to perform a join using the where clause
+/// </summary>
+/// <param name="cmd">of form "select * from table1,table2 where table1.table1col=table2.table2col"</param>
+/// <returns>string vector of form [table1, table2, table1col, table2col]</returns>
+inline vector<string> Parser::get_join_where_info(string cmd)
+{
+	string tbl_name = Utils::get_string_between_two_strings(cmd, "from ", " where");
+	vector<string> ret;
+	std::vector<string> tables = Utils::split(tbl_name, ",");
+	string table1 = tables[0];
+	string table2 = tables[1];
+
+	string fkey = Utils::get_string_between_two_strings(cmd, "where ", ";");
+	std::vector<std::string> splitkeys;
+
+	char* token = strtok(const_cast<char*>(fkey.c_str()), "=");
+	while (token != nullptr)
+	{
+		splitkeys.push_back(std::string(token));
+		token = strtok(nullptr, "=");
+	}
+	string localkey = splitkeys[0];
+	string foreignkey = splitkeys[1];
+
+	std::vector<string> tab1namecol = Utils::split(localkey, ".");
+	std::vector<string> tab2namecol = Utils::split(foreignkey, ".");
+
+	ret.push_back(tab1namecol[0]);
+	ret.push_back(tab2namecol[0]);
+	ret.push_back(tab1namecol[1]);
+	ret.push_back(tab2namecol[1]);
+
+	return ret;
+
+}
+
+string Parser::get_foreign_key(string cmd) {
+	string keyword = "on ";
+	string foreignKey;
+	size_t first_delim_pos = cmd.find(keyword);
+	size_t end_pos_of_first_delim = first_delim_pos + keyword.length();
+	size_t last_delim_pos = cmd.find(" ", end_pos_of_first_delim + 1);	
+	size_t last_delim_pos2 = cmd.find(";");
+
+	if (last_delim_pos != string::npos) {
+		foreignKey = cmd.substr(end_pos_of_first_delim, last_delim_pos - end_pos_of_first_delim);
+	}
+	else if (last_delim_pos2 != string::npos) {
+		foreignKey = cmd.substr(end_pos_of_first_delim, last_delim_pos2 - end_pos_of_first_delim);
+	}
+	else {
+
+	}
+
+	return foreignKey;
 }
 
 /// Author: Andrew
@@ -102,8 +317,7 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 		{
 			tmp = Utils::split(Utils::remove_char(sm[1], ';'), op);
 
-			for (string str : tmp) {
-				cout << "Where Clause: " << str << endl;
+			for (string str : tmp) {				
 				ret.push_back(Utils::trim(str));
 			}
 
@@ -115,6 +329,42 @@ vector<string> Parser::get_where_clause(string cmd, string op) {
 	}
 
 	return ret;
+}
+
+/// <summary>
+/// Creates a dictionary of keywords used in a where clause. 
+/// It finds keywords and adds the following words to a vector until it hits a new keyword.
+/// When it hits a new keyword then it does the process all over again.
+/// It saves this in a dictionary
+/// </summary>
+/// <param name="cmd">the command to parse</param>
+/// <returns>A dictionary with key value pairs of keywords and their following words</returns>
+Dictionary Parser::get_where_clause(string cmd) {
+	// check what keywords are in the string
+	Parser parser;	
+	vector<string> wordsFound = Parser::findKeyWords(parser.KEYWORDS, cmd);
+
+	Dictionary dic;
+	bool keyWordFound = false;
+	string keyword = "";
+
+	vector<string> subs = Utils::split(cmd);
+	for (string sub : subs) {
+		// if keyword found then add it to dictionary
+		if (Utils::contains(parser.KEYWORDS, sub)) {
+			keyWordFound = true;
+			keyword = sub;
+			dic.AddNewKey(sub);
+		}
+		else if (keyWordFound) {
+			// if keyword found add current keyword value to dictionary
+			dic.AddKeyValuePair(keyword, sub);
+		}
+	}
+
+
+
+	return dic;
 }
 
 /// Author: Andrew
@@ -142,9 +392,7 @@ std::string* Parser::split_str(std::string str, char delim) {
 	return ret;
 }
 
-/// Author: Andrew
-/// Date: 11-15-2021
-/// Splits the provided string on the specified delimiter - it obviously does not do this lol
+
 
 /// <summary>
 /// Appears to figure out whether or not what is asked to be inserted into a table is possible
@@ -156,9 +404,8 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 	smatch sm;
 	vector<string> ret;
 	vector<string> tmp;
-
-	//regex str_expr("insert into " + table_name + " \\((.*)\\)", regex::icase);
-	regex str_expr(table_name + "(?:\\s*\\()(.*)\\)(?:\\s*)values", regex::icase);
+;
+	regex str_expr(table_name + "(?:\\s*\\()(.*)\\)(?:\\s*)values", regex::icase);	//regex str_expr("insert into " + table_name + " \\((.*)\\)", regex::icase)
 
 	// Check if the match was found, and add to the vector
 	if (regex_search(cmd, sm, str_expr)) {
@@ -182,6 +429,8 @@ vector<string> Parser::get_insert_columns(string cmd, string table_name) {
 
 	return ret;
 }
+
+
 
 /// Author: Andrew
 /// Date: 12-12-2021
@@ -216,7 +465,7 @@ string Parser::get_conditional(string stm) {
 
 /// Author: Andrew Nunez
 /// Date: 11-15-2021
-/// Splits the provided string on the specified delimiter - again, no it doesn't
+/// Splits the provided string on the specified delimiter - again, no it doesn'MinDegree
 
 /// <summary>
 /// same as 2 above but with rows
@@ -264,7 +513,7 @@ vector<vector<string> > Parser::get_insert_rows(string cmd, string table_name) {
 
 /// Author: Andrew
 /// Date: 10-28-2021
-/// Splits the provided string on the specified delimiter - you guessed it, no it doesn't
+/// Splits the provided string on the specified delimiter - you guessed it, no it doesn'MinDegree
 
 /// <summary>
 /// gets a selected column from input command
@@ -328,6 +577,21 @@ vector<string> Parser::get_create_columns(string cmd) {
 	return ret;
 
 }
+
+
+std::string Parser::get_table_name(string cmd) {
+	smatch sm;
+	string ret;
+	string keyword = "from";
+
+	size_t found = cmd.find(keyword);
+	
+
+	return ret;
+
+}
+
+
 /// <summary>
 /// table name retriever
 /// </summary>
@@ -341,10 +605,11 @@ std::string Parser::get_table_name(string cmd, string first_delim, string second
 	string exp = "";
 
 	if (second_delim == "(") {
-		exp = first_delim + "(?:\\s*)([A-Za-z\\-_]*)(?:\\s*)\\(";
+		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)\\(";
 	}
 	else {
-		exp = first_delim + "(?:\\s*)([A-Za-z\\-_]*)(?:\\s*)" + second_delim;
+		/*exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)" + second_delim;		*/
+		exp = first_delim + "(?:\\s*)([A-Za-z0-9\\-_]*)(?:\\s*)";
 	}
 
 	regex str_expr(exp, regex_constants::icase);
@@ -352,7 +617,7 @@ std::string Parser::get_table_name(string cmd, string first_delim, string second
 	// Check if the match was found, and add to the vector
 	if (regex_search(cmd, sm, str_expr)) {
 		try
-		{
+		{			
 			ret = Utils::trim(sm[1]);
 
 		}
@@ -383,4 +648,117 @@ std::vector<std::string> split_text(std::string input, std::string delimeter)
 	auto results = Utils::split(input, delimeter);
 	return results;
 }
+
+
+/// <summary>
+	/// Finds keywords in a string and returns the keywords found
+	/// </summary>
+	/// <param name="keyWords">The keywords to use</param>
+	/// <param name="cmd">The string to look at</param>
+	/// <returns>Vector of keywords found</returns>
+vector<string> Parser::findKeyWords(vector<string> keyWords, string cmd) {	
+	vector<string> wordsFound;
+
+	// check to see if keywords are in the cmd string
+	for (string key : keyWords) {
+		if (Utils::contains(cmd, key)) {
+			// add found word to vector
+			wordsFound.push_back(key);
+		}
+	}
+
+	return wordsFound;
+
+}
+
+
+
+/// <summary>
+/// parser for the sum() command to get the column name that is in the call sum(<column name>) or avg(<column name>)
+/// </summary>
+/// <param name="cmd">string command that is to be analyzed</param>
+/// <returns>just the column name</returns>
+std::string Parser::getSumFunctionColumnName(std::string cmd)
+{
+	std::string columnName;
+
+	// perform regex to find when sum(.*) is found
+	regex str_expr("(.*)(sum||SUM||avg||AVG)\\((.*)\\)(.*)");
+	smatch sm;
+	regex_match(cmd, sm, str_expr);
+	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
+	
+	/*
+	cout << "String:range, size:" << sm.size() << " matches\n";
+	for (unsigned i = 0; i < sm.size(); ++i) {
+		cout << i << " : [" << sm[i] << "] \n";
+	}
+	cout << "sm.size()-1 = " << sm.size() - 2 << "\n";
+	*/
+
+	// return the column name
+	columnName = sm[sm.size()-2];
+
+	//cout << "column name \t:" << columnName << "\n";
+
+	return columnName;
+}
+
+/// <summary>
+/// parser for the count() command to get the column name that is in the call count(<column name>)
+/// </summary>
+/// <param name="cmd"></param>
+/// <returns></returns>
+std::string Parser::getCountFunctionColumnName(std::string cmd)
+{
+	std::string columnName;
+
+	// perform regex to find when count(.*) is found
+	regex str_expr("(.*)count\\((.*)\\)(.*)");
+	smatch sm;
+	regex_match(cmd, sm, str_expr);
+	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
+
+	// return the column name
+	columnName = sm[2];
+
+	return columnName;
+}
+
+
+
+
+/// <summary>
+/// get the source table name that the function should call from for avg() and sum()
+/// </summary>
+/// <param name="cmd"></param>
+/// <returns></returns>
+std::string Parser::getSumFunctionSourceTableName(std::string cmd)
+{
+	std::string tableName;
+
+	//cout << "cmd:" << cmd << "\n";
+
+	// perform regex to find when sum(.*) is found
+	regex str_expr("(.*)(sum||SUM||avg||AVG)\\((.*)\\) (from||FROM) (.*)( .*)*");
+	smatch sm;
+	regex_match(cmd, sm, str_expr);
+	regex_match(cmd.cbegin(), cmd.cend(), sm, str_expr);
+
+	/*
+	cout << "String:range, size:" << sm.size() << "\t matches\n";
+	for (unsigned i = 0; i < sm.size(); ++i) {
+		cout << i << " : [" << sm[i] << "] \n";
+	}
+	*/
+	
+
+	// return the column name
+	tableName = sm[sm.size()-2];
+
+	//cout << "table name \t:" << tableName << "\n";
+
+	return tableName;
+}
+
 
