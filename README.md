@@ -354,6 +354,7 @@ If you want to operate directly in the users.txt file, after deleting or adding 
     - Version control
     - Operating Instructions
     - Conduct routine tests to ensure project integrity
+    - Fix bugs
 ## License
 MIT License
 
